@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: chapter04-spring-intro
+server:
+  port: 8080
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  application:
+    name: chapter04-spring-intro-dev
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  application:
+    name: chapter04-spring-intro-prod

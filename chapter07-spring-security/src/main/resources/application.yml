@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/edu_spring
+    username: edu
+    password: edu1234
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+# JWT 설정
+jwt:
+  secret: mySecretKeyForJwtTokenGenerationThatIsLongEnoughForHS256Algorithm123456
+  expiration: 3600000  # 1시간 (밀리초)

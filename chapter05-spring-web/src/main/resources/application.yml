@@ -1,0 +1,21 @@
+# Spring Web MVC 설정
+server:
+  port: 8080
+
+spring:
+  application:
+    name: chapter05-spring-web
+
+  # Jackson JSON 설정
+  jackson:
+    # 날짜/시간을 ISO 8601 형식으로 직렬화
+    serialization:
+      write-dates-as-timestamps: false
+    # 알 수 없는 프로퍼티 무시
+    deserialization:
+      fail-on-unknown-properties: false
+
+# 로깅 설정
+logging:
+  level:
+    com.edu.web: DEBUG

@@ -138,6 +138,8 @@ public class ExceptionBasics {
             account.withdraw(-1000);
         } catch (IllegalArgumentException e) {
             System.out.println("  잘못된 요청: " + e.getMessage());
+        } catch (InsufficientBalanceException e) {
+            System.out.println("  출금 실패: " + e.getMessage());
         }
         System.out.println();
     }

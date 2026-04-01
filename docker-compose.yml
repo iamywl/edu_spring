@@ -1,0 +1,20 @@
+services:
+  java-edu:
+    build: .
+    container_name: java-edu
+    volumes:
+      # 소스 코드를 볼륨 마운트 → VSC에서 수정하면 컨테이너에 바로 반영
+      - ./chapter01-java-basics/src/main/java/com/edu/basics:/app/src/com/edu/basics
+      - ./chapter02-oop/src/main/java/com/edu/oop:/app/src/com/edu/oop
+      - ./chapter03-collections/src/main/java/com/edu/collections:/app/src/com/edu/collections
+      # 스크립트도 마운트
+      - ./run.sh:/app/run.sh
+      - ./compile.sh:/app/compile.sh
+      # 개념서/교육자료 (읽기용)
+      - ./docs:/app/docs:ro
+      # 챕터별 README
+      - ./chapter01-java-basics/README.md:/app/readme/ch01-README.md:ro
+      - ./chapter02-oop/README.md:/app/readme/ch02-README.md:ro
+      - ./chapter03-collections/README.md:/app/readme/ch03-README.md:ro
+    stdin_open: true
+    tty: true

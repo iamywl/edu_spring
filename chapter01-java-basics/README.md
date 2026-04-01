@@ -1,294 +1,193 @@
-# Chapter 01: Java Basics (자바 기초)
+# Chapter 01: Java 기초 - 실습 가이드
 
-Java 프로그래밍의 기초를 다루는 챕터입니다. 변수, 연산자, 제어문, 배열, 메서드, 예외처리까지 핵심 개념을 학습합니다.
-
----
-
-## 목차
-
-1. [변수와 데이터 타입](#1-변수와-데이터-타입)
-2. [연산자](#2-연산자)
-3. [제어문](#3-제어문)
-4. [배열](#4-배열)
-5. [메서드](#5-메서드)
-6. [예외처리 기초](#6-예외처리-기초)
+> 이 문서는 **실습 가이드(LAB GUIDE)**입니다.
+> 개념 설명은 `/docs/` 디렉토리의 문서를 참고하고, 여기서는 코드를 직접 실행하고 수정하며 배웁니다.
 
 ---
 
-## 1. 변수와 데이터 타입
-
-> POC 코드: [`VariablesAndTypes.java`](src/main/java/com/edu/basics/VariablesAndTypes.java)
-
-### 1.1 기본형 (Primitive Types)
-
-Java는 8가지 기본형 데이터 타입을 제공합니다.
-
-| 타입      | 크기    | 범위 / 설명                          |
-|-----------|---------|--------------------------------------|
-| `byte`    | 1 byte  | -128 ~ 127                           |
-| `short`   | 2 bytes | -32,768 ~ 32,767                     |
-| `int`     | 4 bytes | -2^31 ~ 2^31-1 (약 21억)            |
-| `long`    | 8 bytes | -2^63 ~ 2^63-1                       |
-| `float`   | 4 bytes | 단정밀도 부동소수점                  |
-| `double`  | 8 bytes | 배정밀도 부동소수점                  |
-| `char`    | 2 bytes | 유니코드 문자 하나                   |
-| `boolean` | 1 bit*  | `true` 또는 `false`                  |
-
-### 1.2 참조형 (Reference Types)
-
-기본형을 제외한 모든 타입은 참조형입니다. 객체의 메모리 주소를 저장합니다.
-
-- `String` - 문자열 (불변 객체)
-- 배열 (`int[]`, `String[]` 등)
-- 클래스, 인터페이스, 열거형
-
-### 1.3 형변환 (Type Casting)
-
-- **자동 형변환 (Widening)**: 작은 타입 -> 큰 타입 (데이터 손실 없음)
-  ```java
-  int num = 100;
-  long bigNum = num; // 자동 형변환
-  ```
-- **강제 형변환 (Narrowing)**: 큰 타입 -> 작은 타입 (데이터 손실 가능)
-  ```java
-  double pi = 3.14;
-  int intPi = (int) pi; // 3 (소수점 손실)
-  ```
-
-### 1.4 var 키워드 (Java 10+)
-
-지역 변수의 타입을 컴파일러가 추론합니다.
-
-```java
-var message = "Hello";    // String으로 추론
-var numbers = List.of(1, 2, 3); // List<Integer>로 추론
-```
-
----
-
-## 2. 연산자
-
-> POC 코드: [`VariablesAndTypes.java`](src/main/java/com/edu/basics/VariablesAndTypes.java) 내 연산자 섹션
-
-### 2.1 산술 연산자
-
-| 연산자 | 설명   | 예시        |
-|--------|--------|-------------|
-| `+`    | 덧셈   | `5 + 3 = 8` |
-| `-`    | 뺄셈   | `5 - 3 = 2` |
-| `*`    | 곱셈   | `5 * 3 = 15`|
-| `/`    | 나눗셈 | `5 / 3 = 1` |
-| `%`    | 나머지 | `5 % 3 = 2` |
-
-### 2.2 비교 연산자
-
-`==`, `!=`, `>`, `<`, `>=`, `<=`
-
-### 2.3 논리 연산자
-
-- `&&` (AND), `||` (OR), `!` (NOT)
-- 단축 평가(Short-circuit evaluation): 왼쪽 조건만으로 결과가 확정되면 오른쪽은 평가하지 않음
-
-### 2.4 비트 연산자
-
-`&`, `|`, `^`, `~`, `<<`, `>>`, `>>>`
-
----
-
-## 3. 제어문
-
-> POC 코드: [`ControlFlow.java`](src/main/java/com/edu/basics/ControlFlow.java)
-
-### 3.1 조건문
-
-#### if / else if / else
-
-```java
-if (score >= 90) {
-    grade = "A";
-} else if (score >= 80) {
-    grade = "B";
-} else {
-    grade = "C";
-}
-```
-
-#### switch 문
-
-기존 switch 문과 Java 14+ switch 표현식을 모두 지원합니다.
-
-```java
-// Java 14+ switch 표현식 (화살표 구문)
-String result = switch (day) {
-    case MONDAY, FRIDAY -> "근무일";
-    case SATURDAY, SUNDAY -> "휴일";
-    default -> "평일";
-};
-```
-
-### 3.2 반복문
-
-| 종류           | 용도                              |
-|----------------|-----------------------------------|
-| `for`          | 반복 횟수가 정해진 경우           |
-| `enhanced for` | 배열/컬렉션 순회                  |
-| `while`        | 조건이 참인 동안 반복             |
-| `do-while`     | 최소 1번 실행 후 조건 검사        |
-
-### 3.3 분기문
-
-- `break` - 반복문 즉시 종료
-- `continue` - 현재 반복 건너뛰기
-- **레이블(Label)** - 중첩 반복문에서 외부 루프 제어
-
-```java
-outer:
-for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-        if (j == 1) continue outer; // 외부 루프의 다음 반복으로
-    }
-}
-```
-
----
-
-## 4. 배열
-
-> POC 코드: [`ArraysAndMethods.java`](src/main/java/com/edu/basics/ArraysAndMethods.java)
-
-### 4.1 1차원 배열
-
-```java
-int[] numbers = {1, 2, 3, 4, 5};
-int[] scores = new int[10]; // 크기 10, 기본값 0
-```
-
-### 4.2 2차원 배열
-
-```java
-int[][] matrix = {
-    {1, 2, 3},
-    {4, 5, 6},
-    {7, 8, 9}
-};
-```
-
-배열은 **고정 크기**이며 생성 후 크기를 변경할 수 없습니다. 가변 크기가 필요하면 `ArrayList`를 사용합니다.
-
----
-
-## 5. 메서드
-
-> POC 코드: [`ArraysAndMethods.java`](src/main/java/com/edu/basics/ArraysAndMethods.java)
-
-### 5.1 메서드 구조
-
-```java
-접근제어자 반환타입 메서드이름(매개변수) {
-    // 실행 코드
-    return 반환값;
-}
-```
-
-### 5.2 가변인자 (Varargs)
-
-매개변수 개수가 정해지지 않은 경우 사용합니다.
-
-```java
-public static int sum(int... numbers) {
-    int total = 0;
-    for (int n : numbers) total += n;
-    return total;
-}
-```
-
-### 5.3 메서드 오버로딩 (Overloading)
-
-같은 이름의 메서드를 매개변수의 타입이나 개수를 달리하여 여러 개 정의할 수 있습니다.
-
-### 5.4 재귀 (Recursion)
-
-메서드가 자기 자신을 호출하는 기법입니다. 반드시 **종료 조건(base case)**이 필요합니다.
-
----
-
-## 6. 예외처리 기초
-
-> POC 코드: [`ExceptionBasics.java`](src/main/java/com/edu/basics/ExceptionBasics.java)
-
-### 6.1 예외 계층 구조
-
-```
-Throwable
-├── Error (시스템 오류, 처리 불필요)
-└── Exception
-    ├── RuntimeException (Unchecked - 컴파일러 검사 X)
-    │   ├── NullPointerException
-    │   ├── ArrayIndexOutOfBoundsException
-    │   └── ArithmeticException
-    └── IOException 등 (Checked - 반드시 처리 필요)
-```
-
-### 6.2 try-catch-finally
-
-```java
-try {
-    // 예외 발생 가능 코드
-} catch (예외타입 변수) {
-    // 예외 처리
-} finally {
-    // 항상 실행 (리소스 정리)
-}
-```
-
-### 6.3 try-with-resources (Java 7+)
-
-`AutoCloseable`을 구현한 리소스를 자동으로 닫아줍니다.
-
-```java
-try (var reader = new BufferedReader(new FileReader("file.txt"))) {
-    // reader 사용
-} // 자동으로 reader.close() 호출
-```
-
-### 6.4 커스텀 예외
-
-비즈니스 로직에 맞는 예외를 직접 정의할 수 있습니다.
-
-```java
-public class InsufficientBalanceException extends Exception {
-    public InsufficientBalanceException(String message) {
-        super(message);
-    }
-}
-```
-
----
-
-## 실행 방법
-
-### 로컬 실행 (JDK 21 필요)
+## 환경 설정 및 실행 방법
 
 ```bash
-# 컴파일
-mkdir -p out
-javac -d out src/main/java/com/edu/basics/*.java
-
-# 각 파일 실행
-java -cp out com.edu.basics.VariablesAndTypes
-java -cp out com.edu.basics.ControlFlow
-java -cp out com.edu.basics.ArraysAndMethods
-java -cp out com.edu.basics.ExceptionBasics
+# 프로젝트 루트에서
+docker compose up -d
+# VS Code: F1 → "Dev Containers: Attach to Running Container" → java-edu
+# 컨테이너 터미널에서:
+./compile.sh
+./run.sh      # 대화형 메뉴
 ```
 
-### Docker로 실행
+> 소스 파일을 수정한 후에는 반드시 `./compile.sh` → `./run.sh N` 순서로 다시 실행하세요.
 
-```bash
-# 기본 실행 (VariablesAndTypes)
-docker compose up --build
+---
 
-# 특정 클래스 실행
-docker compose run java-basics java -cp out com.edu.basics.ControlFlow
-docker compose run java-basics java -cp out com.edu.basics.ArraysAndMethods
-docker compose run java-basics java -cp out com.edu.basics.ExceptionBasics
-```
+## 세션 목차
+
+1. [변수와 데이터 타입](#세션-1-변수와-데이터-타입)
+2. [연산자](#세션-2-연산자)
+3. [제어문](#세션-3-제어문)
+4. [배열과 메서드](#세션-4-배열과-메서드)
+5. [예외처리](#세션-5-예외처리)
+
+---
+
+### 세션 1: 변수와 데이터 타입
+
+**개념 학습**
+- 📖 [JAVA_개념서](../docs/JAVA_개념서.md) - Chapter 2: "데이터를 담는 그릇 - 변수" 읽기 (기본형 vs 참조형, 메모리 모델, String Pool)
+- 📝 [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 1.2: "변수와 데이터 타입" 읽기 (8가지 기본형, 형변환, var 키워드)
+
+**예제 실행**
+- 소스 코드: `src/main/java/com/edu/basics/VariablesAndTypes.java`
+- 실행: `./run.sh 1`
+- 주요 출력 확인 포인트:
+  - `primitiveTypes()`: 각 기본형의 최대값이 출력됩니다. `int`와 `long`의 범위 차이를 확인하세요.
+  - `typeCasting()`: `int(300) → byte`가 **44**가 되는 오버플로우 결과를 확인하세요.
+  - `stringOperations()`: `str1 == str3`은 `true`인데 `str1 == str2`는 `false`인 이유를 확인하세요 (String Pool).
+  - `varKeyword()`: `var`로 선언해도 타입이 추론되는 것을 확인하세요.
+
+**실습 과제**
+
+1. `VariablesAndTypes.java` 97번 줄의 `int bigInt = 300;`을 `int bigInt = 128;`로 바꿔보세요.
+   - `(byte) 128`의 결과는? 왜 `-128`이 되는지 생각해보세요.
+   - `./compile.sh` → `./run.sh 1`로 확인
+
+2. `VariablesAndTypes.java` 41번 줄의 `float floatVar = 3.14f;`에서 `f`를 제거해보세요.
+   - 어떤 컴파일 에러가 나는지 확인하세요.
+   - `./compile.sh`의 에러 메시지를 읽어보세요.
+
+3. `stringOperations()` 메서드에서 119번 줄의 `new String("Hello")`를 `"Hello"`로 바꿔보세요.
+   - `str1 == str2`의 결과가 어떻게 바뀌는지 확인하세요.
+
+---
+
+### 세션 2: 연산자
+
+**개념 학습**
+- 📝 [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 1.3: "연산자" 읽기 (산술, 비교, 논리, 비트, 삼항, instanceof)
+
+**예제 실행**
+- 소스 코드: `src/main/java/com/edu/basics/VariablesAndTypes.java` - `operators()` 메서드
+- 실행: `./run.sh 1`
+- 주요 출력 확인 포인트:
+  - 정수 나눗셈 `10 / 3 = 3`과 실수 나눗셈 `10.0 / 3 = 3.333...`의 차이를 확인하세요.
+  - 증감 연산자: `x++`는 5를 출력하고 나서 6이 되지만, `++x`는 7로 먼저 증가한 후 7을 출력합니다.
+  - 단축 평가: `str`이 `null`인데도 `NullPointerException`이 발생하지 않는 이유를 확인하세요.
+
+**실습 과제**
+
+1. `operators()` 메서드의 252번 줄 단축 평가 코드에서 조건 순서를 바꿔보세요:
+   ```java
+   // 기존: (str != null) && (str.length() > 0)
+   // 변경: (str.length() > 0) && (str != null)
+   ```
+   - `NullPointerException`이 발생하는지 확인하세요. 왜 순서가 중요한지 이해합니다.
+   - 확인 후 원래대로 되돌리세요.
+
+2. `operators()` 메서드의 216번 줄 부근에 다음 코드를 추가해보세요:
+   ```java
+   System.out.println("10 / 0 = " + (10 / 0));
+   ```
+   - `ArithmeticException`이 발생하는 것을 확인하세요. 정수를 0으로 나누면 예외가 됩니다.
+
+---
+
+### 세션 3: 제어문
+
+**개념 학습**
+- 📖 [JAVA_개념서](../docs/JAVA_개념서.md) - Chapter 3: "프로그램의 흐름을 제어하다" 읽기
+- 📝 [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 1.4: "제어문" 읽기 (if/else, switch, for, while, break/continue, labeled loops)
+
+**예제 실행**
+- 소스 코드: `src/main/java/com/edu/basics/ControlFlow.java`
+- 실행: `./run.sh 2`
+- 주요 출력 확인 포인트:
+  - `ifElseDemo()`: score=85일 때 "등급: B"가 출력되는 흐름을 추적하세요.
+  - `switchExpressionDemo()`: 화살표(`->`) 구문에서 break가 없어도 fall-through가 발생하지 않는 것을 확인하세요.
+  - `whileLoopDemo()`: `while`은 조건이 false이면 실행되지 않지만, `do-while`은 최소 1번 실행되는 차이를 확인하세요.
+  - `labeledLoopDemo()`: 레이블 없는 break는 내부 루프만 종료하고, 레이블 break는 외부 루프까지 종료하는 차이를 확인하세요.
+
+**실습 과제**
+
+1. `ControlFlow.java` 76번 줄의 `switchDemo()` 메서드에서 `case 3:`의 `break;` (83번 줄)를 삭제해보세요.
+   - `dayNumber = 3`일 때 "수요일"이 아니라 "목요일"이 출력되는 것을 확인하세요 (fall-through).
+   - `./compile.sh` → `./run.sh 2`로 확인
+
+2. `forLoopDemo()`의 177번 줄에서 `i <= 5`를 `i <= 0`으로 바꿔보세요.
+   - for 루프가 한 번도 실행되지 않는 것을 확인하세요.
+
+3. `labeledLoopDemo()`의 331번 줄에서 `target = 5`를 `target = 99`로 바꿔보세요.
+   - "찾지 못했습니다" 메시지가 출력되는지 확인하세요.
+
+---
+
+### 세션 4: 배열과 메서드
+
+**개념 학습**
+- 📝 [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 1.5: "배열" 읽기 (1차원, 2차원, Arrays 유틸리티)
+- 📝 [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 1.6: "메서드" 읽기 (가변인자, 오버로딩, 재귀)
+
+**예제 실행**
+- 소스 코드: `src/main/java/com/edu/basics/ArraysAndMethods.java`
+- 실행: `./run.sh 3`
+- 주요 출력 확인 포인트:
+  - `oneDimensionalArrays()`: `Arrays.toString()`, `Arrays.sort()`, `Arrays.copyOf()`의 동작을 확인하세요.
+  - `twoDimensionalArrays()`: 비정방 배열(jagged array)에서 각 행의 길이가 다른 것을 확인하세요. 학생 성적표에서 평균 계산 로직을 따라가 보세요.
+  - `overloadingDemo()`: 같은 이름 `add`이지만 매개변수 타입에 따라 다른 메서드가 호출되는 것을 확인하세요.
+  - `recursionDemo()`: 하노이의 탑 출력에서 원반 이동 순서를 따라가 보세요.
+
+**실습 과제**
+
+1. `ArraysAndMethods.java`의 `oneDimensionalArrays()`에서 43번 줄의 `Arrays.toString(numbers1)`을 `numbers1`로만 바꿔보세요.
+   - 배열의 주소값(`[I@...`)이 출력되는 것을 확인하세요. 왜 `Arrays.toString()`이 필요한지 이해합니다.
+
+2. `recursionDemo()`의 255번 줄에서 `factorial(5)`를 `factorial(25)`로 바꿔보세요.
+   - 결과가 음수가 되는 것을 확인하세요. `long` 타입도 오버플로우가 발생할 수 있습니다.
+   - (힌트: `factorial(20)`까지는 정상입니다)
+
+3. `overloadingDemo()`에 새로운 호출을 추가해보세요:
+   ```java
+   System.out.println("add(3, 5.0) = " + add(3, 5.0));
+   ```
+   - `int`와 `double`을 섞어서 호출하면 어떤 버전의 `add`가 선택되는지 확인하세요 (자동 형변환 → double 버전).
+
+---
+
+### 세션 5: 예외처리
+
+**개념 학습**
+- 📝 [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 1.7: "예외처리" 읽기 (예외 계층, Checked vs Unchecked, try-with-resources)
+
+**예제 실행**
+- 소스 코드: `src/main/java/com/edu/basics/ExceptionBasics.java`
+- 실행: `./run.sh 4`
+- 주요 출력 확인 포인트:
+  - `tryCatchFinallyDemo()`: `10 / 0`에서 예외가 발생해도 finally 블록이 실행되는 것을 확인하세요. 예외가 없는 경우에도 finally가 실행됩니다.
+  - `multipleCatchDemo()`: 인덱스 0("100")은 성공, 인덱스 1("abc")은 NumberFormatException, 인덱스 2(null)는 NullPointerException, 인덱스 3은 ArrayIndexOutOfBoundsException -- 각각 다른 catch 블록이 실행됩니다.
+  - `customExceptionDemo()`: 3000원 출금은 성공하지만 50000원 출금은 `InsufficientBalanceException`이 발생합니다. 음수 금액은 `IllegalArgumentException`(Unchecked)이 발생합니다.
+  - `tryWithResourcesDemo()`: 리소스가 **선언의 역순**으로 닫히는 것을 확인하세요 (리소스2 → 리소스1).
+
+**실습 과제**
+
+1. `ExceptionBasics.java`의 `multipleCatchDemo()` 78번 줄에서 `ArrayIndexOutOfBoundsException`을 `Exception`으로 바꿔보세요.
+   - 컴파일 에러가 발생합니다. `Exception`은 더 넓은 타입이므로 아래의 구체적인 catch보다 위에 올 수 없습니다.
+   - `./compile.sh`의 에러 메시지를 읽어보세요.
+
+2. `customExceptionDemo()`의 127번 줄에서 출금 금액을 `50000` 대신 `7000`으로 바꿔보세요.
+   - 현재 잔액(10000 - 3000 = 7000)과 정확히 같은 금액을 출금하면 성공하는지 확인하세요.
+   - 그다음 `7001`로 바꾸면 어떻게 되는지도 확인하세요.
+
+3. `tryWithResourcesDemo()`의 `MyResource` 클래스(329번 줄)에서 `doWork()` 메서드가 예외를 던지도록 수정해보세요:
+   ```java
+   public void doWork() {
+       System.out.println("    " + name + " 작업 수행 중...");
+       throw new RuntimeException(name + " 작업 중 오류 발생!");
+   }
+   ```
+   - 예외가 발생해도 `close()`가 자동으로 호출되는지 확인하세요. 이것이 try-with-resources의 핵심입니다.
+
+---
+
+## 다음 단계
+
+모든 세션의 예제 실행과 실습 과제를 완료했다면 [Chapter 02: 객체지향 프로그래밍(OOP)](../chapter02-oop/)으로 넘어가세요.
+여기서 배운 메서드, 메모리 모델, 예외처리가 클래스와 상속을 이해하는 기반이 됩니다.

@@ -1,90 +1,121 @@
 # Java & Spring Boot 교육 과정
 
 ## 소개
-이 프로젝트는 Java 기초부터 Spring Boot 실전까지 단계별로 학습할 수 있는 교육 자료이다.
-모든 예제는 Docker를 활용하여 실행 환경을 통일하고, 인프라 구성을 코드로 관리한다.
+이 프로젝트는 Java 기초부터 Spring Boot 실전까지 단계별로 학습할 수 있는 교육 자료입니다.
+각 챕터의 README에서 개념을 학습하고, Docker로 예제 코드를 바로 실행하며 체험할 수 있습니다.
 
 ## 사전 준비
-- JDK 21 (Eclipse Temurin 권장)
-- Docker & Docker Compose
-- IDE (IntelliJ IDEA 권장)
+- Docker & Docker Compose (필수 - 이것만 있으면 됩니다!)
+- IDE (IntelliJ IDEA 또는 VS Code 권장, 코드를 읽고 수정할 때)
 - Git
+
+> **JDK를 따로 설치할 필요 없습니다.** Docker 컨테이너 안에 JDK 21이 포함되어 있습니다.
+
+---
 
 ## 목차
 
-| 챕터 | 주제 | 핵심 개념 | Docker 활용 |
-|------|------|-----------|-------------|
-| 01 | Java 기초 | 변수, 타입, 제어문, 배열, 메서드, 예외처리 | Java 컴파일/실행 컨테이너 |
-| 02 | 객체지향 프로그래밍 | 클래스, 상속, 다형성, 인터페이스, record, sealed class | Java 컴파일/실행 컨테이너 |
-| 03 | 컬렉션과 스트림 | 제네릭, List/Set/Map, Stream API, Lambda, Optional | Java 컴파일/실행 컨테이너 |
-| 04 | Spring Boot 입문 | IoC/DI, Bean, ComponentScan, Profile, 자동설정 | Spring Boot 앱 컨테이너 |
-| 05 | Spring Web MVC | REST API, DTO, Validation, 예외처리 | Spring Boot 앱 컨테이너 |
-| 06 | Spring Data JPA | Entity, Repository, JPQL, 페이징, 연관관계 | PostgreSQL + 앱 컨테이너 |
-| 07 | Spring Security | 인증/인가, JWT, BCrypt, RBAC | PostgreSQL + 앱 컨테이너 |
-| 08 | 테스트 | JUnit5, Mockito, @SpringBootTest, Testcontainers | Testcontainers (Docker 기반 테스트) |
-| 09 | 종합 프로젝트 | 게시판 API (회원, 게시글, 댓글) | Docker Compose 풀스택 |
+| 챕터 | 주제 | 핵심 개념 |
+|------|------|-----------|
+| 01 | [Java 기초](chapter01-java-basics/) | 변수, 타입, 제어문, 배열, 메서드, 예외처리 |
+| 02 | [객체지향 프로그래밍](chapter02-oop/) | 클래스, 상속, 다형성, 인터페이스, record, sealed class |
+| 03 | [컬렉션과 스트림](chapter03-collections/) | 제네릭, List/Set/Map, Stream API, Lambda, Optional |
+| 04 | [Spring Boot 입문](chapter04-spring-boot-intro/) | IoC/DI, Bean, ComponentScan, Profile, 자동설정 |
+| 05 | [Spring Web MVC](chapter05-spring-web/) | REST API, DTO, Validation, 예외처리 |
+| 06 | [Spring Data JPA](chapter06-spring-data-jpa/) | Entity, Repository, JPQL, 페이징, 연관관계 |
+| 07 | [Spring Security](chapter07-spring-security/) | 인증/인가, JWT, BCrypt, RBAC |
+| 08 | [테스트](chapter08-testing/) | JUnit5, Mockito, @SpringBootTest, Testcontainers |
+| 09 | [종합 프로젝트](chapter09-final-project/) | 게시판 API (회원, 게시글, 댓글) |
+
+---
 
 ## 빠른 시작
 
-### Chapter 01~03 실행 (순수 Java)
-```bash
-cd chapter01-java-basics
-docker build -t java-basics .
-docker run --rm java-basics
+### Chapter 01~03: Java 기초 (통합 Docker + VS Code 실습)
 
-# 특정 클래스 실행
-docker run --rm java-basics java -cp out com.edu.basics.ControlFlow
+하나의 Docker 컨테이너에서 Chapter 01~03의 모든 예제를 실행합니다.
+VS Code에 붙여서 개념서를 읽으면서 코드를 수정하고 바로 실행할 수 있습니다.
+
+```bash
+# 1. 컨테이너 띄우기 (최초 1회)
+docker compose up -d
+
+# 2. VS Code에서 접속 (추천!)
+#    F1 → "Dev Containers: Attach to Running Container" → java-edu 선택
+#    터미널 열기(Ctrl+`) 후:
+./compile.sh                  # 컴파일
+./run.sh                      # 대화형 메뉴
+./run.sh 1                    # Ch01 - 변수와 타입
+./run.sh 5                    # Ch02 - OOP 종합 데모
+./run.sh 8                    # Ch03 - Stream API
+
+# 3. 또는 터미널에서 직접 실행
+docker exec -it java-edu ./compile.sh
+docker exec -it java-edu ./run.sh      # 대화형 메뉴
+docker exec -it java-edu ./run.sh 1    # 번호로 직접 실행
+docker exec -it java-edu ./run.sh all  # 전체 실행
+
+# 4. 종료
+docker compose down
 ```
 
-### Chapter 04~07 실행 (Spring Boot)
-```bash
-cd chapter04-spring-boot-intro
-docker compose up --build
+### 학습 흐름
+
+```
+README로 개념 학습  →  Docker + VSC로 예제 실행  →  코드 수정/실험  →  compile.sh → run.sh
 ```
 
-### Chapter 09 종합 프로젝트 실행
+1. 각 챕터의 `README.md`를 읽으며 **왜(Why)** 이 개념이 필요한지 이해합니다
+2. VS Code에서 예제를 실행하여 **결과를 눈으로 확인**합니다
+3. 소스 코드를 직접 수정하고 `./compile.sh` → `./run.sh`로 변화를 확인합니다
+4. 다음 챕터로 넘어갑니다
+
+> 볼륨 마운트 덕분에 VS Code에서 파일 저장하면 컨테이너에 바로 반영됩니다.
+> `docker build`를 다시 할 필요 없이 `./compile.sh`만 실행하면 됩니다.
+
+---
+
+### Chapter 04~08: Spring Boot
+
+Spring Boot 챕터는 각 챕터 디렉토리에서 개별적으로 실행합니다.
+
 ```bash
-cd chapter09-final-project
-docker compose up --build
-
-# API 테스트
-# 회원가입
-curl -X POST http://localhost:8080/api/auth/signup \
-  -H "Content-Type: application/json" \
-  -d '{"username":"testuser","password":"password123"}'
-
-# 로그인
-curl -X POST http://localhost:8080/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"testuser","password":"password123"}'
-
-# 게시글 작성 (토큰 필요)
-curl -X POST http://localhost:8080/api/posts \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer {TOKEN}" \
-  -d '{"title":"첫 게시글","content":"안녕하세요!"}'
-
-# 게시글 목록 조회
-curl "http://localhost:8080/api/posts?page=0&size=10"
-
-# 게시글 상세 조회
-curl http://localhost:8080/api/posts/1
-```
-
-## 인프라 Docker Compose
-공통 인프라(PostgreSQL, Redis, Adminer)를 한번에 실행:
-```bash
+# 공통 인프라 먼저 실행 (PostgreSQL, Redis, Adminer)
 cd docker
 docker compose -f docker-compose-infra.yml up -d
 
 # Adminer(DB 관리도구) 접속: http://localhost:8081
 # PostgreSQL 접속정보: edu / edu1234 / edu_spring
+
+# 각 챕터 실행
+cd ../chapter04-spring-boot-intro
+docker compose up --build
 ```
 
+### Chapter 09: 종합 프로젝트
+
+```bash
+cd chapter09-final-project
+docker compose up --build
+
+# API 테스트
+curl -X POST http://localhost:8080/api/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{"username":"testuser","password":"password123"}'
+
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"testuser","password":"password123"}'
+```
+
+---
+
 ## 프로젝트 구조
+
 ```
 edu_spring/
-├── README.md                      # 이 파일
+├── Dockerfile                     # Java 챕터 통합 실행 (Ch01~03)
+├── run.sh                         # 대화형 예제 실행 스크립트
 ├── docker/                        # 공통 Docker 설정
 │   ├── docker-compose-infra.yml   # 인프라 (PostgreSQL, Redis, Adminer)
 │   ├── init-db.sql               # DB 초기화 스크립트
@@ -97,14 +128,16 @@ edu_spring/
 ├── chapter06-spring-data-jpa/     # Spring Data JPA
 ├── chapter07-spring-security/     # Spring Security
 ├── chapter08-testing/             # 테스트
-└── chapter09-final-project/       # 종합 프로젝트 (게시판)
+├── chapter09-final-project/       # 종합 프로젝트 (게시판)
+└── docs/                          # 참고 문서
+    ├── JAVA_개념서.md
+    ├── JAVA_교육자료.md
+    ├── JAVA_코딩표준.md
+    ├── SPRING_개념서.md
+    ├── SPRING_교육자료.md
+    ├── 학습계획.md
+    └── 맥북_Docker_실습가이드.md
 ```
-
-## 학습 방법
-1. 각 챕터의 `README.md`를 먼저 읽고 개념을 이해한다
-2. POC 코드를 Docker로 실행하며 결과를 확인한다
-3. 코드를 수정하고 다시 실행하며 실험한다
-4. Chapter 09에서 전체 개념을 종합하여 실전 프로젝트를 완성한다
 
 ## 기술 스택
 - **Language**: Java 21

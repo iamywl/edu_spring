@@ -1,307 +1,146 @@
-# Chapter 03: Collections, Generics, Streams
+# Chapter 03: 컬렉션, 제네릭, 스트림, 람다 -- 실습 가이드
 
-Java 컬렉션 프레임워크, 제네릭, 스트림 API를 학습합니다.
-
----
-
-## 1. 제네릭 (Generic)
-
-제네릭은 클래스나 메서드를 정의할 때 타입을 파라미터로 지정하는 기능입니다.
-컴파일 시점에 타입 안전성을 보장하며, 불필요한 캐스팅을 제거합니다.
-
-### 1.1 제네릭 클래스
-
-```java
-// T는 타입 파라미터 (Type Parameter)
-public class Box<T> {
-    private T value;
-
-    public void set(T value) { this.value = value; }
-    public T get() { return value; }
-}
-
-// 사용
-Box<String> stringBox = new Box<>();
-stringBox.set("Hello");
-String value = stringBox.get(); // 캐스팅 불필요
-```
-
-### 1.2 제네릭 메서드
-
-```java
-public static <T> T getFirst(List<T> list) {
-    return list.isEmpty() ? null : list.get(0);
-}
-```
-
-### 1.3 바운디드 타입 파라미터 (Bounded Type Parameter)
-
-```java
-// T는 반드시 Number의 하위 타입이어야 함
-public static <T extends Number> double sum(List<T> list) {
-    return list.stream().mapToDouble(Number::doubleValue).sum();
-}
-```
-
-### 1.4 와일드카드 (Wildcard)
-
-| 와일드카드 | 의미 | 사용 시점 |
-|---|---|---|
-| `<?>` | 모든 타입 허용 | 읽기 전용으로 사용할 때 |
-| `<? extends T>` | T 또는 T의 하위 타입 | 상한 경계 - 데이터를 꺼낼 때 (Producer) |
-| `<? super T>` | T 또는 T의 상위 타입 | 하한 경계 - 데이터를 넣을 때 (Consumer) |
-
-> **PECS 원칙**: Producer-Extends, Consumer-Super
+> 이 문서는 **실습 가이드**입니다. 개념 설명은 [JAVA_개념서](../docs/JAVA_개념서.md)와 [JAVA_교육자료](../docs/JAVA_교육자료.md)를 참고하세요.
 
 ---
 
-## 2. List, Set, Map
+## 환경 준비
 
-### 2.1 List - 순서가 있는 컬렉션
-
-| 구현체 | 내부 구조 | 특징 |
-|---|---|---|
-| `ArrayList` | 배열 기반 | 인덱스 접근 O(1), 삽입/삭제 O(n) |
-| `LinkedList` | 이중 연결 리스트 | 삽입/삭제 O(1), 인덱스 접근 O(n) |
-
-```java
-List<String> arrayList = new ArrayList<>();
-List<String> linkedList = new LinkedList<>();
-```
-
-### 2.2 Set - 중복을 허용하지 않는 컬렉션
-
-| 구현체 | 내부 구조 | 특징 |
-|---|---|---|
-| `HashSet` | 해시 테이블 | 가장 빠름, 순서 없음 |
-| `TreeSet` | 레드-블랙 트리 | 정렬된 순서 유지 |
-| `LinkedHashSet` | 해시 테이블 + 연결 리스트 | 삽입 순서 유지 |
-
-### 2.3 Map - 키-값 쌍 컬렉션
-
-| 구현체 | 내부 구조 | 특징 |
-|---|---|---|
-| `HashMap` | 해시 테이블 | 가장 빠름, 순서 없음 |
-| `TreeMap` | 레드-블랙 트리 | 키 기준 정렬 |
-| `LinkedHashMap` | 해시 테이블 + 연결 리스트 | 삽입 순서 유지 |
-
----
-
-## 3. Queue, Deque
-
-### 3.1 Queue - FIFO (First In, First Out)
-
-```java
-Queue<String> queue = new LinkedList<>();
-queue.offer("first");   // 삽입
-queue.poll();            // 제거 및 반환
-queue.peek();            // 조회만
-```
-
-### 3.2 Deque - 양방향 큐
-
-```java
-Deque<String> deque = new ArrayDeque<>();
-deque.offerFirst("front");  // 앞에 삽입
-deque.offerLast("back");    // 뒤에 삽입
-deque.pollFirst();           // 앞에서 제거
-deque.pollLast();            // 뒤에서 제거
-```
-
-### 3.3 PriorityQueue - 우선순위 큐
-
-```java
-// 기본: 오름차순 정렬
-PriorityQueue<Integer> pq = new PriorityQueue<>();
-
-// 내림차순 정렬
-PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Comparator.reverseOrder());
-```
-
----
-
-## 4. Collections 유틸리티
-
-```java
-// 정렬
-Collections.sort(list);
-Collections.sort(list, Comparator.reverseOrder());
-
-// 불변 리스트 (수정 시 UnsupportedOperationException 발생)
-List<String> unmodifiable = Collections.unmodifiableList(list);
-
-// 스레드 안전 리스트
-List<String> syncList = Collections.synchronizedList(new ArrayList<>());
-
-// 기타 유틸리티
-Collections.reverse(list);
-Collections.shuffle(list);
-Collections.frequency(list, "element");
-Collections.min(list);
-Collections.max(list);
-```
-
----
-
-## 5. Stream API
-
-Stream은 컬렉션 데이터를 선언적으로 처리하는 API입니다 (Java 8+).
-
-### 5.1 Stream 생성
-
-```java
-// 컬렉션에서 생성
-list.stream();
-
-// 직접 생성
-Stream.of("a", "b", "c");
-Stream.iterate(0, n -> n + 2);    // 0, 2, 4, 6, ...
-Stream.generate(Math::random);     // 무한 스트림
-```
-
-### 5.2 중간 연산 (Intermediate Operations) - Lazy 평가
-
-| 연산 | 설명 | 예시 |
-|---|---|---|
-| `filter` | 조건에 맞는 요소만 통과 | `.filter(x -> x > 5)` |
-| `map` | 요소 변환 | `.map(String::toUpperCase)` |
-| `flatMap` | 중첩 구조 평탄화 | `.flatMap(Collection::stream)` |
-| `sorted` | 정렬 | `.sorted(Comparator.reverseOrder())` |
-| `distinct` | 중복 제거 | `.distinct()` |
-| `peek` | 디버깅용 확인 | `.peek(System.out::println)` |
-| `limit` | 개수 제한 | `.limit(5)` |
-| `skip` | 앞에서 건너뛰기 | `.skip(3)` |
-
-### 5.3 최종 연산 (Terminal Operations) - 실행 트리거
-
-| 연산 | 설명 | 반환 타입 |
-|---|---|---|
-| `collect` | 결과 수집 | 컬렉션 등 |
-| `reduce` | 누적 연산 | Optional/T |
-| `forEach` | 각 요소 소비 | void |
-| `count` | 개수 | long |
-| `anyMatch` | 하나라도 일치? | boolean |
-| `allMatch` | 모두 일치? | boolean |
-| `findFirst` | 첫 번째 요소 | Optional |
-
-### 5.4 Collectors
-
-```java
-// 리스트로 수집
-.collect(Collectors.toList());
-
-// 그룹핑
-.collect(Collectors.groupingBy(Person::getCity));
-
-// 문자열 결합
-.collect(Collectors.joining(", "));
-
-// 통계
-.collect(Collectors.summarizingInt(Person::getAge));
-```
-
-### 5.5 Parallel Stream
-
-```java
-list.parallelStream()
-    .filter(x -> x > 10)
-    .collect(Collectors.toList());
-```
-
-> 주의: 항상 빠른 것은 아닙니다. 데이터가 충분히 크고, 독립적인 연산일 때 효과적입니다.
-
----
-
-## 6. Optional
-
-`null` 대신 값의 존재/부재를 명시적으로 표현하는 컨테이너입니다.
-
-```java
-// 생성
-Optional<String> opt = Optional.of("value");
-Optional<String> empty = Optional.empty();
-Optional<String> nullable = Optional.ofNullable(possiblyNull);
-
-// 값 접근
-opt.isPresent();                    // true/false
-opt.ifPresent(System.out::println); // 값이 있을 때만 실행
-opt.orElse("default");              // 없으면 기본값
-opt.orElseThrow();                  // 없으면 예외
-
-// 변환
-opt.map(String::toUpperCase);
-opt.flatMap(this::findById);
-opt.filter(s -> s.length() > 3);
-```
-
----
-
-## 7. Lambda와 함수형 인터페이스
-
-### 7.1 주요 함수형 인터페이스
-
-| 인터페이스 | 메서드 | 입력 | 출력 | 용도 |
-|---|---|---|---|---|
-| `Predicate<T>` | `test(T)` | T | boolean | 조건 검사 |
-| `Function<T,R>` | `apply(T)` | T | R | 변환 |
-| `Consumer<T>` | `accept(T)` | T | void | 소비 |
-| `Supplier<T>` | `get()` | - | T | 생성 |
-| `UnaryOperator<T>` | `apply(T)` | T | T | 단항 연산 |
-| `BinaryOperator<T>` | `apply(T,T)` | T, T | T | 이항 연산 |
-
-### 7.2 Lambda 표현식
-
-```java
-// 기본 형태
-(parameters) -> expression
-(parameters) -> { statements; }
-
-// 예시
-Predicate<String> isEmpty = s -> s.isEmpty();
-Function<String, Integer> toLength = String::length;  // 메서드 참조
-Consumer<String> printer = System.out::println;
-Supplier<List<String>> listFactory = ArrayList::new;   // 생성자 참조
-```
-
-### 7.3 메서드 참조 (Method Reference)
-
-| 유형 | 문법 | Lambda 동등 표현 |
-|---|---|---|
-| 정적 메서드 | `Class::staticMethod` | `x -> Class.staticMethod(x)` |
-| 인스턴스 메서드 | `obj::method` | `x -> obj.method(x)` |
-| 임의 객체 메서드 | `Class::method` | `(obj, x) -> obj.method(x)` |
-| 생성자 | `Class::new` | `x -> new Class(x)` |
-
----
-
-## 실행 방법
-
-### javac 직접 실행
 ```bash
-cd chapter03-collections
-mkdir -p out
-javac -d out src/main/java/com/edu/collections/*.java
-java -cp out com.edu.collections.GenericExample
-java -cp out com.edu.collections.CollectionExample
-java -cp out com.edu.collections.StreamExample
-java -cp out com.edu.collections.LambdaExample
+docker compose up -d
+# VS Code: F1 → "Dev Containers: Attach to Running Container" → java-edu
+./compile.sh
+./run.sh 6    # 컬렉션
+./run.sh 7    # 제네릭
+./run.sh 8    # Stream API
+./run.sh 9    # 람다
 ```
 
-### Docker 실행
-```bash
-cd chapter03-collections
-docker build -t chapter03 .
-docker run --rm chapter03
-```
+> 소스 파일을 수정한 후 `./compile.sh` → `./run.sh N`으로 바로 결과를 확인하세요.
 
 ---
 
-## 핵심 정리
+## 세션 순서
 
-| 주제 | 핵심 포인트 |
-|---|---|
-| 제네릭 | 타입 안전성, PECS 원칙, 와일드카드 |
-| 컬렉션 | List(순서), Set(중복X), Map(키-값), Queue(FIFO) |
-| Stream | 선언적 처리, Lazy 평가, 중간/최종 연산 구분 |
-| Optional | null 안전성, map/flatMap 체이닝 |
-| Lambda | 함수형 인터페이스, 메서드 참조, 간결한 코드 |
+| 세션 | 토픽 | 실행 명령 | 소스 파일 |
+|------|------|-----------|-----------|
+| 1 | 제네릭 | `./run.sh 7` | `GenericExample.java` |
+| 2 | 컬렉션 프레임워크 | `./run.sh 6` | `CollectionExample.java` |
+| 3 | Stream API | `./run.sh 8` | `StreamExample.java` |
+| 4 | 람다와 함수형 인터페이스 | `./run.sh 9` | `LambdaExample.java` |
+
+---
+
+### 세션 1: 제네릭 (Generics)
+
+**개념 학습**
+- 📖 [JAVA_개념서](../docs/JAVA_개념서.md) - Chapter 5: "제네릭" 읽기
+- 📝 [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 3.1: "Generics와 PECS 원칙" 읽기
+
+**예제 코드 분석**
+- 파일: `src/main/java/com/edu/collections/GenericExample.java`
+- `Box<T>` 클래스가 어떻게 String, Integer, Double 등 다양한 타입을 하나의 클래스로 처리하는지 확인
+- `NumberBox<T extends Number>`에서 바운디드 타입이 어떻게 `doubleValue()` 호출을 가능하게 하는지 확인
+- `copy(List<? extends T> src, List<? super T> dest)` 메서드에서 PECS 원칙이 실제로 어떻게 적용되는지 확인
+
+**예제 실행**
+- `./run.sh 7`
+- 출력에서 확인할 것들:
+  - `Box<String>`과 `Box<Integer>`가 같은 클래스인데 다른 타입을 담는 것
+  - `NumberBox<String>` 사용 시 컴파일 에러가 나는 이유 (주석 처리된 코드 참고)
+  - 와일드카드 섹션에서 `Integer` 리스트와 `Double` 리스트가 모두 `sumWithWildcard`에 전달되는 것
+
+**실습 과제**
+1. `Box<T>`에 `boolean isEmpty()` 메서드를 추가하세요. value가 null이면 true를 반환합니다. main에서 테스트 코드도 추가하세요.
+2. `Pair<K, V>`를 3개의 타입 파라미터를 받는 `Triple<A, B, C>` 클래스로 확장해보세요.
+3. `NumberBox<String> strBox = new NumberBox<>("error");` 주석을 해제하고 컴파일해보세요. 어떤 에러 메시지가 나오나요?
+
+---
+
+### 세션 2: 컬렉션 프레임워크 List/Set/Map
+
+**개념 학습**
+- 📖 [JAVA_개념서](../docs/JAVA_개념서.md) - Chapter 5: "컬렉션 - 배열의 한계, List/Set/Map, HashMap 내부 구조" 읽기
+- 📝 [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 3.2: "Collection framework와 시간복잡도" 읽기
+
+**예제 코드 분석**
+- 파일: `src/main/java/com/edu/collections/CollectionExample.java`
+- `demonstrateSet()`에서 HashSet, TreeSet, LinkedHashSet의 출력 순서 차이를 주목 -- 같은 데이터를 넣어도 순서가 다름
+- `demonstrateMap()`에서 `putIfAbsent`, `computeIfAbsent`, `merge` 같은 Java 8+ 메서드들이 기존 if-null 패턴을 어떻게 대체하는지 확인
+- `demonstrateQueue()`에서 ArrayDeque가 스택과 큐 두 가지로 모두 사용되는 패턴 확인
+
+**예제 실행**
+- `./run.sh 6`
+- 출력에서 확인할 것들:
+  - HashSet의 출력 순서가 삽입 순서와 다른 것
+  - TreeSet이 한글 기준으로 자동 정렬되는 것
+  - 합집합/교집합/차집합 연산 결과
+  - HashMap에서 같은 키("김철수")로 두 번 put했을 때 값이 92로 갱신되는 것
+
+**실습 과제**
+1. `demonstrateSet()`에서 TreeSet 대신 LinkedHashSet을 사용해보세요. 출력 순서가 어떻게 달라지나요?
+2. `demonstrateMap()`에서 `merge`를 사용하여 모든 과목 점수에 5점 보너스를 추가하는 코드를 작성하세요.
+3. `demonstrateQueue()`에서 PriorityQueue에 문자열을 넣고, 문자열 길이 기준으로 정렬되도록 Comparator를 지정해보세요.
+
+---
+
+### 세션 3: Stream API
+
+**개념 학습**
+- 📖 [JAVA_개념서](../docs/JAVA_개념서.md) - Chapter 6: "함수형 프로그래밍 - Stream (컨베이어 벨트 비유)" 읽기
+- 📝 [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 3.3~3.4: "Lambda/Stream API, 메서드 참조" 읽기
+
+**예제 코드 분석**
+- 파일: `src/main/java/com/edu/collections/StreamExample.java`
+- `demonstrateIntermediateOperations()`에서 `peek`의 출력 순서를 통해 Lazy 평가가 실제로 어떻게 동작하는지 확인 -- filter에 걸리지 않는 요소도 peek은 실행됨
+- `demonstrateCollectors()`의 Student 데이터로 `groupingBy`, `partitioningBy`, `summarizingInt`가 어떻게 데이터를 집계하는지 확인
+- `demonstrateParallelStream()`에서 순차/병렬 스트림의 실행 시간 비교와 스레드 이름 출력 확인
+
+**예제 실행**
+- `./run.sh 8`
+- 출력에서 확인할 것들:
+  - `Stream.iterate`와 `Stream.generate`의 차이 (규칙적 vs 무작위)
+  - `flatMap`이 중첩 리스트를 어떻게 평탄화하는지
+  - `reduce`로 합계, 최댓값, 문자열 결합이 모두 가능한 것
+  - `groupingBy`로 도시별 학생 분류 결과
+  - 병렬 스트림 실행 시 사용되는 스레드 이름 목록
+
+**실습 과제**
+1. `demonstrateIntermediateOperations()`에서 filter 조건을 `name.startsWith("김")` 대신 `name.endsWith("수")`로 바꿔보세요. 결과가 어떻게 달라지나요?
+2. `demonstrateCollectors()`에서 Student 데이터를 나이 그룹별(20대 초반/중반/후반)로 groupingBy 해보세요.
+3. `demonstrateTerminalOperations()`에서 `reduce`를 사용하여 리스트의 모든 요소를 곱하는 코드를 추가하세요.
+
+---
+
+### 세션 4: 람다와 함수형 인터페이스
+
+**개념 학습**
+- 📖 [JAVA_개념서](../docs/JAVA_개념서.md) - Chapter 6: "람다 표현식" 읽기
+- 📝 [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 3.3: "Lambda와 함수형 인터페이스" 읽기
+
+**예제 코드 분석**
+- 파일: `src/main/java/com/edu/collections/LambdaExample.java`
+- `demonstrateFunctionalInterfaces()`에서 Predicate, Function, Consumer, Supplier 4가지 핵심 인터페이스가 각각 "조건 검사 / 변환 / 소비 / 생성" 역할을 하는 것 확인
+- `demonstrateMethodReferences()`에서 람다 `s -> s.toUpperCase()`가 메서드 참조 `String::toUpperCase`로 변환되는 4가지 패턴 확인
+- `demonstratePracticalExamples()`에서 Predicate/Function/Consumer/Supplier가 실제 비즈니스 로직에 어떻게 조합되는지 확인
+
+**예제 실행**
+- `./run.sh 9`
+- 출력에서 확인할 것들:
+  - Calculator 인터페이스의 4가지 연산이 모두 람다로 구현된 것
+  - `isEven.negate()`가 isOdd와 동일하게 동작하는 것
+  - `Function.andThen`과 `Function.compose`의 실행 순서 차이
+  - Optional 체이닝에서 null이 중간에 있을 때 안전하게 기본값이 반환되는 것
+
+**실습 과제**
+1. `LambdaExample`에서 새로운 `Predicate<String>`을 만들어 이름 리스트에서 3글자 이상인 이름만 필터링해보세요.
+2. `Calculator` 인터페이스를 사용하여 거듭제곱(`Math.pow`) 연산을 구현해보세요. (힌트: 반환 타입이 int이므로 캐스팅 필요)
+3. `demonstratePracticalExamples()`에서 `Function` 조합을 사용하여 Person의 이름을 대문자로 변환 후 "님" 접미사를 붙이는 파이프라인을 만들어보세요.
+
+---
+
+## 학습 팁
+
+- 각 세션의 **개념 학습**을 먼저 읽고 코드를 분석하면 이해가 빠릅니다.
+- 실습 과제를 수행한 후 반드시 `./compile.sh` → `./run.sh N`으로 결과를 확인하세요.
+- 컴파일 에러가 나면 에러 메시지를 읽어보세요 -- 제네릭 관련 에러 메시지를 해석하는 것도 중요한 학습입니다.

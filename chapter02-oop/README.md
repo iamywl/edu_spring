@@ -1,320 +1,273 @@
-# Chapter 02: 객체지향 프로그래밍 (OOP)
-
-Java의 핵심인 객체지향 프로그래밍의 주요 개념을 학습합니다.
-
----
-
-## 1. 클래스와 객체
-
-### 클래스란?
-클래스는 객체를 생성하기 위한 **설계도(blueprint)** 입니다.
-필드(상태)와 메서드(행위)로 구성됩니다.
-
-```java
-public class Animal {
-    // 필드 (상태)
-    private String name;
-    private int age;
-
-    // 생성자
-    public Animal(String name, int age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    // 메서드 (행위)
-    public void speak() {
-        System.out.println(name + "이(가) 소리를 냅니다.");
-    }
-}
-```
-
-### 객체란?
-클래스를 기반으로 생성된 **실체(instance)** 입니다.
-
-```java
-Animal dog = new Animal("멍멍이", 3);  // 객체 생성
-dog.speak();  // 메서드 호출
-```
-
-### toString, equals, hashCode
-`Object` 클래스의 메서드를 오버라이드하여 객체의 동등성과 문자열 표현을 정의합니다.
-
-```java
-@Override
-public String toString() {
-    return "Animal{name='" + name + "', age=" + age + "}";
-}
-
-@Override
-public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof Animal animal)) return false;
-    return age == animal.age && Objects.equals(name, animal.name);
-}
-
-@Override
-public int hashCode() {
-    return Objects.hash(name, age);
-}
-```
-
----
-
-## 2. 캡슐화 (Encapsulation)
-
-### 접근 제어자
-
-| 접근 제어자 | 같은 클래스 | 같은 패키지 | 하위 클래스 | 전체 |
-|------------|:---------:|:---------:|:---------:|:---:|
-| `private`   | O | X | X | X |
-| `(default)` | O | O | X | X |
-| `protected` | O | O | O | X |
-| `public`    | O | O | O | O |
-
-### Getter / Setter
-필드를 `private`으로 선언하고, 공개 메서드를 통해 접근합니다.
-
-```java
-public class Animal {
-    private String name;
-
-    // Getter
-    public String getName() {
-        return name;
-    }
-
-    // Setter (유효성 검증 가능)
-    public void setName(String name) {
-        if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("이름은 비어있을 수 없습니다.");
-        }
-        this.name = name;
-    }
-}
-```
-
----
-
-## 3. 상속과 다형성
-
-### 상속 (Inheritance)
-`extends` 키워드로 부모 클래스의 필드와 메서드를 물려받습니다.
-
-```java
-public class Dog extends Animal {
-    private String breed;
-
-    public Dog(String name, int age, String breed) {
-        super(name, age);  // 부모 생성자 호출
-        this.breed = breed;
-    }
-
-    @Override
-    public String speak() {
-        return getName() + "이(가) 멍멍! 하고 짖습니다.";
-    }
-}
-```
-
-### 다형성 (Polymorphism)
-부모 타입의 참조 변수로 자식 객체를 다룰 수 있습니다.
-
-```java
-Animal animal1 = new Dog("바둑이", 3, "진돗개");
-Animal animal2 = new Cat("나비", 2, true);
-
-// 같은 메서드 호출이지만 실제 타입에 따라 다른 동작
-animal1.speak();  // "바둑이이(가) 멍멍! 하고 짖습니다."
-animal2.speak();  // "나비이(가) 야옹~ 하고 웁니다."
-```
-
-### instanceof와 패턴 매칭 (Java 16+)
-
-```java
-if (animal instanceof Dog dog) {
-    System.out.println("품종: " + dog.getBreed());
-}
-```
-
----
-
-## 4. 추상 클래스와 인터페이스
-
-### 추상 클래스 (Abstract Class)
-- `abstract` 키워드로 선언
-- 직접 인스턴스 생성 불가
-- 추상 메서드와 일반 메서드를 모두 가질 수 있음
-
-```java
-public abstract class Animal {
-    public abstract String speak();  // 하위 클래스에서 반드시 구현
-
-    public String breathe() {        // 일반 메서드도 가능
-        return "숨을 쉽니다.";
-    }
-}
-```
-
-### 인터페이스 (Interface)
-- 다중 구현 가능 (`implements`)
-- Java 8+: `default` 메서드, `static` 메서드
-- Java 9+: `private` 메서드
-
-```java
-public interface Flyable {
-    // 추상 메서드
-    String fly();
-
-    // default 메서드 (기본 구현 제공)
-    default String land() {
-        return "착륙합니다.";
-    }
-
-    // static 메서드
-    static String description() {
-        return "날 수 있는 능력을 나타내는 인터페이스입니다.";
-    }
-}
-```
-
-### 추상 클래스 vs 인터페이스
-
-| 구분 | 추상 클래스 | 인터페이스 |
-|------|-----------|-----------|
-| 다중 상속 | 불가 (단일 상속) | 가능 (다중 구현) |
-| 필드 | 인스턴스 변수 가능 | 상수만 가능 (`public static final`) |
-| 생성자 | 있음 | 없음 |
-| 용도 | IS-A 관계 | CAN-DO / HAS-A 능력 |
-
----
-
-## 5. enum (열거형)
-
-상수의 집합을 타입 안전하게 정의합니다.
-
-```java
-public enum Season {
-    SPRING("봄", "3월~5월"),
-    SUMMER("여름", "6월~8월"),
-    AUTUMN("가을", "9월~11월"),
-    WINTER("겨울", "12월~2월");
-
-    private final String koreanName;
-    private final String period;
-
-    Season(String koreanName, String period) {
-        this.koreanName = koreanName;
-        this.period = period;
-    }
-
-    public String describe() {
-        return koreanName + " (" + period + ")";
-    }
-}
-```
-
-### enum 활용
-- `values()` : 모든 상수 배열 반환
-- `valueOf("SPRING")` : 이름으로 상수 조회
-- `name()`, `ordinal()` : 이름, 순번 조회
-- `switch` 문에서 활용 가능
-
----
-
-## 6. record (Java 16+)
-
-불변 데이터 객체를 간결하게 정의합니다.
-`equals()`, `hashCode()`, `toString()`, getter가 자동 생성됩니다.
-
-```java
-public record PersonRecord(String name, int age, String email) {
-
-    // 컴팩트 생성자 (유효성 검증)
-    public PersonRecord {
-        if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("이름은 필수입니다.");
-        }
-        if (age < 0) {
-            throw new IllegalArgumentException("나이는 0 이상이어야 합니다.");
-        }
-    }
-
-    // 커스텀 메서드
-    public String introduce() {
-        return name + " (" + age + "세, " + email + ")";
-    }
-}
-```
-
-### record 특징
-- 모든 필드는 `private final` (불변)
-- `getter`는 필드명과 동일 (`name()`, `age()`)
-- 상속 불가 (`final` 클래스)
-- 인터페이스 구현 가능
-
----
-
-## 7. sealed class (Java 17+)
-
-상속할 수 있는 클래스를 **명시적으로 제한**합니다.
-
-```java
-// Shape를 상속할 수 있는 클래스를 permits로 지정
-public sealed class Shape permits Circle, Rectangle {
-    // ...
-}
-
-// final: 더 이상 상속 불가
-public final class Circle extends Shape { }
-
-// non-sealed: 자유롭게 상속 가능
-public non-sealed class Rectangle extends Shape { }
-```
-
-### sealed class 허용되는 하위 클래스 키워드
-- `final` : 더 이상 상속 불가
-- `sealed` : 다시 제한된 상속 허용
-- `non-sealed` : 자유로운 상속 허용
-
-### switch 패턴 매칭과 함께 사용 (Java 21+)
-
-```java
-String info = switch (shape) {
-    case Circle c    -> "반지름: " + c.getRadius();
-    case Rectangle r -> "가로: " + r.getWidth() + ", 세로: " + r.getHeight();
-};
-```
+# Chapter 02: 객체지향 프로그래밍 (OOP) - 실습 가이드
+
+> 이 문서는 **실습 가이드**입니다. OOP 개념의 상세한 설명은 아래 문서를 참고하세요.
+> - [JAVA_개념서](../docs/JAVA_개념서.md) - Chapter 4: 객체지향 프로그래밍 (왜 OOP인가, 4대 원칙, SOLID)
+> - [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 2: OOP 코드 예제 (2.1~2.8)
 
 ---
 
 ## 실행 방법
 
-### Docker로 실행
 ```bash
-docker build -t chapter02-oop .
-docker run --rm chapter02-oop
+# Docker 컨테이너 내에서 실행
+./run.sh 5
 ```
 
-### 직접 컴파일 및 실행
-```bash
-mkdir -p out
-javac -d out src/main/java/com/edu/oop/*.java
-java -cp out com.edu.oop.OopMain
+OopMain.java가 8개 섹션을 순서대로 실행하며, 각 세션의 출력을 구분선으로 나누어 보여줍니다.
+
+---
+
+## 프로젝트 구조
+
 ```
+src/main/java/com/edu/oop/
+  OopMain.java        # 메인 실행 파일 (8개 섹션)
+  Animal.java          # 추상 클래스 (공통 필드, 추상 메서드, equals/hashCode)
+  Dog.java             # Animal 상속 - 개
+  Cat.java             # Animal 상속 - 고양이
+  Bird.java            # Animal 상속 + Flyable 구현 - 새
+  Flyable.java         # 인터페이스 (추상/default/static 메서드)
+  Season.java          # enum (필드, 생성자, 커스텀 메서드)
+  PersonRecord.java    # record (컴팩트 생성자, 팩토리 메서드)
+  Shape.java           # sealed class
+  Circle.java          # Shape의 final 하위 클래스
+  Rectangle.java       # Shape의 non-sealed 하위 클래스
+```
+
+---
+
+## 세션별 실습
+
+### 세션 1: 클래스와 객체, 상속, 다형성
+
+**개념 학습**
+- [JAVA_개념서](../docs/JAVA_개념서.md) - Chapter 4: "절차적 vs 객체지향", "캡슐화", "상속", "다형성" 읽기
+- [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 2.1~2.4: "클래스와 객체", "상속", "다형성" 읽기
+
+**예제 코드 분석**
+- 파일: `Animal.java`, `Dog.java`, `Cat.java`, `Bird.java`
+- OopMain.java 섹션: 1번 (클래스, 상속, 다형성)
+- 주목할 포인트:
+  - `Animal` 타입 변수로 `Dog`, `Cat`, `Bird` 객체를 참조 (다형성)
+  - `Animal[]` 배열을 순회하며 `speak()` 호출 시 실제 타입에 따라 다른 결과 출력
+  - `super(name, age)` 호출로 부모 생성자에 값 전달
+
+**예제 실행**
+- `./run.sh 5` 실행
+- 출력에서 확인할 것:
+  - 각 동물의 `info()`가 하위 클래스마다 다른 정보를 포함하는지
+  - `speak()`가 동물별로 다른 울음소리를 반환하는지
+  - `breathe()`는 모든 동물이 동일한 동작을 하는지
+
+**실습 과제**
+1. `Fish` 클래스를 만들어 `Animal`을 상속받아보세요. `speak()`에서 `"뻐끔뻐끔"`을 반환하게 하세요.
+2. `OopMain.java`의 `animals` 배열에 `Fish` 객체를 추가하고 다시 실행해보세요.
+3. `Fish`만의 고유 메서드 `swim()`을 추가해보세요.
+
+---
+
+### 세션 2: 캡슐화
+
+**개념 학습**
+- [JAVA_개념서](../docs/JAVA_개념서.md) - Chapter 4: "캡슐화" (자동차 비유) 읽기
+- [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 2.2: "캡슐화" 읽기
+
+**예제 코드 분석**
+- 파일: `Animal.java` (private 필드 + getter/setter), `Dog.java`
+- OopMain.java 섹션: 2번 (캡슐화)
+- 주목할 포인트:
+  - `Animal`의 필드가 `private`으로 선언되어 외부에서 직접 접근 불가
+  - `setName("")` 호출 시 유효성 검증이 작동하여 예외 발생
+  - getter/setter를 통해서만 필드 값에 접근 가능
+
+**예제 실행**
+- `./run.sh 5` 실행
+- 출력에서 확인할 것:
+  - getter로 이름, 나이, 품종 조회 결과
+  - setter로 이름/나이 변경 후 `info()` 출력 변화
+  - 빈 이름 설정 시 `IllegalArgumentException` 메시지
+
+**실습 과제**
+1. `Animal.setAge(-1)`을 호출해서 음수 나이 유효성 검증이 작동하는지 확인하세요.
+2. `Dog`에 `setBreed()` 메서드를 추가하고, 빈 문자열이 들어오면 예외를 던지도록 만들어보세요.
+
+---
+
+### 세션 3: toString, equals, hashCode
+
+**개념 학습**
+- [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 2.1: "toString, equals, hashCode" 읽기
+
+**예제 코드 분석**
+- 파일: `Animal.java` (equals/hashCode 오버라이드), `Dog.java` (toString 오버라이드)
+- OopMain.java 섹션: 3번
+- 주목할 포인트:
+  - `==`는 참조(주소) 비교, `equals()`는 내용 비교
+  - `Animal.equals()`가 `name`과 `age`만 비교 (breed는 비교하지 않음)
+  - `equals()`가 true이면 `hashCode()`도 동일해야 하는 규칙
+
+**예제 실행**
+- `./run.sh 5` 실행
+- 출력에서 확인할 것:
+  - `dog1 == dog2`가 `false`인 이유 (서로 다른 객체)
+  - `dog1.equals(dog2)`가 `true`인 이유 (같은 이름, 같은 나이)
+  - `hashCode`가 동일한지
+
+**실습 과제**
+1. `Dog`의 `equals()`를 오버라이드하여 `breed`까지 비교하도록 수정해보세요. `hashCode()`도 함께 수정하세요.
+2. 같은 이름/나이지만 다른 품종의 `Dog` 두 개를 만들어서 `equals()` 결과가 달라지는지 확인하세요.
+
+---
+
+### 세션 4: instanceof 패턴 매칭
+
+**개념 학습**
+- [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 2.4: "다형성", "instanceof 패턴 매칭" 읽기
+
+**예제 코드 분석**
+- 파일: `OopMain.java` 섹션 4
+- 주목할 포인트:
+  - Java 16+ 패턴 매칭: `if (animal instanceof Dog d)` 에서 타입 검사와 캐스팅을 동시에 수행
+  - 각 타입별 고유 메서드 호출 (`fetch()`, `purr()`, `fly()`)
+  - 기존 방식 `((Dog) animal).fetch()` 대비 간결함
+
+**예제 실행**
+- `./run.sh 5` 실행
+- 출력에서 확인할 것:
+  - 각 동물이 자기 타입에 맞는 고유 행동을 출력하는지
+
+**실습 과제**
+1. 세션 1에서 만든 `Fish`에 대한 `instanceof` 분기를 추가하고, `swim()`을 호출하도록 수정해보세요.
+2. `switch` 패턴 매칭(Java 21+)으로 `if-else` 체인을 변환해보세요:
+   ```java
+   String result = switch (animal) {
+       case Dog d -> d.fetch();
+       case Cat c -> c.purr();
+       case Bird b -> b.fly();
+       default -> "알 수 없는 동물";
+   };
+   ```
+
+---
+
+### 세션 5: 인터페이스
+
+**개념 학습**
+- [JAVA_개념서](../docs/JAVA_개념서.md) - Chapter 4: "추상 클래스 vs 인터페이스" 읽기
+- [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 2.5: "추상 클래스와 인터페이스" 읽기
+
+**예제 코드 분석**
+- 파일: `Flyable.java`, `Bird.java`
+- OopMain.java 섹션: 5번 (인터페이스)
+- 주목할 포인트:
+  - `Flyable` 인터페이스에 추상 메서드(`fly()`, `getMaxAltitude()`), default 메서드(`land()`, `flightStatus()`), static 메서드(`description()`, `isSafeAltitude()`) 세 종류가 있음
+  - `Bird`가 `Animal extends` + `Flyable implements` 동시에 사용
+  - `Bird`가 `land()`를 오버라이드하여 기본 구현을 대체
+
+**예제 실행**
+- `./run.sh 5` 실행
+- 출력에서 확인할 것:
+  - `Flyable.description()` static 메서드 호출 결과
+  - `flightStatus()` default 메서드의 기본 동작
+  - `land()` 오버라이드된 결과와 기본 구현의 차이
+  - `isSafeAltitude()` 유틸리티 메서드 결과
+
+**실습 과제**
+1. `Swimmable` 인터페이스를 만들어보세요 (추상 메서드: `swim()`, `getMaxDepth()`, default 메서드: `dive()`).
+2. 세션 1에서 만든 `Fish`에 `Swimmable`을 구현해보세요.
+3. `Bird`의 `land()` 오버라이드를 삭제하고, default 구현이 사용되는지 확인해보세요.
+
+---
+
+### 세션 6: enum
+
+**개념 학습**
+- [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 2.6: "enum" 읽기
+
+**예제 코드 분석**
+- 파일: `Season.java`
+- OopMain.java 섹션: 6번 (enum)
+- 주목할 포인트:
+  - 각 enum 상수가 필드 값(`koreanName`, `period`, `avgTemperature`)을 가짐
+  - `values()`, `valueOf()`, `name()`, `ordinal()` 기본 메서드 활용
+  - `fromKoreanName()` 커스텀 검색 메서드와 switch 표현식 활용
+
+**예제 실행**
+- `./run.sh 5` 실행
+- 출력에서 확인할 것:
+  - 모든 계절 순회 시 ordinal 값 순서
+  - `isHot()`, `isCold()` 판별 결과
+  - `valueOf("AUTUMN")`, `fromKoreanName("봄")` 조회 결과
+
+**실습 과제**
+1. `Season`에 `isWarm()` 메서드를 추가해보세요 (평균 기온 10도 이상일 때 true).
+2. `getNextSeason()` 메서드를 추가해보세요 (봄 -> 여름 -> 가을 -> 겨울 -> 봄). 힌트: `values()`와 `ordinal()` 활용.
+3. `fromKoreanName("장마")` 처럼 없는 이름으로 호출하면 어떤 예외가 발생하는지 확인해보세요.
+
+---
+
+### 세션 7: record
+
+**개념 학습**
+- [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 2.7: "record" 읽기
+
+**예제 코드 분석**
+- 파일: `PersonRecord.java`
+- OopMain.java 섹션: 7번 (record)
+- 주목할 포인트:
+  - `record` 한 줄로 `private final` 필드, 생성자, getter, `equals()`, `hashCode()`, `toString()` 자동 생성
+  - 컴팩트 생성자에서 유효성 검증 (빈 이름, 잘못된 이메일)
+  - 정적 팩토리 메서드 `withDefaultEmail()` 패턴
+
+**예제 실행**
+- `./run.sh 5` 실행
+- 출력에서 확인할 것:
+  - record의 getter가 `getName()`이 아니라 `name()`인 점
+  - 자동 생성된 `toString()` 형식
+  - 두 record 객체의 `equals()`, `hashCode()` 동일성
+  - 빈 이름으로 생성 시 유효성 검증 예외
+
+**실습 과제**
+1. `AddressRecord(String city, String street, String zipCode)` record를 만들어보세요. zipCode 유효성 검증을 추가하세요.
+2. `PersonRecord`에 `AddressRecord`를 포함하는 새 record `EmployeeRecord(String name, int age, AddressRecord address)`를 만들어보세요.
+3. record는 상속이 불가능합니다. 시도해보고 컴파일 에러 메시지를 확인하세요.
+
+---
+
+### 세션 8: sealed class
+
+**개념 학습**
+- [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 2.8: "sealed class" 읽기
+
+**예제 코드 분석**
+- 파일: `Shape.java`, `Circle.java`, `Rectangle.java`
+- OopMain.java 섹션: 8번 (sealed class)
+- 주목할 포인트:
+  - `sealed class Shape permits Circle, Rectangle` - 상속 가능 클래스를 명시적으로 제한
+  - `Circle`은 `final` (더 이상 상속 불가), `Rectangle`은 `non-sealed` (자유롭게 상속 가능)
+  - `instanceof` 패턴 매칭으로 sealed class의 하위 타입별 처리
+
+**예제 실행**
+- `./run.sh 5` 실행
+- 출력에서 확인할 것:
+  - 각 도형의 `describe()` 출력 (색상, 넓이)
+  - `instanceof` 패턴 매칭으로 타입별 상세 정보 (반지름/둘레, 가로/세로/정사각형 여부)
+
+**실습 과제**
+1. `Triangle` 클래스를 만들고 `Shape`의 `permits`에 추가해보세요. `final`로 선언하고 `area()`를 구현하세요.
+2. `Circle`을 상속하는 클래스를 만들려고 시도해보세요. `final` 때문에 컴파일 에러가 나는지 확인하세요.
+3. `Rectangle`은 `non-sealed`이므로 `Square extends Rectangle`을 만들 수 있습니다. 시도해보세요.
+4. `permits`에 없는 클래스가 `Shape`를 상속하면 어떤 에러가 나는지 확인해보세요.
 
 ---
 
 ## 핵심 정리
 
-| 개념 | 핵심 키워드 | 설명 |
-|------|-----------|------|
-| 클래스/객체 | `class`, `new` | 설계도와 실체 |
-| 캡슐화 | `private`, getter/setter | 데이터 보호 |
-| 상속 | `extends`, `super` | 코드 재사용 |
-| 다형성 | 오버라이딩, 업캐스팅 | 유연한 설계 |
-| 추상 클래스 | `abstract` | 공통 뼈대 정의 |
-| 인터페이스 | `interface`, `implements` | 능력/계약 정의 |
-| enum | `enum` | 타입 안전한 상수 |
-| record | `record` | 불변 데이터 객체 |
-| sealed class | `sealed`, `permits` | 제한된 상속 |
+| 개념 | 핵심 키워드 | 예제 파일 |
+|---|---|---|
+| 상속/다형성 | `extends`, `@Override`, 부모 타입 참조 | Animal, Dog, Cat, Bird |
+| 캡슐화 | `private` 필드, getter/setter, 유효성 검증 | Animal |
+| 인터페이스 | `implements`, `default`, `static` 메서드 | Flyable, Bird |
+| enum | 상수 + 필드 + 메서드, `values()`, `valueOf()` | Season |
+| record | 불변 데이터, 자동 생성, 컴팩트 생성자 | PersonRecord |
+| sealed class | `sealed`, `permits`, `final`/`non-sealed` | Shape, Circle, Rectangle |

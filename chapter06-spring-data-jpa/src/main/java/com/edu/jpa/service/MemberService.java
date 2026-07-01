@@ -3,6 +3,8 @@ package com.edu.jpa.service;
 import com.edu.jpa.dto.*;
 import com.edu.jpa.entity.Member;
 import com.edu.jpa.entity.Team;
+import com.edu.jpa.exception.DuplicateResourceException;
+import com.edu.jpa.exception.ResourceNotFoundException;
 import com.edu.jpa.repository.MemberRepository;
 import com.edu.jpa.repository.TeamRepository;
 import org.springframework.data.domain.Page;
@@ -39,17 +41,17 @@ public class MemberService {
      */
     @Transactional
     public MemberResponse createMember(MemberRequest request) {
-        // 이메일 중복 검사
+        // 이메일 중복 검사 (중복 → 409 Conflict)
         memberRepository.findByEmail(request.email())
                 .ifPresent(m -> {
-                    throw new IllegalArgumentException("이미 사용 중인 이메일입니다: " + request.email());
+                    throw new DuplicateResourceException("이미 사용 중인 이메일입니다: " + request.email());
                 });
 
-        // 팀 조회 (teamId가 있는 경우)
+        // 팀 조회 (teamId가 있는 경우, 없는 팀 → 404 Not Found)
         Team team = null;
         if (request.teamId() != null) {
             team = teamRepository.findById(request.teamId())
-                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀입니다: " + request.teamId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 팀입니다: " + request.teamId()));
         }
 
         // 회원 생성 및 저장
@@ -64,7 +66,7 @@ public class MemberService {
      */
     public MemberResponse getMember(Long id) {
         Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 회원입니다: " + id));
         return MemberResponse.from(member);
     }
 
@@ -74,6 +76,8 @@ public class MemberService {
      * - Page<T>: 페이징 결과 (데이터 + 메타정보)
      */
     public Page<MemberResponse> getMembers(Pageable pageable) {
+        // findAll(pageable)은 @EntityGraph로 team을 함께 조회하므로
+        // MemberResponse 변환 시 팀 이름 접근에서 N+1이 발생하지 않는다.
         return memberRepository.findAll(pageable)
                 .map(MemberResponse::from); // Page의 map 메서드로 DTO 변환
     }
@@ -83,22 +87,22 @@ public class MemberService {
      */
     @Transactional
     public MemberResponse updateMember(Long id, MemberRequest request) {
-        // 수정할 회원 조회
+        // 수정할 회원 조회 (없으면 → 404)
         Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 회원입니다: " + id));
 
-        // 이메일 중복 검사 (자신 제외)
+        // 이메일 중복 검사 (자신 제외, 중복 → 409)
         memberRepository.findByEmail(request.email())
                 .filter(m -> !m.getId().equals(id))
                 .ifPresent(m -> {
-                    throw new IllegalArgumentException("이미 사용 중인 이메일입니다: " + request.email());
+                    throw new DuplicateResourceException("이미 사용 중인 이메일입니다: " + request.email());
                 });
 
-        // 팀 조회 (teamId가 있는 경우)
+        // 팀 조회 (teamId가 있는 경우, 없는 팀 → 404)
         Team team = null;
         if (request.teamId() != null) {
             team = teamRepository.findById(request.teamId())
-                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀입니다: " + request.teamId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 팀입니다: " + request.teamId()));
         }
 
         // 엔티티 수정 (JPA 변경 감지 - Dirty Checking)
@@ -116,7 +120,7 @@ public class MemberService {
     @Transactional
     public void deleteMember(Long id) {
         if (!memberRepository.existsById(id)) {
-            throw new IllegalArgumentException("존재하지 않는 회원입니다: " + id);
+            throw new ResourceNotFoundException("존재하지 않는 회원입니다: " + id);
         }
         memberRepository.deleteById(id);
     }
@@ -160,7 +164,7 @@ public class MemberService {
     @Transactional
     public TeamResponse createTeam(TeamRequest request) {
         if (teamRepository.existsByName(request.name())) {
-            throw new IllegalArgumentException("이미 존재하는 팀 이름입니다: " + request.name());
+            throw new DuplicateResourceException("이미 존재하는 팀 이름입니다: " + request.name());
         }
         Team team = new Team(request.name());
         Team savedTeam = teamRepository.save(team);
@@ -169,18 +173,32 @@ public class MemberService {
 
     /**
      * 팀 단건 조회 (소속 회원 포함)
+     * - findByIdWithMembers: members를 JOIN FETCH로 함께 로딩 (N+1 방지)
      */
     public TeamResponse getTeam(Long id) {
-        Team team = teamRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀입니다: " + id));
+        Team team = teamRepository.findByIdWithMembers(id)
+                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 팀입니다: " + id));
         return TeamResponse.from(team);
     }
 
     /**
+     * 팀별 소속 회원 목록 조회
+     * - GET /api/teams/{id}/members 전용: 팀 정보가 아닌 "회원 목록"만 반환한다.
+     */
+    public List<MemberResponse> getTeamMembers(Long id) {
+        Team team = teamRepository.findByIdWithMembers(id)
+                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 팀입니다: " + id));
+        return team.getMembers().stream()
+                .map(MemberResponse::from)
+                .toList();
+    }
+
+    /**
      * 팀 전체 조회
+     * - findAllWithMembers: 각 팀의 members를 함께 로딩해 회원 수 집계 시 N+1 방지
      */
     public List<TeamResponse> getTeams() {
-        return teamRepository.findAll().stream()
+        return teamRepository.findAllWithMembers().stream()
                 .map(TeamResponse::withoutMembers)
                 .toList();
     }
@@ -191,7 +209,7 @@ public class MemberService {
     @Transactional
     public void deleteTeam(Long id) {
         if (!teamRepository.existsById(id)) {
-            throw new IllegalArgumentException("존재하지 않는 팀입니다: " + id);
+            throw new ResourceNotFoundException("존재하지 않는 팀입니다: " + id);
         }
         teamRepository.deleteById(id);
     }

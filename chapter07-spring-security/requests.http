@@ -1,0 +1,86 @@
+### Chapter 07 - Spring Security (JWT 인증/인가) 요청 모음
+#
+# 사용법
+#  - VS Code: "REST Client" 확장 설치 후 각 요청 위의 "Send Request" 클릭
+#  - IntelliJ IDEA: 우측 상단의 초록색 ▶ 버튼 클릭
+#
+# 사전 준비 (DB가 필요합니다!)
+#  방법 A) cd chapter07-spring-security && docker compose up --build
+#  방법 B) 공통 인프라 먼저: cd docker && docker compose -f docker-compose-infra.yml up -d
+#          그 후 챕터를 실행
+#  DB 접속정보: edu / edu1234 / edu_spring
+#
+# JWT 흐름
+#  1) 회원가입 또는 로그인 → 응답 본문의 token 을 받음
+#  2) 보호된 요청에 헤더 Authorization: Bearer <token> 을 붙임
+#
+# 토큰 자동 재사용 (REST Client 문법)
+#  로그인 요청에 "# @name login" 이름을 붙이면, 이후 요청에서
+#  {{login.response.body.$.token}} 으로 발급된 토큰을 자동 참조할 수 있습니다.
+#  (IntelliJ 등 호환을 위해, 수동 대안도 아래 주석으로 안내합니다.)
+
+@baseUrl = http://localhost:8080
+
+### 1) 회원가입 (POST /api/auth/signup) → 201 Created
+# 주의: 이 챕터의 회원가입은 role 이 필수입니다. (USER 또는 ADMIN)
+# password 는 8자 이상이어야 합니다.
+POST {{baseUrl}}/api/auth/signup
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "password123",
+  "role": "USER"
+}
+
+### 2) 로그인 (POST /api/auth/login) → 200 OK, 응답: { "token": "..." }
+# @name login  ← 이 응답을 'login' 이라는 이름으로 저장
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "password123"
+}
+
+### 3) 내 정보 조회 (GET /api/users/me) - 인증 필요
+# 아래는 위 login 응답의 토큰을 자동으로 사용합니다. (REST Client)
+# IntelliJ 등에서 자동 참조가 안 되면, 2번 응답의 token 값을 복사해
+# Bearer 뒤에 직접 붙여넣으세요.
+GET {{baseUrl}}/api/users/me
+Authorization: Bearer {{login.response.body.$.token}}
+
+### 4) [에러 체험] 토큰 없이 보호된 요청 → 401 Unauthorized
+GET {{baseUrl}}/api/users/me
+
+### 5) [에러 체험] USER 토큰으로 관리자 API 접근 → 403 Forbidden
+# /api/admin/** 은 ADMIN 역할만 접근 가능합니다.
+GET {{baseUrl}}/api/admin/users
+Authorization: Bearer {{login.response.body.$.token}}
+
+### --- 관리자(ADMIN) 흐름 ---
+
+### 6) 관리자 회원가입 (role = ADMIN)
+POST {{baseUrl}}/api/auth/signup
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin1234",
+  "role": "ADMIN"
+}
+
+### 7) 관리자 로그인 → adminLogin 이름으로 저장
+# @name adminLogin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin1234"
+}
+
+### 8) 관리자 전용 - 전체 사용자 조회 (GET /api/admin/users) → 200 OK
+GET {{baseUrl}}/api/admin/users
+Authorization: Bearer {{adminLogin.response.body.$.token}}

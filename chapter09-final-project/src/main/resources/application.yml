@@ -12,7 +12,9 @@ spring:
         format_sql: true
 
 jwt:
-  secret: mySecretKeyForBoardProjectJwtTokenGeneration1234567890abcdef
+  # 운영 환경에서는 비밀키를 코드/설정 파일에 두지 말고 환경 변수(JWT_SECRET)로 외부화해야 합니다.
+  # ${ENV:default} 문법: 환경 변수가 있으면 그 값을, 없으면 콜론 뒤의 개발용 기본값을 사용합니다.
+  secret: ${JWT_SECRET:mySecretKeyForBoardProjectJwtTokenGeneration1234567890abcdef}
   expiration: 86400000
 
 server:

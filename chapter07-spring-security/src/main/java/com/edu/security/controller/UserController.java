@@ -4,6 +4,7 @@ import com.edu.security.entity.User;
 import com.edu.security.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -58,8 +59,14 @@ public class UserController {
      * ADMIN 역할을 가진 사용자만 접근할 수 있습니다.
      * 일반 USER가 접근하면 403 Forbidden 응답이 반환됩니다.
      *
+     * 추가로 @PreAuthorize("hasRole('ADMIN')")를 메서드에 직접 선언했다.
+     * - URL 기반 규칙(SecurityConfig)과 메서드 기반 규칙(@PreAuthorize)은 함께 쓸 수 있다.
+     * - @EnableMethodSecurity(SecurityConfig)가 켜져 있어야 동작한다.
+     * - 메서드 보안은 컨트롤러뿐 아니라 서비스 계층에도 적용할 수 있어 더 세밀한 제어가 가능하다.
+     *
      * @return 전체 사용자 목록 (비밀번호 제외)
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/api/admin/users")
     public ResponseEntity<List<Map<String, Object>>> getAllUsers() {
         List<Map<String, Object>> users = userRepository.findAll().stream()

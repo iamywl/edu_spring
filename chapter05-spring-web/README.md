@@ -4,6 +4,7 @@
 - REST API의 개념과 설계 원칙을 이해한다
 - Spring Web MVC를 사용하여 REST API를 구현한다
 - 요청/응답 처리, 유효성 검증, 예외 처리를 학습한다
+- Swagger(OpenAPI)로 API 문서를 자동 생성하고, CORS를 설정한다
 - Docker를 사용하여 애플리케이션을 컨테이너로 실행한다
 
 ---
@@ -128,17 +129,35 @@ public TodoResponse get(@PathVariable Long id) {
 ```
 
 ### @RequestParam
-쿼리 파라미터를 추출한다.
+쿼리 파라미터(URL의 `?key=value`)를 추출한다.
 
 ```java
 @GetMapping("/api/todos")
-public List<TodoResponse> search(
-    @RequestParam(required = false) String keyword,
-    @RequestParam(defaultValue = "0") int page
+public List<TodoResponse> getTodos(
+    @RequestParam(required = false) Boolean completed,  // ?completed=true
+    @RequestParam(required = false) String keyword      // ?keyword=spring
 ) {
-    // /api/todos?keyword=spring&page=1
-    return todoService.search(keyword, page);
+    // /api/todos?completed=true&keyword=spring
+    return todoService.search(completed, keyword);
 }
+```
+
+### @PathVariable vs @RequestParam
+
+| 구분 | @PathVariable | @RequestParam |
+|------|---------------|---------------|
+| 위치 | 경로 일부 `/api/todos/{id}` | 쿼리 문자열 `?completed=true` |
+| 용도 | 특정 리소스 식별 | 필터/검색/정렬/페이징 조건 |
+| 예시 | `GET /api/todos/1` | `GET /api/todos?completed=true` |
+
+본 프로젝트의 `TodoController.getTodos()`에서 `@RequestParam` 기반 검색/필터를, `getTodoById()`에서 `@PathVariable` 기반 단건 조회를 직접 비교할 수 있다.
+
+```bash
+# 완료된 할일만 조회
+curl "http://localhost:8080/api/todos?completed=true"
+
+# 제목에 "spring"이 포함된 할일만 조회
+curl "http://localhost:8080/api/todos?keyword=spring"
 ```
 
 ---
@@ -277,7 +296,96 @@ public ResponseEntity<TodoResponse> create(@Valid @RequestBody TodoRequest reque
 
 ---
 
-## 9. Docker로 실행하기
+## 9. Swagger / OpenAPI (API 문서 자동화)
+
+API 명세를 코드와 따로 문서로 관리하면 금방 불일치가 생긴다. Swagger(OpenAPI)는 코드의 애노테이션을 읽어 **API 문서와 테스트 UI를 자동 생성**한다.
+
+### 의존성 추가
+
+```gradle
+implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
+```
+
+의존성만 추가하면 별도 설정 없이 다음 엔드포인트가 자동 생성된다.
+
+| 엔드포인트 | 설명 |
+|------------|------|
+| `/swagger-ui.html` | 브라우저에서 API를 보고 직접 호출해보는 UI |
+| `/v3/api-docs` | OpenAPI 명세(JSON) |
+
+### 문서화 애노테이션
+
+| 애노테이션 | 대상 | 설명 |
+|------------|------|------|
+| `@Tag` | 컨트롤러 클래스 | API 그룹 이름/설명 |
+| `@Operation` | 메서드 | 각 API의 요약/설명 |
+| `@ApiResponse` | 메서드 | 응답 코드별 의미 (200, 404 등) |
+| `@Parameter` | 파라미터 | 파라미터 설명 |
+
+```java
+@Tag(name = "Todo API", description = "할일 관리 REST API")
+@RestController
+@RequestMapping("/api/todos")
+public class TodoController {
+
+    @Operation(summary = "할일 단건 조회", description = "ID로 특정 할일을 조회한다")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "조회 성공"),
+        @ApiResponse(responseCode = "404", description = "해당 ID의 할일이 없음")
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<TodoResponse> getTodoById(@PathVariable Long id) { ... }
+}
+```
+
+### 접속 방법
+
+애플리케이션 실행 후 브라우저에서 아래 주소로 접속한다.
+
+```
+http://localhost:8080/swagger-ui.html
+```
+
+화면에서 각 API를 펼쳐 "Try it out" 버튼으로 직접 요청을 보내볼 수 있다.
+
+---
+
+## 10. CORS 설정
+
+### CORS(Cross-Origin Resource Sharing)란?
+브라우저는 보안을 위해 **다른 출처(origin)** 로의 요청을 기본적으로 차단한다. 출처는 `프로토콜 + 호스트 + 포트`로 구성된다.
+
+```
+프론트엔드 http://localhost:3000  →  백엔드 API http://localhost:8080
+                                     (포트가 달라 "다른 출처" → 브라우저가 차단)
+```
+
+서버가 "이 출처는 허용한다"고 응답 헤더로 알려주면 브라우저가 요청을 통과시킨다.
+
+### WebMvcConfigurer로 전역 설정
+`WebMvcConfigurer`를 구현하고 `addCorsMappings()`를 오버라이드하여 전역 CORS 정책을 정의한다.
+
+```java
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/api/**")                   // 적용 경로
+                .allowedOrigins("http://localhost:3000")  // 허용 출처(개발용 프론트엔드)
+                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .allowedHeaders("*")
+                .allowCredentials(true)                   // 쿠키 등 인증 정보 허용
+                .maxAge(3600);                            // preflight 캐시(초)
+    }
+}
+```
+
+> 운영 환경에서는 `allowedOrigins("*")`처럼 모든 출처를 허용하지 말고, 신뢰할 수 있는 출처만 명시하는 것이 안전하다.
+
+---
+
+## 11. Docker로 실행하기
 
 ### 프로젝트 빌드 및 Docker 실행
 
@@ -340,8 +448,10 @@ chapter05-spring-web/
 └── src/main/
     ├── java/com/edu/web/
     │   ├── Chapter05Application.java          ← 메인 클래스
+    │   ├── config/
+    │   │   └── WebConfig.java                 ← 전역 CORS 설정
     │   ├── controller/
-    │   │   ├── TodoController.java            ← REST 컨트롤러
+    │   │   ├── TodoController.java            ← REST 컨트롤러 (+ Swagger 문서화)
     │   │   └── GlobalExceptionHandler.java    ← 전역 예외 처리
     │   ├── dto/
     │   │   ├── TodoRequest.java               ← 요청 DTO
@@ -365,4 +475,7 @@ chapter05-spring-web/
 4. **ResponseEntity**로 HTTP 상태 코드를 명시적으로 제어한다
 5. **@ControllerAdvice**로 예외를 전역적으로 처리하여 일관된 에러 응답을 제공한다
 6. **@Valid**와 Bean Validation으로 입력 데이터의 유효성을 검증한다
-7. **Docker 멀티 스테이지 빌드**로 최적화된 컨테이너 이미지를 생성한다
+7. **@RequestParam**은 검색/필터 조건에, **@PathVariable**은 리소스 식별에 사용한다
+8. **Swagger/OpenAPI**로 API 문서와 테스트 UI를 자동 생성한다 (`/swagger-ui.html`)
+9. **CORS** 설정으로 다른 출처의 프론트엔드가 API를 호출할 수 있게 허용한다
+10. **Docker 멀티 스테이지 빌드**로 최적화된 컨테이너 이미지를 생성한다

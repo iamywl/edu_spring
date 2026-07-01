@@ -28,6 +28,8 @@ docker compose up -d
 | 2 | 컬렉션 프레임워크 | `./run.sh 6` | `CollectionExample.java` |
 | 3 | Stream API | `./run.sh 8` | `StreamExample.java` |
 | 4 | 람다와 함수형 인터페이스 | `./run.sh 9` | `LambdaExample.java` |
+| 5 | Comparable과 Comparator | `./run.sh 14` | `ComparableComparatorExample.java` |
+| 6 | equals와 hashCode 계약 | `./run.sh 15` | `EqualsHashCodeExample.java` |
 
 ---
 
@@ -136,6 +138,53 @@ docker compose up -d
 1. `LambdaExample`에서 새로운 `Predicate<String>`을 만들어 이름 리스트에서 3글자 이상인 이름만 필터링해보세요.
 2. `Calculator` 인터페이스를 사용하여 거듭제곱(`Math.pow`) 연산을 구현해보세요. (힌트: 반환 타입이 int이므로 캐스팅 필요)
 3. `demonstratePracticalExamples()`에서 `Function` 조합을 사용하여 Person의 이름을 대문자로 변환 후 "님" 접미사를 붙이는 파이프라인을 만들어보세요.
+
+---
+
+### 세션 5: Comparable과 Comparator
+
+**개념 학습**
+- 📝 [JAVA_교육자료](../docs/JAVA_교육자료.md) - "객체 정렬: Comparable / Comparator" 참고
+
+**예제 코드 분석**
+- 파일: `src/main/java/com/edu/collections/ComparableComparatorExample.java`
+- `Student implements Comparable<Student>`로 자연 정렬(점수 오름차순)을 정의하는 방법 확인
+- `Comparator.comparing(...).thenComparing(...)`로 다중 키 정렬, `reversed()`로 역순 정렬 확인
+- `TreeSet`이 `compareTo`(또는 생성자에 넘긴 Comparator)로 자동 정렬하는 것 확인
+
+**예제 실행**
+- `./run.sh 14`
+- 출력에서 확인할 것들:
+  - `sort(null)`로 자연 순서 정렬이 동작하는 것
+  - 점수 내림차순 + 동점 시 나이 오름차순의 다중 키 정렬 결과
+  - TreeSet이 `compareTo == 0`인 요소를 중복으로 보고 저장하지 않는 것
+
+**실습 과제**
+1. 이름 기준 정렬 후 동명이인은 점수 높은 순으로 정렬하는 Comparator를 만들어보세요.
+2. `Comparator.comparingInt`로 점수 정렬을 작성해 `comparing`과 비교해보세요.
+
+---
+
+### 세션 6: equals와 hashCode 계약
+
+**개념 학습**
+- 📝 [JAVA_교육자료](../docs/JAVA_교육자료.md) - "equals/hashCode 계약" 참고
+
+**예제 코드 분석**
+- 파일: `src/main/java/com/edu/collections/EqualsHashCodeExample.java`
+- `equals`만 재정의하고 `hashCode`를 재정의하지 않은 `BadProduct`가 `HashSet`에서 중복 제거에 실패하는 버그 확인
+- `equals`와 `hashCode`를 함께 재정의한 `GoodProduct`로 정상 동작하는 것 확인
+- equals/hashCode 계약 규칙(주석/출력) 확인
+
+**예제 실행**
+- `./run.sh 15`
+- 출력에서 확인할 것들:
+  - `BadProduct`: `equals`는 `true`인데 `hashCode`가 달라 HashSet 크기가 2가 되는 것(버그)
+  - `GoodProduct`: HashSet 크기가 1이 되고 `contains`로 동일 객체를 찾는 것
+
+**실습 과제**
+1. `BadProduct`에 올바른 `hashCode()`를 추가해 버그를 고쳐보세요.
+2. 같은 두 필드를 갖는 `record`로 만들면 equals/hashCode가 자동 생성됨을 확인해보세요.
 
 ---
 

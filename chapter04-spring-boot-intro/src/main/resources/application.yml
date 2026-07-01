@@ -3,6 +3,13 @@ spring:
     name: chapter04-spring-intro
 server:
   port: 8080
+
+# @ConfigurationProperties(prefix = "app")가 읽어가는 커스텀 설정
+# AppProperties.java의 필드(name, version, maxUsers)에 자동으로 바인딩된다
+app:
+  name: 교육용 Spring Boot 앱
+  version: 1.0.0
+  max-users: 100   # 케밥케이스(max-users) -> 카멜케이스(maxUsers) 필드로 매핑됨
 ---
 spring:
   config:

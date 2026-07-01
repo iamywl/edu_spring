@@ -223,13 +223,16 @@ class ApplicationIntegrationTest {
 
 **Controller 레이어만** 테스트할 때 사용한다. Service는 Mock으로 대체된다.
 
+> **Spring Boot 3.4 변경점**: 기존 `@MockBean`이 deprecated 되었고,
+> `org.springframework.test.context.bean.override.mockito.MockitoBean`의 `@MockitoBean`을 사용한다.
+
 ```java
 @WebMvcTest(ProductController.class)
 class ProductControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean                        // Spring Boot 3.4+ : @MockBean 대신 사용
     private ProductService productService;
 
     @Test
@@ -242,6 +245,9 @@ class ProductControllerTest {
     }
 }
 ```
+
+> 실제 동작하는 예제는 `src/test/.../ProductControllerTest.java`와
+> 그 대상인 `src/main/.../controller/ProductController.java`를 참고한다.
 
 ### 4.3 @DataJpaTest
 
@@ -264,12 +270,12 @@ class ProductRepositoryTest {
 
 ### 4.4 테스트 슬라이스 비교
 
-| 어노테이션 | 로드 범위 | 용도 |
-|------------|----------|------|
-| `@SpringBootTest` | 전체 컨텍스트 | 통합 테스트 |
-| `@WebMvcTest` | Controller + MVC 관련 | API 테스트 |
-| `@DataJpaTest` | JPA + Repository 관련 | DB 테스트 |
-| `@JsonTest` | JSON 직렬화/역직렬화 | JSON 테스트 |
+| 어노테이션 | 로드 범위 | 용도 | 예제 코드 |
+|------------|----------|------|-----------|
+| `@SpringBootTest` | 전체 컨텍스트 | 통합 테스트 | - |
+| `@WebMvcTest` | Controller + MVC 관련 | API 테스트 | `ProductControllerTest` |
+| `@DataJpaTest` | JPA + Repository 관련 | DB 테스트 | `ProductRepositoryTestcontainersTest` |
+| `@JsonTest` | JSON 직렬화/역직렬화 | JSON 테스트 | - |
 
 ---
 
@@ -385,7 +391,74 @@ open build/reports/tests/test/index.html
 
 ---
 
-## 7. 프로젝트 구조
+## 7. 테스트 커버리지 (JaCoCo)
+
+### 7.1 JaCoCo란?
+
+JaCoCo(Java Code Coverage)는 **테스트가 소스 코드의 어느 부분을 실행했는지** 측정해주는 도구다.
+"내 테스트가 실제로 얼마나 많은 코드를 검증하고 있는가?"를 수치로 보여준다.
+
+이 챕터의 `build.gradle`에는 JaCoCo 플러그인이 적용되어 있다.
+
+```groovy
+plugins {
+    id 'jacoco'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport   // 테스트가 끝나면 자동으로 리포트 생성
+}
+
+jacocoTestReport {
+    dependsOn test                 // 리포트는 항상 test 실행 결과 기반
+}
+```
+
+### 7.2 실행 방법
+
+```bash
+# 테스트 실행 후 커버리지 리포트 생성
+./gradlew test jacocoTestReport
+
+# (test 태스크에 finalizedBy가 걸려 있어 ./gradlew test 만 실행해도 리포트가 생성된다)
+```
+
+### 7.3 리포트 확인
+
+HTML 리포트는 아래 경로에 생성된다.
+
+```
+build/reports/jacoco/test/html/index.html
+```
+
+```bash
+# macOS 기준
+open build/reports/jacoco/test/html/index.html
+```
+
+패키지/클래스/메서드 단위로 다음과 같은 지표를 보여준다.
+
+- **라인 커버리지(Line Coverage)**: 실행된 코드 라인의 비율
+- **브랜치 커버리지(Branch Coverage)**: 실행된 분기(if/else 등)의 비율
+
+### 7.4 커버리지의 의미와 한계
+
+| 구분 | 설명 |
+|------|------|
+| **의미** | 테스트가 코드를 얼마나 "실행"했는지 보여주는 지표 |
+| **유용성** | 테스트가 아예 닿지 않은 코드(사각지대)를 발견하는 데 효과적 |
+
+> **주의: 높은 커버리지 != 좋은 테스트**
+>
+> 커버리지는 코드를 **실행했는지**만 측정할 뿐, 그 결과를 **제대로 검증(assert)했는지**는 알지 못한다.
+> 단언문 없이 메서드를 호출하기만 해도 커버리지는 올라간다.
+> 따라서 커버리지는 "테스트가 부족한 곳"을 찾는 보조 지표로 활용하고,
+> 100% 커버리지 자체를 목표로 삼지 않는 것이 좋다. 중요한 것은 **의미 있는 검증**이다.
+
+---
+
+## 8. 프로젝트 구조
 
 ```
 chapter08-testing/
@@ -397,6 +470,8 @@ chapter08-testing/
 │   ├── main/
 │   │   ├── java/com/edu/testing/
 │   │   │   ├── Chapter08Application.java
+│   │   │   ├── controller/
+│   │   │   │   └── ProductController.java
 │   │   │   ├── entity/
 │   │   │   │   └── Product.java
 │   │   │   ├── repository/
@@ -409,6 +484,7 @@ chapter08-testing/
 │       ├── java/com/edu/testing/
 │       │   ├── ProductEntityTest.java          ← 단위 테스트 (JUnit 5)
 │       │   ├── ProductServiceTest.java         ← 단위 테스트 (Mockito)
+│       │   ├── ProductControllerTest.java      ← 슬라이스 테스트 (@WebMvcTest + MockMvc)
 │       │   └── ProductRepositoryTestcontainersTest.java ← 통합 테스트 (Testcontainers)
 │       └── resources/
 │           └── application.yml
@@ -417,15 +493,17 @@ chapter08-testing/
 
 ---
 
-## 8. 핵심 정리
+## 9. 핵심 정리
 
 | 개념 | 설명 |
 |------|------|
 | **단위 테스트** | 하나의 클래스/메서드를 격리하여 테스트. 빠르고 간단 |
 | **Mockito** | 의존 객체를 가짜(Mock)로 대체하여 격리된 테스트 작성 |
 | **Spring Boot Test Slice** | 필요한 레이어만 로드하여 테스트 속도 향상 |
+| **@WebMvcTest + MockMvc** | Controller 레이어만 로드해 HTTP API를 빠르게 검증 (`@MockitoBean`으로 Service Mock) |
 | **Testcontainers** | Docker로 실제 DB를 띄워서 신뢰도 높은 통합 테스트 |
 | **Given-When-Then** | 테스트의 가독성을 높이는 BDD 스타일 패턴 |
+| **JaCoCo 커버리지** | 테스트가 실행한 코드 비율 측정 (높은 수치 != 좋은 테스트) |
 
 ---
 

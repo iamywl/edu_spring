@@ -24,6 +24,10 @@ dependencies {
     // Bean Validation - 요청 데이터 유효성 검증
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+    // Swagger/OpenAPI - API 문서 자동 생성 및 테스트 UI 제공
+    // 추가하면 /swagger-ui.html, /v3/api-docs 엔드포인트가 자동 생성된다
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
+
     // 테스트 의존성
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

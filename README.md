@@ -129,19 +129,28 @@ edu_spring/
 ├── chapter07-spring-security/     # Spring Security
 ├── chapter08-testing/             # 테스트
 ├── chapter09-final-project/       # 종합 프로젝트 (게시판)
+├── compile.sh                     # Ch01~03 Java 컴파일 스크립트
+├── docker-compose.yml             # Ch01~03 Java 통합 실행
+├── .devcontainer/                 # VS Code Dev Container 설정
 └── docs/                          # 참고 문서
     ├── JAVA_개념서.md
     ├── JAVA_교육자료.md
     ├── JAVA_코딩표준.md
     ├── SPRING_개념서.md
     ├── SPRING_교육자료.md
-    ├── 학습계획.md
+    ├── 학습계획.md / 학습계획.csv
+    ├── 트러블슈팅.md              # 자주 겪는 오류 해결 가이드
+    ├── 추가자료_안내.md           # .http 파일 등 보조 자료 안내
     └── 맥북_Docker_실습가이드.md
 ```
 
+> **API 테스트**: 각 Spring 챕터(05~07, 09)에는 `requests.http` 파일이 있어 VS Code REST Client
+> 또는 IntelliJ HTTP Client로 curl 없이 API를 호출/테스트할 수 있습니다. (`docs/추가자료_안내.md` 참고)
+> 막히는 부분이 있으면 `docs/트러블슈팅.md`를 먼저 확인하세요.
+
 ## 기술 스택
 - **Language**: Java 21
-- **Framework**: Spring Boot 3.3.x ~ 3.4.x
+- **Framework**: Spring Boot 3.4.3
 - **Database**: PostgreSQL 16
 - **Cache**: Redis 7
 - **Security**: Spring Security + JWT

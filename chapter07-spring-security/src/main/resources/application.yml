@@ -9,6 +9,9 @@ spring:
     show-sql: true
 
 # JWT 설정
+# - secret은 HS256 서명에 사용되며 최소 32바이트(32자 이상) 이어야 한다.
+# - ${JWT_SECRET:기본값} : 환경변수 JWT_SECRET이 있으면 그 값을, 없으면 기본값을 사용한다.
+#   실제 운영에서는 비밀키를 코드/설정파일에 두지 말고 환경변수 등으로 외부에서 주입해야 한다.
 jwt:
-  secret: mySecretKeyForJwtTokenGenerationThatIsLongEnoughForHS256Algorithm123456
+  secret: ${JWT_SECRET:mySecretKeyForJwtTokenGenerationThatIsLongEnoughForHS256Algorithm123456}
   expiration: 3600000  # 1시간 (밀리초)

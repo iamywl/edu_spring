@@ -32,6 +32,7 @@ src/main/java/com/edu/oop/
   Shape.java           # sealed class
   Circle.java          # Shape의 final 하위 클래스
   Rectangle.java       # Shape의 non-sealed 하위 클래스
+  NestedClassExample.java # 중첩 클래스 4종 (정적 중첩/내부/지역/익명)
 ```
 
 ---
@@ -261,6 +262,31 @@ src/main/java/com/edu/oop/
 
 ---
 
+### 세션 9: 중첩 클래스
+
+**개념 학습**
+- [JAVA_교육자료](../docs/JAVA_교육자료.md) - "중첩 클래스, 익명 클래스" 참고
+
+**예제 코드 분석**
+- 파일: `NestedClassExample.java` (독립 실행)
+- 주목할 포인트:
+  - **정적 중첩 클래스(static nested)**: 바깥 인스턴스 없이 생성
+  - **내부 클래스(inner)**: `바깥인스턴스.new Inner()` 문법, 바깥 클래스의 private 필드 접근 가능
+  - **지역 클래스(local)**: 메서드 안에 선언, 사실상 final 지역 변수 캡처
+  - **익명 클래스(anonymous)**: 인터페이스를 즉석에서 구현, 함수형 인터페이스는 람다로 대체 가능
+
+**예제 실행**
+- `./run.sh 13`
+- 출력에서 확인할 것:
+  - 내부 클래스가 바깥 필드(`outerField`)에 접근하는 것
+  - 익명 클래스 구현과 동일한 일을 하는 람다 표현식의 간결함
+
+**실습 과제**
+1. `Greeting`을 구현하는 익명 클래스를 하나 더 만들고, 같은 동작을 람다로도 작성해 비교해보세요.
+2. 정적 중첩 클래스와 내부 클래스의 생성 방법 차이를 코드로 확인해보세요.
+
+---
+
 ## 핵심 정리
 
 | 개념 | 핵심 키워드 | 예제 파일 |
@@ -271,3 +297,4 @@ src/main/java/com/edu/oop/
 | enum | 상수 + 필드 + 메서드, `values()`, `valueOf()` | Season |
 | record | 불변 데이터, 자동 생성, 컴팩트 생성자 | PersonRecord |
 | sealed class | `sealed`, `permits`, `final`/`non-sealed` | Shape, Circle, Rectangle |
+| 중첩 클래스 | static nested / inner / local / anonymous, 람다 | NestedClassExample |

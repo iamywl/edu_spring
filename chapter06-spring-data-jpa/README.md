@@ -5,7 +5,8 @@
 - Spring Data JPA를 활용하여 데이터베이스 CRUD를 구현한다
 - 쿼리 메서드, JPQL, Native Query를 사용할 수 있다
 - 페이징과 정렬을 구현한다
-- 엔티티 간 연관관계를 매핑한다
+- 엔티티 간 연관관계를 매핑하고 **N+1 문제를 `@EntityGraph`/`JOIN FETCH`로 해결**한다
+- `@Transactional`과 변경 감지(dirty checking), 전역 예외 처리를 이해한다
 - Docker로 PostgreSQL을 실행하고 연동한다
 
 ---
@@ -56,10 +57,13 @@ Spring Data JPA  →  JPA (표준 스펙)  →  Hibernate (구현체)  →  JDBC
 
 | 전략 | 설명 |
 |------|------|
-| `IDENTITY` | 데이터베이스에 위임 (PostgreSQL의 SERIAL) |
-| `SEQUENCE` | 시퀀스 사용 (PostgreSQL 기본 전략) |
-| `TABLE` | 키 생성 전용 테이블 사용 |
-| `AUTO` | DB 방언에 따라 자동 선택 |
+| `IDENTITY` | 키 생성을 DB에 위임 (PostgreSQL의 SERIAL/IDENTITY 컬럼). 이 챕터의 코드가 사용하는 전략 |
+| `SEQUENCE` | DB 시퀀스 오브젝트 사용. PostgreSQL/Oracle처럼 시퀀스를 지원하는 DB에서 권장 |
+| `TABLE` | 키 생성 전용 테이블 사용 (모든 DB에서 동작하나 성능은 낮음) |
+| `AUTO` | DB 방언(Dialect)에 따라 자동 선택. Hibernate 6 + PostgreSQL에서는 `SEQUENCE`가 선택됨 |
+
+> 참고: `SEQUENCE`는 "PostgreSQL의 기본값"이 아니라 **JPA가 선택하는 키 생성 전략** 중 하나다.
+> `AUTO`로 두면 Hibernate 6가 PostgreSQL에 대해 `SEQUENCE`를 고르지만, 이 챕터는 명시적으로 `IDENTITY`를 쓴다.
 
 ### 엔티티 예시
 
@@ -264,9 +268,72 @@ public void addMember(Member member) {
 }
 ```
 
+### N+1 문제와 해결 (★ 실무 핵심)
+
+연관관계에서 가장 자주 만나는 성능 함정이 **N+1 문제**다.
+
+- `Member.team`은 `LAZY`로 설정되어 있다. 회원 목록(N건)을 조회한 뒤 각 회원의 팀 이름
+  (`member.getTeam().getName()`)에 접근하면, 팀을 가져오는 쿼리가 **회원 수만큼 추가**로 나간다.
+- 즉, 목록 1번 + 각 행마다 1번 = **1 + N 쿼리**. 데이터가 많을수록 치명적이다.
+
+`application.yml`에 `show-sql: true`가 켜져 있으니, **콘솔 로그에서 쿼리가 몇 번 나가는지 직접 확인**해 보자.
+
+**해결책 1 — `@EntityGraph` (이 챕터의 `MemberRepository.findAll(Pageable)`):**
+
+```java
+@Override
+@EntityGraph(attributePaths = "team")   // team을 LEFT JOIN으로 함께 로딩
+Page<Member> findAll(Pageable pageable);
+```
+
+**해결책 2 — JPQL `JOIN FETCH` (`MemberRepository.findAllWithTeam`, `TeamRepository.findAllWithMembers`):**
+
+```java
+@Query("SELECT m FROM Member m JOIN FETCH m.team")
+List<Member> findAllWithTeam();
+
+// 컬렉션(1:N)을 FETCH JOIN할 때는 중복 행이 생기므로 DISTINCT를 붙인다
+@Query("SELECT DISTINCT t FROM Team t LEFT JOIN FETCH t.members")
+List<Team> findAllWithMembers();
+```
+
+> 팁: `member→team`처럼 **다대일(ToOne)** 관계는 `@EntityGraph` + 페이징을 함께 써도 안전하다.
+> 반면 **일대다(컬렉션) FETCH JOIN + 페이징**은 메모리에서 페이징하게 되어(`HHH000104` 경고) 위험하므로 주의한다.
+
 ---
 
-## 8. Docker로 PostgreSQL 실행하기
+## 8. 트랜잭션과 예외 처리
+
+### @Transactional
+
+`MemberService`는 클래스 레벨에 `@Transactional(readOnly = true)`를, 쓰기 메서드(`create`/`update`/`delete`)에는
+`@Transactional`을 붙였다.
+
+- **읽기 전용 트랜잭션**(`readOnly = true`)은 변경 감지(dirty checking)를 생략해 약간의 성능 이점이 있다.
+- **변경 감지(Dirty Checking)**: `updateMember`는 `save()`를 호출하지 않는다. 트랜잭션 안에서 조회한
+  엔티티(영속 상태)의 필드를 바꾸면, 커밋 시점에 JPA가 변경을 감지해 자동으로 UPDATE를 실행한다.
+- **영속성 컨텍스트 상태**: 트랜잭션 내에서 조회한 엔티티는 *영속(managed)* 상태이고, 트랜잭션이 끝나면
+  *준영속(detached)* 상태가 된다. LAZY 연관을 트랜잭션 밖에서 접근하면 `LazyInitializationException`이 난다.
+
+### 일관된 예외 처리와 HTTP 상태 코드
+
+이 챕터는 컨트롤러마다 `@ExceptionHandler`를 두는 대신, **전역 예외 처리기**
+(`exception/GlobalExceptionHandler`, `@RestControllerAdvice`)로 모든 예외를 한 곳에서 처리한다 (Chapter 05와 동일 패턴).
+핵심은 **상황에 맞는 정확한 HTTP 상태 코드**를 돌려주는 것이다.
+
+| 상황 | 예외 | HTTP 상태 |
+|------|------|-----------|
+| 없는 회원/팀 조회·수정·삭제 | `ResourceNotFoundException` | **404 Not Found** |
+| 이메일/팀 이름 중복 | `DuplicateResourceException` | **409 Conflict** |
+| `@Valid` 검증 실패 | `MethodArgumentNotValidException` | **400 Bad Request** |
+| 그 외 예기치 못한 오류 | `Exception` | **500 Internal Server Error** |
+
+> 모든 상황에 `IllegalArgumentException`(→400)을 던지면 "없는 데이터(404)"와 "잘못된 입력(400)"을 구분할 수 없다.
+> 의미에 맞는 예외 타입을 만들어 상태 코드를 분리하는 것이 REST API 설계의 기본이다.
+
+---
+
+## 9. Docker로 PostgreSQL 실행하기
 
 ### Docker Compose로 실행
 
@@ -374,13 +441,18 @@ chapter06-spring-data-jpa/
 │   │   ├── MemberRequest.java
 │   │   ├── MemberResponse.java
 │   │   ├── TeamRequest.java
-│   │   └── TeamResponse.java
+│   │   ├── TeamResponse.java
+│   │   └── ErrorResponse.java        # 공통 에러 응답 DTO
 │   ├── entity/
 │   │   ├── Member.java
 │   │   └── Team.java
+│   ├── exception/                    # 예외 + 전역 처리기
+│   │   ├── ResourceNotFoundException.java   # → 404
+│   │   ├── DuplicateResourceException.java  # → 409
+│   │   └── GlobalExceptionHandler.java      # @RestControllerAdvice
 │   ├── repository/
-│   │   ├── MemberRepository.java
-│   │   └── TeamRepository.java
+│   │   ├── MemberRepository.java     # @EntityGraph / JOIN FETCH (N+1 방지)
+│   │   └── TeamRepository.java       # JOIN FETCH (N+1 방지)
 │   └── service/
 │       └── MemberService.java
 └── src/main/resources/
@@ -401,4 +473,7 @@ chapter06-spring-data-jpa/
 | Native Query | DB에 직접 SQL 실행 |
 | 페이징 | `Pageable`과 `Page`로 구현 |
 | 연관관계 | `@ManyToOne`, `@OneToMany`로 엔티티 간 관계 매핑 |
+| N+1 문제 | LAZY 연관 반복 접근 시 1+N 쿼리 발생 → `@EntityGraph` / `JOIN FETCH`로 해결 |
+| @Transactional | 트랜잭션 경계 설정, 변경 감지(dirty checking)로 UPDATE 자동 반영 |
+| 예외 처리 | `@RestControllerAdvice`로 전역 처리, 의미에 맞는 HTTP 상태(404/409/400) 반환 |
 | Docker Compose | PostgreSQL + Spring 앱을 함께 실행 |

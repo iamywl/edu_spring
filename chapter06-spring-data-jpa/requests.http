@@ -1,0 +1,86 @@
+### Chapter 06 - Spring Data JPA (Member / Team API) 요청 모음
+#
+# 사용법
+#  - VS Code: "REST Client" 확장 설치 후 각 요청 위의 "Send Request" 클릭
+#  - IntelliJ IDEA: 우측 상단의 초록색 ▶ 버튼 클릭
+#
+# 사전 준비 (DB가 필요합니다!)
+#  방법 A) 챕터 docker-compose 로 DB + 앱을 함께 실행
+#     cd chapter06-spring-data-jpa
+#     docker compose up postgres -d      # DB 먼저
+#     docker compose up -d                # 앱까지 (또는 --build)
+#  방법 B) 공통 인프라 + 로컬 실행
+#     cd docker && docker compose -f docker-compose-infra.yml up -d
+#     cd ../chapter06-spring-data-jpa && ./gradlew bootRun
+#
+#  DB 접속정보: edu / edu1234 / edu_spring  (Adminer: http://localhost:8081)
+#  인증은 필요 없습니다.
+
+@baseUrl = http://localhost:8080
+
+### 1) 팀 생성 (POST /api/teams) → 201 Created
+POST {{baseUrl}}/api/teams
+Content-Type: application/json
+
+{
+  "name": "개발팀"
+}
+
+### 2) 팀 전체 조회 (GET /api/teams)
+GET {{baseUrl}}/api/teams
+
+### 3) 팀 단건 조회 - 소속 회원 포함 (GET /api/teams/{id})
+GET {{baseUrl}}/api/teams/1
+
+### 4) 회원 등록 (POST /api/members) → 201 Created
+# teamId 는 선택값입니다. 1번 팀이 존재해야 연결됩니다. (팀 미소속이면 null 가능)
+POST {{baseUrl}}/api/members
+Content-Type: application/json
+
+{
+  "name": "홍길동",
+  "email": "hong@example.com",
+  "teamId": 1
+}
+
+### 5) 회원 전체 조회 - 페이징/정렬 (GET /api/members?page=0&size=10&sort=createdAt,desc)
+GET {{baseUrl}}/api/members?page=0&size=10&sort=createdAt,desc
+
+### 6) 회원 단건 조회 (GET /api/members/{id})
+GET {{baseUrl}}/api/members/1
+
+### 7) 이름으로 검색 - 페이징 (GET /api/members/search?keyword=홍)
+GET {{baseUrl}}/api/members/search?keyword=홍&page=0&size=10
+
+### 8) 이메일 도메인으로 검색 (GET /api/members/search/email?domain=example.com)
+GET {{baseUrl}}/api/members/search/email?domain=example.com
+
+### 9) 팀별 회원 조회 (GET /api/teams/{id}/members)
+GET {{baseUrl}}/api/teams/1/members
+
+### 10) 회원 수정 (PUT /api/members/{id})
+PUT {{baseUrl}}/api/members/1
+Content-Type: application/json
+
+{
+  "name": "홍길동2",
+  "email": "hong2@example.com",
+  "teamId": 1
+}
+
+### 11) 회원 삭제 (DELETE /api/members/{id}) → 204 No Content
+DELETE {{baseUrl}}/api/members/1
+
+### 12) 팀 삭제 (DELETE /api/teams/{id}) → 204 No Content
+DELETE {{baseUrl}}/api/teams/1
+
+### 13) [에러 체험] 잘못된 이메일 형식 → 400 Bad Request
+# email 은 @Email 검증이 걸려 있습니다.
+POST {{baseUrl}}/api/members
+Content-Type: application/json
+
+{
+  "name": "테스트",
+  "email": "not-an-email",
+  "teamId": 1
+}

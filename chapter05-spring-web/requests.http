@@ -1,0 +1,58 @@
+### Chapter 05 - Spring Web MVC (Todo API) 요청 모음
+#
+# 사용법
+#  - VS Code: "REST Client" 확장 설치 후, 각 요청 위의 "Send Request" 클릭
+#  - IntelliJ IDEA: 우측 상단의 초록색 ▶ 버튼 클릭 (Ultimate / 최신 Community 지원)
+#
+# 사전 준비
+#  1) cd chapter05-spring-web
+#  2) docker compose up --build
+#  3) 앱이 http://localhost:8080 에서 뜨면 아래 요청을 실행
+#
+# Todo API는 인증이 필요 없습니다. (메모리에 저장되므로 앱 재시작 시 데이터 초기화)
+
+@baseUrl = http://localhost:8080
+
+### 1) 할일 생성 (POST /api/todos) → 201 Created
+POST {{baseUrl}}/api/todos
+Content-Type: application/json
+
+{
+  "title": "Spring 학습",
+  "description": "Chapter 05 실습",
+  "completed": false
+}
+
+### 2) 전체 할일 목록 조회 (GET /api/todos) → 200 OK
+GET {{baseUrl}}/api/todos
+
+### 3) 단건 조회 (GET /api/todos/{id}) → 200 OK / 없으면 404
+GET {{baseUrl}}/api/todos/1
+
+### 4) 할일 수정 (PUT /api/todos/{id}) → 200 OK
+PUT {{baseUrl}}/api/todos/1
+Content-Type: application/json
+
+{
+  "title": "Spring 학습 완료",
+  "description": "Chapter 05 실습 완료",
+  "completed": true
+}
+
+### 5) 할일 삭제 (DELETE /api/todos/{id}) → 204 No Content
+DELETE {{baseUrl}}/api/todos/1
+
+### 6) [에러 체험] 제목 없이 생성 → 400 Bad Request (Validation 실패)
+# title 은 @NotBlank 라서 비우면 검증 오류가 발생합니다.
+# 응답 본문의 error / message 필드에서 실패 사유를 확인하세요.
+POST {{baseUrl}}/api/todos
+Content-Type: application/json
+
+{
+  "title": "",
+  "description": "제목을 비워서 일부러 검증 실패 유도",
+  "completed": false
+}
+
+### 7) [에러 체험] 존재하지 않는 ID 조회 → 404 Not Found
+GET {{baseUrl}}/api/todos/99999

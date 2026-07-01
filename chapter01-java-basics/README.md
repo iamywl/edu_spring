@@ -27,6 +27,9 @@ docker compose up -d
 3. [제어문](#세션-3-제어문)
 4. [배열과 메서드](#세션-4-배열과-메서드)
 5. [예외처리](#세션-5-예외처리)
+6. [래퍼 클래스와 박싱/언박싱](#세션-6-래퍼-클래스와-박싱언박싱)
+7. [날짜와 시간 API](#세션-7-날짜와-시간-api)
+8. [파일 입출력 기초](#세션-8-파일-입출력-기초)
 
 ---
 
@@ -184,6 +187,56 @@ docker compose up -d
    }
    ```
    - 예외가 발생해도 `close()`가 자동으로 호출되는지 확인하세요. 이것이 try-with-resources의 핵심입니다.
+
+---
+
+### 세션 6: 래퍼 클래스와 박싱/언박싱
+
+**예제 실행**
+- 소스 코드: `src/main/java/com/edu/basics/WrappingAndBoxing.java`
+- 실행: `./run.sh 10`
+- 주요 출력 확인 포인트:
+  - 오토박싱/언박싱: `int` ↔ `Integer` 자동 변환과 `List<Integer>`에서의 활용을 확인하세요.
+  - **Integer 캐시 함정**: `Integer 100 == 100`은 `true`인데 `Integer 1000 == 1000`은 `false`인 이유를 확인하세요 (-128~127 캐시). 값 비교는 항상 `equals()`를 쓰세요.
+  - **null 언박싱**: `null`인 `Integer`를 `int`로 언박싱하면 `NullPointerException`이 발생하는 것을 확인하세요.
+  - `parseInt`(기본형 반환) vs `valueOf`(래퍼 반환)의 차이를 확인하세요.
+
+**실습 과제**
+1. `integerCachePitfall()`의 `1000`을 `127`로 바꿔보세요. `==` 결과가 어떻게 달라지나요?
+2. `nullUnboxingPitfall()`에서 언박싱 전에 null 체크를 추가해 NPE를 방어해보세요.
+
+---
+
+### 세션 7: 날짜와 시간 API
+
+**예제 실행**
+- 소스 코드: `src/main/java/com/edu/basics/DateTimeExample.java`
+- 실행: `./run.sh 11`
+- 주요 출력 확인 포인트:
+  - `LocalDate`/`LocalTime`/`LocalDateTime`의 생성과 필드 조회를 확인하세요. (Spring 엔티티의 생성일시 필드는 보통 `LocalDateTime`을 사용합니다.)
+  - `plusDays`/`minusDays` 등은 불변 객체이므로 원본을 바꾸지 않고 **새 객체**를 반환하는 것을 확인하세요.
+  - `isBefore`/`isAfter`로 날짜를 비교하고, `Period`(날짜 간격)와 `Duration`(시간 간격)으로 두 시점의 차이를 계산하는 것을 확인하세요.
+  - `DateTimeFormatter`로 객체↔문자열을 포맷팅/파싱하는 것을 확인하세요.
+
+**실습 과제**
+1. 오늘로부터 100일 뒤가 무슨 요일인지 출력해보세요.
+2. 자신의 생일과 오늘 날짜로 `Period`를 계산해 만 나이를 출력해보세요.
+
+---
+
+### 세션 8: 파일 입출력 기초
+
+**예제 실행**
+- 소스 코드: `src/main/java/com/edu/basics/FileIoExample.java`
+- 실행: `./run.sh 12`
+- 주요 출력 확인 포인트:
+  - `Files.writeString`/`readString`으로 파일 전체를 한 번에 쓰고 읽는 것을 확인하세요. (임시 파일을 사용하므로 비대화형으로 실행됩니다.)
+  - `Files.readAllLines`로 줄 단위 읽기, `try-with-resources`로 `BufferedReader`를 자동으로 닫는 패턴을 확인하세요.
+  - `Scanner`로 콘솔 입력을 받는 개념을 확인하세요 (실제 stdin 대신 문자열을 소스로 사용).
+
+**실습 과제**
+1. CSV 형식(`상품,가격`)을 한 줄 더 추가하고 출력 결과를 확인하세요.
+2. `Files.write`로 `List<String>`을 직접 파일에 쓰는 방법을 찾아 적용해보세요.
 
 ---
 

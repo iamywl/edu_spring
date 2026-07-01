@@ -2,13 +2,13 @@ package com.edu.security.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.function.Function;
 
@@ -102,10 +102,17 @@ public class JwtService {
 
     /**
      * JWT 서명에 사용할 SecretKey를 생성합니다.
-     * Base64로 인코딩된 비밀키를 디코딩하여 HMAC-SHA 키로 변환합니다.
+     *
+     * 비밀키 문자열의 UTF-8 바이트를 그대로 HMAC-SHA 키로 사용합니다.
+     * (Base64 디코딩이 아니라 평문 문자열의 바이트를 사용)
+     *
+     * 주의: HS256 알고리즘은 최소 32바이트(256비트) 길이의 키를 요구합니다.
+     * 따라서 application.yml의 jwt.secret 값은 최소 32자 이상의
+     * ASCII 문자열이어야 합니다. (ASCII 1글자 = 1바이트)
+     * 32자보다 짧으면 서명 시 WeakKeyException이 발생합니다.
      */
     private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

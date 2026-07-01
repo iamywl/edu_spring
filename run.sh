@@ -36,6 +36,9 @@ show_menu() {
     echo -e "${BLUE}║${NC}   ${GREEN}10)${NC} 래퍼 클래스/박싱            (WrappingAndBoxing)         ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}   ${GREEN}11)${NC} 날짜와 시간 API            (DateTimeExample)           ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}   ${GREEN}12)${NC} 파일 입출력 기초            (FileIoExample)             ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${GREEN}16)${NC} [심화] 부동소수점 비트      (FloatingPointBits)         ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${GREEN}17)${NC} [심화] 2의 보수/오버플로우  (TwosComplement)            ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${GREEN}18)${NC} [심화] 값에 의한 전달       (PassByValue)               ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}                                                            ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}  ${YELLOW}[ Chapter 02: 객체지향 프로그래밍 (OOP) ]${NC}                  ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}    ${GREEN}5)${NC} OOP 종합 데모              (OopMain)                   ${BLUE}║${NC}"
@@ -49,6 +52,9 @@ show_menu() {
     echo -e "${BLUE}║${NC}    ${GREEN}9)${NC} 람다와 함수형 인터페이스    (LambdaExample)             ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}   ${GREEN}14)${NC} Comparable/Comparator      (ComparableComparatorExample)${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}   ${GREEN}15)${NC} equals/hashCode 계약       (EqualsHashCodeExample)     ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${GREEN}19)${NC} [심화] Big-O 측정           (BigOTiming)                ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${GREEN}20)${NC} [심화] HashMap 내부 동작    (HashMapInternals)          ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${GREEN}21)${NC} [심화] 제네릭 타입 소거     (TypeErasureDemo)           ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}                                                            ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}  ${CYAN}  a) 전체 실행 (Chapter 01 ~ 03 순서대로)${NC}                ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}  ${RED}  q) 종료${NC}                                                 ${BLUE}║${NC}"
@@ -93,6 +99,12 @@ run_all() {
     run_class "com.edu.oop.NestedClassExample" "Ch02 - 중첩 클래스"
     run_class "com.edu.collections.ComparableComparatorExample" "Ch03 - Comparable/Comparator"
     run_class "com.edu.collections.EqualsHashCodeExample" "Ch03 - equals/hashCode"
+    run_class "com.edu.basics.FloatingPointBits" "Ch01 심화 - 부동소수점 비트"
+    run_class "com.edu.basics.TwosComplement" "Ch01 심화 - 2의 보수/오버플로우"
+    run_class "com.edu.basics.PassByValue" "Ch01 심화 - 값에 의한 전달"
+    run_class "com.edu.collections.BigOTiming" "Ch03 심화 - Big-O 측정"
+    run_class "com.edu.collections.HashMapInternals" "Ch03 심화 - HashMap 내부 동작"
+    run_class "com.edu.collections.TypeErasureDemo" "Ch03 심화 - 제네릭 타입 소거"
 }
 
 # 인자가 있으면 바로 실행 (비대화형 모드)
@@ -113,6 +125,12 @@ if [ $# -gt 0 ]; then
         13) run_class "com.edu.oop.NestedClassExample" "Ch02 - 중첩 클래스" ;;
         14) run_class "com.edu.collections.ComparableComparatorExample" "Ch03 - Comparable/Comparator" ;;
         15) run_class "com.edu.collections.EqualsHashCodeExample" "Ch03 - equals/hashCode" ;;
+        16) run_class "com.edu.basics.FloatingPointBits" "Ch01 심화 - 부동소수점 비트" ;;
+        17) run_class "com.edu.basics.TwosComplement" "Ch01 심화 - 2의 보수/오버플로우" ;;
+        18) run_class "com.edu.basics.PassByValue" "Ch01 심화 - 값에 의한 전달" ;;
+        19) run_class "com.edu.collections.BigOTiming" "Ch03 심화 - Big-O 측정" ;;
+        20) run_class "com.edu.collections.HashMapInternals" "Ch03 심화 - HashMap 내부 동작" ;;
+        21) run_class "com.edu.collections.TypeErasureDemo" "Ch03 심화 - 제네릭 타입 소거" ;;
         all) run_all ;;
         *) java -cp /app/out "$1" ;;
     esac
@@ -141,6 +159,12 @@ while true; do
         13) run_class "com.edu.oop.NestedClassExample" "Ch02 - 중첩 클래스"; wait_for_enter ;;
         14) run_class "com.edu.collections.ComparableComparatorExample" "Ch03 - Comparable/Comparator"; wait_for_enter ;;
         15) run_class "com.edu.collections.EqualsHashCodeExample" "Ch03 - equals/hashCode"; wait_for_enter ;;
+        16) run_class "com.edu.basics.FloatingPointBits" "Ch01 심화 - 부동소수점 비트"; wait_for_enter ;;
+        17) run_class "com.edu.basics.TwosComplement" "Ch01 심화 - 2의 보수/오버플로우"; wait_for_enter ;;
+        18) run_class "com.edu.basics.PassByValue" "Ch01 심화 - 값에 의한 전달"; wait_for_enter ;;
+        19) run_class "com.edu.collections.BigOTiming" "Ch03 심화 - Big-O 측정"; wait_for_enter ;;
+        20) run_class "com.edu.collections.HashMapInternals" "Ch03 심화 - HashMap 내부 동작"; wait_for_enter ;;
+        21) run_class "com.edu.collections.TypeErasureDemo" "Ch03 심화 - 제네릭 타입 소거"; wait_for_enter ;;
         a|A) run_all; wait_for_enter ;;
         q|Q)
             echo -e "\n${GREEN}학습을 마칩니다. 수고하셨습니다!${NC}\n"

@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 회원(Member) REST API 컨트롤러
@@ -146,12 +145,13 @@ public class MemberController {
     }
 
     /**
-     * 팀별 회원 조회
+     * 팀별 소속 회원 목록 조회
      * GET /api/teams/{id}/members
+     * - GET /api/teams/{id}(팀 정보)와 달리, 회원 "목록"만 반환한다.
      */
     @GetMapping("/teams/{id}/members")
-    public ResponseEntity<TeamResponse> getTeamMembers(@PathVariable Long id) {
-        return ResponseEntity.ok(memberService.getTeam(id));
+    public ResponseEntity<List<MemberResponse>> getTeamMembers(@PathVariable Long id) {
+        return ResponseEntity.ok(memberService.getTeamMembers(id));
     }
 
     /**
@@ -164,17 +164,6 @@ public class MemberController {
         return ResponseEntity.noContent().build();
     }
 
-    // ========================
-    // 예외 처리
-    // ========================
-
-    /**
-     * IllegalArgumentException 처리
-     * - 존재하지 않는 리소스, 중복 데이터 등
-     */
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException e) {
-        return ResponseEntity.badRequest()
-                .body(Map.of("error", e.getMessage()));
-    }
+    // 예외 처리는 com.edu.jpa.exception.GlobalExceptionHandler(@RestControllerAdvice)가
+    // 전역에서 담당한다. 컨트롤러마다 @ExceptionHandler를 두지 않아 응답 형식이 일관된다.
 }

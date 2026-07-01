@@ -14,12 +14,17 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -59,6 +64,13 @@ public class SecurityConfig {
                 // 세션 관리 - STATELESS: 서버에서 세션을 생성하지 않음 (JWT 사용)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // 인증/인가 실패 시 응답 처리
+                // - 기본값은 둘 다 403을 반환하지만, REST API에서는 의미를 구분해야 한다.
+                //   · 인증 실패(토큰 없음/유효하지 않음) → 401 Unauthorized
+                //   · 인가 실패(인증은 됐으나 권한 부족, 예: USER가 ADMIN API 접근) → 403 Forbidden
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(authenticationEntryPoint())
+                        .accessDeniedHandler(accessDeniedHandler()))
                 // URL 기반 접근 제어 규칙
                 .authorizeHttpRequests(auth -> auth
                         // 인증 API는 누구나 접근 가능 (회원가입, 로그인)
@@ -108,6 +120,42 @@ public class SecurityConfig {
         return username -> userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(
                         "사용자를 찾을 수 없습니다: " + username));
+    }
+
+    /**
+     * 인증 실패(미인증) 처리기 → 401 Unauthorized
+     *
+     * 토큰이 없거나 유효하지 않아 SecurityContext에 인증 정보가 없는 상태에서
+     * 보호된 자원에 접근하면 호출된다.
+     */
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return (request, response, authException) ->
+                writeError(response, HttpStatus.UNAUTHORIZED, "인증이 필요합니다. 유효한 토큰을 포함해 주세요.");
+    }
+
+    /**
+     * 인가 실패(권한 부족) 처리기 → 403 Forbidden
+     *
+     * 인증은 되었지만 해당 자원에 접근할 권한이 없을 때(예: USER가 ADMIN 전용 API 호출) 호출된다.
+     */
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return (request, response, accessDeniedException) ->
+                writeError(response, HttpStatus.FORBIDDEN, "접근 권한이 없습니다.");
+    }
+
+    /**
+     * 에러 응답을 JSON 형태로 직접 작성하는 헬퍼.
+     */
+    private void writeError(jakarta.servlet.http.HttpServletResponse response,
+                            HttpStatus status, String message) throws java.io.IOException {
+        response.setStatus(status.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        String body = String.format("{\"status\":%d,\"error\":\"%s\",\"message\":\"%s\"}",
+                status.value(), status.getReasonPhrase(), message);
+        response.getWriter().write(body);
     }
 
     /**

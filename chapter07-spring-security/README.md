@@ -414,8 +414,56 @@ chapter07-spring-security/
 | BCryptPasswordEncoder | 비밀번호를 안전하게 해싱 (단방향) |
 | JWT | 서버 세션 없이 토큰 기반 인증 수행 |
 | Role | 사용자 역할에 따른 접근 권한 제어 |
+| @PreAuthorize | 메서드 단위 권한 제어 (`@EnableMethodSecurity` 필요) |
+| 401 vs 403 | 인증 실패=401(토큰 없음/무효), 인가 실패=403(권한 부족) |
 | CORS | 다른 출처의 요청을 허용하기 위한 설정 |
 | STATELESS | JWT 사용 시 서버 세션을 사용하지 않는 정책 |
+
+---
+
+## 401 vs 403 — 인증 실패와 인가 실패의 구분
+
+REST API에서는 두 상황을 반드시 구분해야 한다.
+
+| 상태 코드 | 의미 | 발생 상황 |
+|-----------|------|-----------|
+| **401 Unauthorized** | 인증(Authentication) 실패 | 토큰이 없거나 유효하지 않음 → "당신이 누구인지 모른다" |
+| **403 Forbidden** | 인가(Authorization) 실패 | 인증은 됐지만 권한이 부족함 → "누구인지는 알지만 접근 권한이 없다" |
+
+Spring Security는 기본적으로 두 경우 모두 403을 반환하므로, `SecurityConfig`에서
+`AuthenticationEntryPoint`(→401)와 `AccessDeniedHandler`(→403)를 직접 등록해 구분했다.
+
+```java
+.exceptionHandling(ex -> ex
+        .authenticationEntryPoint(authenticationEntryPoint())  // 미인증 → 401
+        .accessDeniedHandler(accessDeniedHandler()))           // 권한부족 → 403
+```
+
+`src/test`의 `AuthIntegrationTest`가 이 동작(토큰 없음→401, USER의 ADMIN API 접근→403)을 검증한다.
+
+---
+
+## ⚠️ 보안 주의사항 (학습용 단순화)
+
+이 챕터는 학습 목적상 일부를 단순화했다. **실무에서는 반드시 다음을 지켜야 한다.**
+
+1. **비밀키(secret)를 코드/설정 파일에 평문으로 두지 말 것.**
+   `application.yml`은 학습 편의를 위해 기본값을 담고 있지만 `${JWT_SECRET:...}` 형태로
+   환경변수 주입을 우선하도록 해두었다. 운영에서는 환경변수·시크릿 매니저로 외부화한다.
+   (참고: HS256 서명키는 최소 32바이트여야 하며, 코드에서는 secret 문자열의 UTF-8 바이트를 키로 사용한다.)
+
+2. **CSRF를 비활성화한 이유.** CSRF 공격은 브라우저가 쿠키를 자동으로 실어 보내는 점을 악용한다.
+   이 프로젝트는 인증 정보를 쿠키가 아니라 `Authorization: Bearer` **헤더**로 전송하고
+   세션을 STATELESS로 두므로 CSRF에 취약하지 않다. 그래서 `csrf.disable()`이 안전하다.
+   반대로 **쿠키/세션 기반 인증**을 쓴다면 CSRF 보호를 *끄면 안 된다*.
+
+3. **회원가입 시 클라이언트가 역할(role)을 직접 고르게 하지 말 것.**
+   현재 `SignUpRequest`에는 `role` 필드가 있어 누구나 `ADMIN`으로 가입할 수 있다(학습용 노출).
+   실무에서는 가입 시 서버가 무조건 `USER`로 고정하고, 권한 상승은 관리자만 수행해야 한다.
+   (Chapter 09에서는 이 점을 개선한다.)
+
+4. **JWT 만료와 갱신.** stateless JWT는 만료 전 강제 무효화가 어렵다.
+   실무에서는 짧은 액세스 토큰 + 리프레시 토큰(서버 저장/회전)으로 재발급하거나 블랙리스트로 무효화한다.
 
 ## 참고 자료
 

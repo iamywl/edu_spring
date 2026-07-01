@@ -7,7 +7,9 @@
 4. [Bean과 Component Scan](#4-bean과-component-scan)
 5. [Spring Boot 자동 설정](#5-spring-boot-자동-설정)
 6. [Profile 설정](#6-profile-설정)
-7. [Docker로 실행하기](#7-docker로-실행하기)
+7. [@Qualifier와 @Primary (동일 타입 Bean 선택)](#7-qualifier와-primary-동일-타입-bean-선택)
+8. [@ConfigurationProperties와 @Value (외부 설정 주입)](#8-configurationproperties와-value-외부-설정-주입)
+9. [Docker로 실행하기](#9-docker로-실행하기)
 
 ---
 
@@ -390,7 +392,127 @@ curl http://localhost:8080/api/hello?name=Spring
 
 ---
 
-## 7. Docker로 실행하기
+## 7. @Qualifier와 @Primary (동일 타입 Bean 선택)
+
+### 문제 상황
+
+같은 타입(인터페이스)의 Bean이 두 개 이상 등록되면, Spring은 어떤 Bean을 주입해야 할지 알 수 없어 에러가 발생한다.
+
+```java
+public interface PaymentService { String pay(int amount); }
+
+@Component class KakaoPayService implements PaymentService { ... }
+@Component class NaverPayService implements PaymentService { ... }
+
+// PaymentService 타입 Bean이 2개라 어떤 것을 주입할지 모호함 -> 에러!
+public PaymentClient(PaymentService paymentService) { ... }
+```
+
+> 참고: 본 프로젝트의 `KoreanGreetingService`/`EnglishGreetingService`는 `@Profile`로 한 번에 하나만 등록되기 때문에 이 문제가 발생하지 않는다. 아래 예제는 동일 타입 Bean을 동시에 여러 개 등록하는 상황을 다룬다.
+
+### 해결 방법 1: @Primary
+
+`@Primary`는 "타입만 명시했을 때 기본으로 주입할 Bean"을 지정한다.
+
+```java
+@Component
+@Primary   // PaymentService를 타입만으로 주입하면 이 Bean이 선택됨
+public class KakaoPayService implements PaymentService { ... }
+```
+
+### 해결 방법 2: @Qualifier
+
+`@Qualifier`는 Bean 이름을 콕 집어 주입한다. **`@Primary`보다 우선순위가 높다.**
+
+```java
+// @Primary가 KakaoPay에 있어도, @Qualifier로 지정하면 NaverPay가 주입됨
+public PaymentClient(
+        PaymentService primaryPayment,                          // -> KakaoPay (@Primary)
+        @Qualifier("naverPayService") PaymentService selected   // -> NaverPay (@Qualifier)
+) { ... }
+```
+
+### 우선순위 정리
+
+```
+@Qualifier(이름 지정)  >  @Primary(기본 지정)  >  (아무것도 없으면 모호 -> 에러)
+```
+
+본 프로젝트의 `QualifierExample.java`에서 두 방식을 모두 확인할 수 있으며, 애플리케이션을 실행하면 어떤 Bean이 주입됐는지 콘솔에 출력된다.
+
+```
+===== @Primary / @Qualifier 데모 =====
+[@Primary 주입]   10000원을 카카오페이로 결제했습니다. (@Primary 기본 Bean)
+[@Qualifier 주입] 5000원을 네이버페이로 결제했습니다. (@Qualifier로 선택된 Bean)
+=====================================
+```
+
+---
+
+## 8. @ConfigurationProperties와 @Value (외부 설정 주입)
+
+`application.yml`에 작성한 설정값을 코드로 가져오는 두 가지 방법이 있다.
+
+### @Value: 프로퍼티 하나씩 주입
+
+```java
+@Value("${app.name:이름 없음}")   // ${키:기본값} - 키가 없으면 기본값 사용
+private String appName;
+```
+
+- 간단한 값 하나를 주입할 때 편리하다.
+- 프로퍼티가 많아지면 `@Value`가 여기저기 흩어져 관리가 어렵다.
+
+### @ConfigurationProperties: 관련 프로퍼티를 객체로 묶기 (권장)
+
+`prefix`로 시작하는 프로퍼티들을 객체의 필드에 한 번에 바인딩한다.
+
+```java
+// 1) 설정 클래스 정의 (record로 불변 객체)
+@ConfigurationProperties(prefix = "app")
+public record AppProperties(
+        String name,
+        String version,
+        int maxUsers       // 케밥케이스(max-users)가 카멜케이스(maxUsers)로 자동 매핑됨
+) {}
+
+// 2) 메인 클래스에서 활성화
+@SpringBootApplication
+@EnableConfigurationProperties(AppProperties.class)
+public class Chapter04Application { ... }
+```
+
+```yaml
+# application.yml
+app:
+  name: 교육용 Spring Boot 앱
+  version: 1.0.0
+  max-users: 100
+```
+
+### 두 방식 비교
+
+| 구분 | @Value | @ConfigurationProperties |
+|------|--------|--------------------------|
+| 주입 단위 | 프로퍼티 하나씩 | 관련 프로퍼티를 묶어서 |
+| 타입 안전성 | 약함 | 강함 (필드 타입으로 검증) |
+| 케밥케이스 매핑 | 직접 키 명시 | 자동 (max-users → maxUsers) |
+| 권장 상황 | 단발성 값 1~2개 | 설정 그룹 관리 |
+
+본 프로젝트의 `AppProperties.java`(설정 클래스)와 `AppPropertiesLogger.java`(출력)에서 두 방식을 모두 확인할 수 있다. 실행하면 설정값이 콘솔에 출력된다.
+
+```
+===== @ConfigurationProperties 데모 =====
+[묶어서 주입] app.name     = 교육용 Spring Boot 앱
+[묶어서 주입] app.version  = 1.0.0
+[묶어서 주입] app.maxUsers = 100
+[@Value 주입] app.name     = 교육용 Spring Boot 앱
+=========================================
+```
+
+---
+
+## 9. Docker로 실행하기
 
 ### Dockerfile
 
@@ -477,7 +599,10 @@ chapter04-spring-boot-intro/
         │       ├── EnglishGreetingService.java     # 영어 구현체
         │       ├── AppConfig.java                  # @Configuration 예제
         │       ├── HelloController.java            # REST 컨트롤러
-        │       └── BeanLifecycleExample.java       # Bean 생명주기 예제
+        │       ├── BeanLifecycleExample.java       # Bean 생명주기 예제
+        │       ├── QualifierExample.java           # @Primary/@Qualifier 예제
+        │       ├── AppProperties.java              # @ConfigurationProperties 예제
+        │       └── AppPropertiesLogger.java        # 설정값 출력(@Value 대조)
         └── resources/
             └── application.yml                     # 설정 파일
 ```
@@ -493,3 +618,5 @@ chapter04-spring-boot-intro/
 | **Component Scan** | @Component 계열 어노테이션을 탐색하여 Bean 자동 등록 |
 | **Auto Configuration** | 클래스패스 기반 자동 설정 |
 | **Profile** | 환경별 설정 분리 |
+| **@Primary / @Qualifier** | 동일 타입 Bean이 여러 개일 때 주입 대상 선택 (@Qualifier가 우선) |
+| **@ConfigurationProperties** | 관련 설정을 객체로 묶어 타입 안전하게 주입 (@Value는 단건 주입) |

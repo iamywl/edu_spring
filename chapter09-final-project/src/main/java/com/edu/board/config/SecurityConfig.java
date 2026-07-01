@@ -1,9 +1,14 @@
 package com.edu.board.config;
 
 import com.edu.board.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -18,6 +23,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Spring Security 설정
@@ -63,6 +71,15 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
                         // 그 외 모든 요청 - 인증 필요
                         .anyRequest().authenticated()
+                )
+
+                // 인증/인가 예외 처리
+                // - 인증 안 됨(토큰 없음/유효하지 않음) → 401 Unauthorized
+                // - 인증은 됐으나 권한 부족 → 403 Forbidden
+                // (기본값은 둘 다 403이라, 명시적으로 401/403을 구분해 REST API 규약을 따른다)
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(authenticationEntryPoint())
+                        .accessDeniedHandler(accessDeniedHandler())
                 )
 
                 // 세션 관리 - Stateless (세션 사용 안 함)
@@ -121,5 +138,45 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * AuthenticationEntryPoint 빈 등록
+     *
+     * 인증되지 않은(=로그인하지 않은) 사용자가 보호된 자원에 접근할 때 호출됩니다.
+     * 401 Unauthorized 상태 코드와 JSON 에러 본문을 반환합니다.
+     */
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return (request, response, authException) ->
+                writeError(response, HttpServletResponse.SC_UNAUTHORIZED, "인증이 필요합니다.");
+    }
+
+    /**
+     * AccessDeniedHandler 빈 등록
+     *
+     * 인증은 되었지만 권한이 부족한 사용자가 접근할 때 호출됩니다.
+     * 403 Forbidden 상태 코드와 JSON 에러 본문을 반환합니다.
+     */
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return (request, response, accessDeniedException) ->
+                writeError(response, HttpServletResponse.SC_FORBIDDEN, "접근 권한이 없습니다.");
+    }
+
+    /**
+     * 보안 예외 응답 본문을 JSON으로 작성하는 유틸리티 메서드
+     * GlobalExceptionHandler의 에러 응답 형식과 일관성을 맞춥니다.
+     */
+    private void writeError(HttpServletResponse response, int status, String message) throws java.io.IOException {
+        response.setStatus(status);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("status", status);
+        body.put("message", message);
+
+        new ObjectMapper().writeValue(response.getWriter(), body);
     }
 }

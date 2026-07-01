@@ -3,6 +3,8 @@ package com.edu.web.service;
 import com.edu.web.dto.TodoRequest;
 import com.edu.web.dto.TodoResponse;
 import com.edu.web.exception.TodoNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,6 +20,8 @@ import java.util.concurrent.atomic.AtomicLong;
 @Service
 public class TodoService {
 
+    private static final Logger log = LoggerFactory.getLogger(TodoService.class);
+
     // 스레드 안전한 인메모리 저장소
     private final Map<Long, TodoData> store = new ConcurrentHashMap<>();
 
@@ -28,9 +32,30 @@ public class TodoService {
      * 전체 할일 목록을 조회한다
      */
     public List<TodoResponse> getAllTodos() {
+        log.debug("전체 할일 목록 조회 - 현재 저장된 개수: {}", store.size());
         return store.values().stream()
                 .map(this::toResponse)
                 .toList();
+    }
+
+    /**
+     * 조건에 맞는 할일을 검색한다
+     * - completed: 완료 여부로 필터링 (null이면 필터링하지 않음)
+     * - keyword:   제목에 키워드가 포함된 항목만 필터링 (null/빈 문자열이면 필터링하지 않음)
+     * 두 조건 모두 null이면 전체 목록을 반환한다
+     */
+    public List<TodoResponse> search(Boolean completed, String keyword) {
+        log.debug("할일 검색 - completed={}, keyword={}", completed, keyword);
+        List<TodoResponse> result = store.values().stream()
+                // completed가 지정된 경우에만 완료 여부로 필터링
+                .filter(data -> completed == null || data.completed() == completed)
+                // keyword가 지정된 경우에만 제목 포함 여부로 필터링 (대소문자 무시)
+                .filter(data -> keyword == null || keyword.isBlank()
+                        || data.title().toLowerCase().contains(keyword.toLowerCase()))
+                .map(this::toResponse)
+                .toList();
+        log.debug("검색 결과 개수: {}", result.size());
+        return result;
     }
 
     /**
@@ -59,6 +84,7 @@ public class TodoService {
                 LocalDateTime.now()
         );
         store.put(id, data);
+        log.debug("할일 생성 완료 - id={}, title={}", id, request.title());
         return toResponse(data);
     }
 

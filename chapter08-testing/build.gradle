@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.3'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'jacoco'
 }
 
 group = 'com.edu'
@@ -31,4 +32,15 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+    // 테스트가 끝나면 자동으로 JaCoCo 커버리지 리포트를 생성
+    finalizedBy jacocoTestReport
+}
+
+// 커버리지 리포트는 항상 test 실행 결과를 기반으로 생성
+jacocoTestReport {
+    dependsOn test
+    reports {
+        html.required = true
+        xml.required = false
+    }
 }

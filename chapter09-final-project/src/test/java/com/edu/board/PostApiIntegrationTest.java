@@ -157,7 +157,8 @@ class PostApiIntegrationTest {
 
     /**
      * 테스트 5: 인증 없이 게시글 작성 시도
-     * - 401 Unauthorized 응답을 확인합니다.
+     * - 토큰 없이 보호된 엔드포인트에 접근하면 401 Unauthorized를 반환합니다.
+     *   (인증 자체가 안 된 경우는 401, 인증은 됐으나 권한이 없으면 403)
      */
     @Test
     @Order(5)
@@ -168,7 +169,7 @@ class PostApiIntegrationTest {
         mockMvc.perform(post("/api/posts")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 
     /**

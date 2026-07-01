@@ -18,6 +18,7 @@ Thumbs.db
 # Java
 *.class
 out/
+bin/
 
 # Spring
 *.log

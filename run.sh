@@ -33,16 +33,22 @@ show_menu() {
     echo -e "${BLUE}║${NC}    ${GREEN}2)${NC} 제어문 - if, switch, 반복문 (ControlFlow)             ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}    ${GREEN}3)${NC} 배열과 메서드, 재귀        (ArraysAndMethods)         ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}    ${GREEN}4)${NC} 예외처리 기초              (ExceptionBasics)           ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${GREEN}10)${NC} 래퍼 클래스/박싱            (WrappingAndBoxing)         ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${GREEN}11)${NC} 날짜와 시간 API            (DateTimeExample)           ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${GREEN}12)${NC} 파일 입출력 기초            (FileIoExample)             ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}                                                            ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}  ${YELLOW}[ Chapter 02: 객체지향 프로그래밍 (OOP) ]${NC}                  ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}    ${GREEN}5)${NC} OOP 종합 데모              (OopMain)                   ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}       클래스/상속/다형성/인터페이스/enum/record/sealed       ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${GREEN}13)${NC} 중첩 클래스                (NestedClassExample)        ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}                                                            ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}  ${YELLOW}[ Chapter 03: 컬렉션과 함수형 프로그래밍 ]${NC}                 ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}    ${GREEN}6)${NC} 컬렉션 프레임워크          (CollectionExample)         ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}    ${GREEN}7)${NC} 제네릭                     (GenericExample)             ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}    ${GREEN}8)${NC} Stream API                 (StreamExample)              ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}    ${GREEN}9)${NC} 람다와 함수형 인터페이스    (LambdaExample)             ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${GREEN}14)${NC} Comparable/Comparator      (ComparableComparatorExample)${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${GREEN}15)${NC} equals/hashCode 계약       (EqualsHashCodeExample)     ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}                                                            ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}  ${CYAN}  a) 전체 실행 (Chapter 01 ~ 03 순서대로)${NC}                ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}  ${RED}  q) 종료${NC}                                                 ${BLUE}║${NC}"
@@ -81,6 +87,12 @@ run_all() {
     run_class "com.edu.collections.GenericExample" "Ch03 - 제네릭"
     run_class "com.edu.collections.StreamExample" "Ch03 - Stream API"
     run_class "com.edu.collections.LambdaExample" "Ch03 - 람다"
+    run_class "com.edu.basics.WrappingAndBoxing" "Ch01 - 래퍼 클래스/박싱"
+    run_class "com.edu.basics.DateTimeExample" "Ch01 - 날짜와 시간 API"
+    run_class "com.edu.basics.FileIoExample" "Ch01 - 파일 입출력"
+    run_class "com.edu.oop.NestedClassExample" "Ch02 - 중첩 클래스"
+    run_class "com.edu.collections.ComparableComparatorExample" "Ch03 - Comparable/Comparator"
+    run_class "com.edu.collections.EqualsHashCodeExample" "Ch03 - equals/hashCode"
 }
 
 # 인자가 있으면 바로 실행 (비대화형 모드)
@@ -95,6 +107,12 @@ if [ $# -gt 0 ]; then
         7) run_class "com.edu.collections.GenericExample" "Ch03 - 제네릭" ;;
         8) run_class "com.edu.collections.StreamExample" "Ch03 - Stream API" ;;
         9) run_class "com.edu.collections.LambdaExample" "Ch03 - 람다" ;;
+        10) run_class "com.edu.basics.WrappingAndBoxing" "Ch01 - 래퍼 클래스/박싱" ;;
+        11) run_class "com.edu.basics.DateTimeExample" "Ch01 - 날짜와 시간 API" ;;
+        12) run_class "com.edu.basics.FileIoExample" "Ch01 - 파일 입출력" ;;
+        13) run_class "com.edu.oop.NestedClassExample" "Ch02 - 중첩 클래스" ;;
+        14) run_class "com.edu.collections.ComparableComparatorExample" "Ch03 - Comparable/Comparator" ;;
+        15) run_class "com.edu.collections.EqualsHashCodeExample" "Ch03 - equals/hashCode" ;;
         all) run_all ;;
         *) java -cp /app/out "$1" ;;
     esac
@@ -117,6 +135,12 @@ while true; do
         7) run_class "com.edu.collections.GenericExample" "Ch03 - 제네릭"; wait_for_enter ;;
         8) run_class "com.edu.collections.StreamExample" "Ch03 - Stream API"; wait_for_enter ;;
         9) run_class "com.edu.collections.LambdaExample" "Ch03 - 람다"; wait_for_enter ;;
+        10) run_class "com.edu.basics.WrappingAndBoxing" "Ch01 - 래퍼 클래스/박싱"; wait_for_enter ;;
+        11) run_class "com.edu.basics.DateTimeExample" "Ch01 - 날짜와 시간 API"; wait_for_enter ;;
+        12) run_class "com.edu.basics.FileIoExample" "Ch01 - 파일 입출력"; wait_for_enter ;;
+        13) run_class "com.edu.oop.NestedClassExample" "Ch02 - 중첩 클래스"; wait_for_enter ;;
+        14) run_class "com.edu.collections.ComparableComparatorExample" "Ch03 - Comparable/Comparator"; wait_for_enter ;;
+        15) run_class "com.edu.collections.EqualsHashCodeExample" "Ch03 - equals/hashCode"; wait_for_enter ;;
         a|A) run_all; wait_for_enter ;;
         q|Q)
             echo -e "\n${GREEN}학습을 마칩니다. 수고하셨습니다!${NC}\n"

@@ -27,6 +27,20 @@
 | 08 | [테스트](chapter08-testing/) | JUnit5, Mockito, @SpringBootTest, Testcontainers |
 | 09 | [종합 프로젝트](chapter09-final-project/) | 게시판 API (회원, 게시글, 댓글) |
 
+### CS 기반 심화 트랙 (비전공자 → 전공자 수준)
+
+프레임워크 사용법을 넘어 **그 밑단이 왜/어떻게 동작하는가**를 다룹니다. 실행 예제로 직접 측정·증명합니다.
+
+| 트랙 | 개념서 | 실습 |
+|------|--------|------|
+| 자료구조·알고리즘 | [docs/CS_알고리즘_개념서.md](docs/CS_알고리즘_개념서.md) | [chapter-cs-algorithms/](chapter-cs-algorithms/) — `./run.sh 22~27` (Big-O, 정렬, 재귀/DP, 트리·힙, 그래프) |
+| 운영체제·동시성 | [docs/CS_운영체제_개념서.md](docs/CS_운영체제_개념서.md) | [chapter-cs-concurrency/](chapter-cs-concurrency/) — `./run.sh 28~32` (경쟁 상태, 동기화, 교착, 스레드풀) |
+| 데이터베이스 이론 | [docs/CS_데이터베이스_개념서.md](docs/CS_데이터베이스_개념서.md) | [chapter-cs-database/](chapter-cs-database/) — PostgreSQL SQL 랩 (정규화, ACID, 격리수준, 인덱스 EXPLAIN) |
+| 컴퓨터 네트워크 | [docs/CS_네트워크_개념서.md](docs/CS_네트워크_개념서.md) | [chapter-cs-network/](chapter-cs-network/) — `./run.sh 33`(원시 HTTP 소켓), `labs/observe_http.sh`(DNS/TCP/TLS 관찰) |
+
+> Java 개념서·Spring 개념서에도 머신 레이어 심화 섹션(바이트코드/JIT/GC, 2의 보수/IEEE-754, 타입 소거,
+> @Transactional 프록시 원리, ACID/격리수준/B-tree 인덱스, HMAC/대칭·비대칭 암호)이 추가되어 있습니다.
+
 ---
 
 ## 빠른 시작
@@ -48,6 +62,9 @@ docker compose up -d
 ./run.sh 1                    # Ch01 - 변수와 타입
 ./run.sh 5                    # Ch02 - OOP 종합 데모
 ./run.sh 8                    # Ch03 - Stream API
+./run.sh 16                   # [심화] 부동소수점 비트 (IEEE-754)
+./run.sh 23                   # CS 알고리즘 - 정렬 5종 측정
+./run.sh 28                   # CS 동시성 - 경쟁 상태(레이스 컨디션)
 
 # 3. 또는 터미널에서 직접 실행
 docker exec -it java-edu ./compile.sh
@@ -129,6 +146,10 @@ edu_spring/
 ├── chapter07-spring-security/     # Spring Security
 ├── chapter08-testing/             # 테스트
 ├── chapter09-final-project/       # 종합 프로젝트 (게시판)
+├── chapter-cs-algorithms/         # [CS] 자료구조와 알고리즘 (실행 예제)
+├── chapter-cs-concurrency/        # [CS] 운영체제와 동시성 (실행 예제)
+├── chapter-cs-database/           # [CS] 데이터베이스 이론 (SQL 랩)
+├── chapter-cs-network/            # [CS] 컴퓨터 네트워크 (관찰 데모)
 ├── compile.sh                     # Ch01~03 Java 컴파일 스크립트
 ├── docker-compose.yml             # Ch01~03 Java 통합 실행
 ├── .devcontainer/                 # VS Code Dev Container 설정

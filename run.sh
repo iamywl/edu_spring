@@ -56,7 +56,27 @@ show_menu() {
     echo -e "${BLUE}║${NC}   ${GREEN}20)${NC} [심화] HashMap 내부 동작    (HashMapInternals)          ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}   ${GREEN}21)${NC} [심화] 제네릭 타입 소거     (TypeErasureDemo)           ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}                                                            ${BLUE}║${NC}"
-    echo -e "${BLUE}║${NC}  ${CYAN}  a) 전체 실행 (Chapter 01 ~ 03 순서대로)${NC}                ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}  ${YELLOW}[ CS 기반: 자료구조와 알고리즘 ]${NC}                          ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${GREEN}22)${NC} 탐색: 선형/이진            (SearchAlgorithms)          ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${GREEN}23)${NC} 정렬 5종 + 측정            (SortingAlgorithms)         ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${GREEN}24)${NC} 재귀와 동적계획법(DP)      (RecursionAndDP)            ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${GREEN}25)${NC} 자료구조 직접 구현         (DataStructuresFromScratch) ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${GREEN}26)${NC} 트리와 힙                  (TreeAndHeap)               ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${GREEN}27)${NC} 그래프 BFS/DFS/다익스트라  (GraphAlgorithms)           ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}                                                            ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}  ${YELLOW}[ CS 기반: 운영체제와 동시성 ]${NC}                            ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${GREEN}28)${NC} 경쟁 상태(잃어버린 갱신)   (RaceConditionDemo)         ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${GREEN}29)${NC} 동기화 3종+volatile 반례   (SynchronizationDemo)       ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${GREEN}30)${NC} 교착 상태 유발/해결        (DeadlockDemo)              ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${GREEN}31)${NC} 스레드풀과 Future          (ExecutorAndFutures)        ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${GREEN}32)${NC} 생산자-소비자              (ProducerConsumer)          ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}                                                            ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}  ${YELLOW}[ CS 기반: 네트워크 ]${NC}                                     ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${GREEN}33)${NC} 원시 HTTP 소켓(TCP 위 텍스트) (RawHttpClient)           ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${CYAN}DB이론=chapter-cs-database/labs/*.sql (SQL 랩)${NC}            ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${CYAN}네트워크 관찰=chapter-cs-network/labs/observe_http.sh${NC}     ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}                                                            ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}  ${CYAN}  a) 전체 실행 (Ch01~03 + CS 알고리즘/동시성)${NC}            ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}  ${RED}  q) 종료${NC}                                                 ${BLUE}║${NC}"
     echo -e "${BLUE}║${NC}                                                            ${BLUE}║${NC}"
     echo -e "${BLUE}╚════════════════════════════════════════════════════════════╝${NC}"
@@ -105,6 +125,20 @@ run_all() {
     run_class "com.edu.collections.BigOTiming" "Ch03 심화 - Big-O 측정"
     run_class "com.edu.collections.HashMapInternals" "Ch03 심화 - HashMap 내부 동작"
     run_class "com.edu.collections.TypeErasureDemo" "Ch03 심화 - 제네릭 타입 소거"
+    # CS 기반: 자료구조와 알고리즘
+    run_class "com.edu.algorithms.SearchAlgorithms" "CS 알고리즘 - 탐색"
+    run_class "com.edu.algorithms.SortingAlgorithms" "CS 알고리즘 - 정렬"
+    run_class "com.edu.algorithms.RecursionAndDP" "CS 알고리즘 - 재귀와 DP"
+    run_class "com.edu.algorithms.DataStructuresFromScratch" "CS 알고리즘 - 자료구조"
+    run_class "com.edu.algorithms.TreeAndHeap" "CS 알고리즘 - 트리와 힙"
+    run_class "com.edu.algorithms.GraphAlgorithms" "CS 알고리즘 - 그래프"
+    # CS 기반: 운영체제와 동시성
+    run_class "com.edu.concurrency.RaceConditionDemo" "CS 동시성 - 경쟁 상태"
+    run_class "com.edu.concurrency.SynchronizationDemo" "CS 동시성 - 동기화"
+    run_class "com.edu.concurrency.DeadlockDemo" "CS 동시성 - 교착 상태"
+    run_class "com.edu.concurrency.ExecutorAndFutures" "CS 동시성 - 스레드풀"
+    run_class "com.edu.concurrency.ProducerConsumer" "CS 동시성 - 생산자-소비자"
+    # 네트워크 RawHttpClient는 인터넷 연결이 필요하여 전체 실행에서 제외 (개별 33번으로 실행)
 }
 
 # 인자가 있으면 바로 실행 (비대화형 모드)
@@ -131,6 +165,18 @@ if [ $# -gt 0 ]; then
         19) run_class "com.edu.collections.BigOTiming" "Ch03 심화 - Big-O 측정" ;;
         20) run_class "com.edu.collections.HashMapInternals" "Ch03 심화 - HashMap 내부 동작" ;;
         21) run_class "com.edu.collections.TypeErasureDemo" "Ch03 심화 - 제네릭 타입 소거" ;;
+        22) run_class "com.edu.algorithms.SearchAlgorithms" "CS 알고리즘 - 탐색(선형/이진)" ;;
+        23) run_class "com.edu.algorithms.SortingAlgorithms" "CS 알고리즘 - 정렬 5종" ;;
+        24) run_class "com.edu.algorithms.RecursionAndDP" "CS 알고리즘 - 재귀와 DP" ;;
+        25) run_class "com.edu.algorithms.DataStructuresFromScratch" "CS 알고리즘 - 자료구조 직접 구현" ;;
+        26) run_class "com.edu.algorithms.TreeAndHeap" "CS 알고리즘 - 트리와 힙" ;;
+        27) run_class "com.edu.algorithms.GraphAlgorithms" "CS 알고리즘 - 그래프(BFS/DFS/다익스트라)" ;;
+        28) run_class "com.edu.concurrency.RaceConditionDemo" "CS 동시성 - 경쟁 상태" ;;
+        29) run_class "com.edu.concurrency.SynchronizationDemo" "CS 동시성 - 동기화 3종" ;;
+        30) run_class "com.edu.concurrency.DeadlockDemo" "CS 동시성 - 교착 상태" ;;
+        31) run_class "com.edu.concurrency.ExecutorAndFutures" "CS 동시성 - 스레드풀과 Future" ;;
+        32) run_class "com.edu.concurrency.ProducerConsumer" "CS 동시성 - 생산자-소비자" ;;
+        33) run_class "com.edu.network.RawHttpClient" "CS 네트워크 - 원시 HTTP 소켓" ;;
         all) run_all ;;
         *) java -cp /app/out "$1" ;;
     esac
@@ -165,6 +211,18 @@ while true; do
         19) run_class "com.edu.collections.BigOTiming" "Ch03 심화 - Big-O 측정"; wait_for_enter ;;
         20) run_class "com.edu.collections.HashMapInternals" "Ch03 심화 - HashMap 내부 동작"; wait_for_enter ;;
         21) run_class "com.edu.collections.TypeErasureDemo" "Ch03 심화 - 제네릭 타입 소거"; wait_for_enter ;;
+        22) run_class "com.edu.algorithms.SearchAlgorithms" "CS 알고리즘 - 탐색(선형/이진)"; wait_for_enter ;;
+        23) run_class "com.edu.algorithms.SortingAlgorithms" "CS 알고리즘 - 정렬 5종"; wait_for_enter ;;
+        24) run_class "com.edu.algorithms.RecursionAndDP" "CS 알고리즘 - 재귀와 DP"; wait_for_enter ;;
+        25) run_class "com.edu.algorithms.DataStructuresFromScratch" "CS 알고리즘 - 자료구조 직접 구현"; wait_for_enter ;;
+        26) run_class "com.edu.algorithms.TreeAndHeap" "CS 알고리즘 - 트리와 힙"; wait_for_enter ;;
+        27) run_class "com.edu.algorithms.GraphAlgorithms" "CS 알고리즘 - 그래프(BFS/DFS/다익스트라)"; wait_for_enter ;;
+        28) run_class "com.edu.concurrency.RaceConditionDemo" "CS 동시성 - 경쟁 상태"; wait_for_enter ;;
+        29) run_class "com.edu.concurrency.SynchronizationDemo" "CS 동시성 - 동기화 3종"; wait_for_enter ;;
+        30) run_class "com.edu.concurrency.DeadlockDemo" "CS 동시성 - 교착 상태"; wait_for_enter ;;
+        31) run_class "com.edu.concurrency.ExecutorAndFutures" "CS 동시성 - 스레드풀과 Future"; wait_for_enter ;;
+        32) run_class "com.edu.concurrency.ProducerConsumer" "CS 동시성 - 생산자-소비자"; wait_for_enter ;;
+        33) run_class "com.edu.network.RawHttpClient" "CS 네트워크 - 원시 HTTP 소켓"; wait_for_enter ;;
         a|A) run_all; wait_for_enter ;;
         q|Q)
             echo -e "\n${GREEN}학습을 마칩니다. 수고하셨습니다!${NC}\n"

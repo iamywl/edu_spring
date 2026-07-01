@@ -7,6 +7,10 @@ services:
       - ./chapter01-java-basics/src/main/java/com/edu/basics:/app/src/com/edu/basics
       - ./chapter02-oop/src/main/java/com/edu/oop:/app/src/com/edu/oop
       - ./chapter03-collections/src/main/java/com/edu/collections:/app/src/com/edu/collections
+      # CS 기반 트랙 (자료구조·알고리즘 / 운영체제·동시성 / 네트워크 Java 데모)
+      - ./chapter-cs-algorithms/src/main/java/com/edu/algorithms:/app/src/com/edu/algorithms
+      - ./chapter-cs-concurrency/src/main/java/com/edu/concurrency:/app/src/com/edu/concurrency
+      - ./chapter-cs-network/src/main/java/com/edu/network:/app/src/com/edu/network
       # 스크립트도 마운트
       - ./run.sh:/app/run.sh
       - ./compile.sh:/app/compile.sh
@@ -16,5 +20,8 @@ services:
       - ./chapter01-java-basics/README.md:/app/readme/ch01-README.md:ro
       - ./chapter02-oop/README.md:/app/readme/ch02-README.md:ro
       - ./chapter03-collections/README.md:/app/readme/ch03-README.md:ro
+      - ./chapter-cs-algorithms/README.md:/app/readme/cs-algorithms-README.md:ro
+      - ./chapter-cs-concurrency/README.md:/app/readme/cs-concurrency-README.md:ro
+      - ./chapter-cs-network/README.md:/app/readme/cs-network-README.md:ro
     stdin_open: true
     tty: true

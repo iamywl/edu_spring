@@ -7,7 +7,7 @@ package com.edu.oop;
  * - 하위 클래스는 반드시 final, sealed, non-sealed 중 하나로 선언
  * - switch 패턴 매칭과 함께 사용하면 모든 경우를 컴파일 타임에 검증 가능
  */
-public sealed class Shape permits Circle, Rectangle {
+public abstract sealed class Shape permits Circle, Rectangle {
 
     // 공통 필드
     private final String color;
@@ -22,10 +22,12 @@ public sealed class Shape permits Circle, Rectangle {
         return color;
     }
 
-    /** 넓이 계산 - 하위 클래스에서 오버라이드 */
-    public double area() {
-        return 0;
-    }
+    /**
+     * 넓이 계산 - 추상 메서드
+     * 도형(Shape) 자체는 넓이를 정의할 수 없으므로(넓이 0인 도형은 의미가 없음)
+     * 하위 클래스(Circle, Rectangle)가 반드시 구현해야 합니다.
+     */
+    public abstract double area();
 
     /** 도형 정보 출력 */
     public String describe() {

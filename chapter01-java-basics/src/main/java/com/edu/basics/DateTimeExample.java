@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 /**
  * Chapter 01 - 날짜와 시간 API (java.time)
@@ -160,9 +161,10 @@ public class DateTimeExample {
         System.out.println("  (요일: " + parsed.getDayOfWeek() + ")");
 
         // 잘못된 형식은 예외(DateTimeParseException)가 발생합니다.
+        // 구체적 예외를 잡아야 의도가 분명하고 예상치 못한 오류를 삼키지 않는다.
         try {
             LocalDateTime.parse("2026/12/25", formatter);
-        } catch (Exception e) {
+        } catch (DateTimeParseException e) {
             System.out.println("\n  형식이 맞지 않으면 파싱 예외 발생: "
                     + e.getClass().getSimpleName());
         }

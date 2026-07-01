@@ -328,4 +328,60 @@ class PostApiIntegrationTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
     }
+
+    /**
+     * 테스트 15: 다른 사용자는 남의 게시글을 수정/삭제할 수 없다 (소유권 검증)
+     *
+     * <p>이 앱의 핵심 보안 약속을 검증한다. testuser(사용자 A)가 작성한 게시글을
+     * 두 번째 사용자(사용자 B)가 수정/삭제하려고 하면 403 Forbidden이어야 한다.
+     * (인증은 됐지만 작성자가 아니므로 권한 없음 → 403)
+     *
+     * <p>기존 테스트들이 하드코딩한 id에 의존하는 취약성을 줄이기 위해,
+     * 이 테스트는 게시글을 직접 생성하고 응답에서 id를 추출해 사용한다.
+     */
+    @Test
+    @Order(15)
+    @DisplayName("게시글 수정/삭제 - 작성자가 아니면 403 Forbidden")
+    void updateAndDeletePost_ByOtherUser_Forbidden() throws Exception {
+        // 1) 사용자 A(testuser) 토큰으로 게시글을 새로 작성하고, 응답에서 id를 추출한다.
+        PostRequest createRequest = new PostRequest("소유권 테스트 게시글", "작성자만 수정/삭제 가능");
+        MvcResult createResult = mockMvc.perform(post("/api/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + authToken)
+                        .content(objectMapper.writeValueAsString(createRequest)))
+                .andExpect(status().isCreated())
+                .andReturn();
+        PostResponse createdPost = objectMapper.readValue(
+                createResult.getResponse().getContentAsString(), PostResponse.class);
+        Long postId = createdPost.id();
+
+        // 2) 두 번째 사용자(사용자 B)를 회원가입시키고 토큰을 발급받는다.
+        SignUpRequest signUpB = new SignUpRequest("otheruser", "password123");
+        MvcResult signUpResult = mockMvc.perform(post("/api/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(signUpB)))
+                .andExpect(status().isCreated())
+                .andReturn();
+        AuthResponse authB = objectMapper.readValue(
+                signUpResult.getResponse().getContentAsString(), AuthResponse.class);
+        String otherToken = authB.token();
+
+        // 3) 사용자 B가 사용자 A의 게시글을 수정하려고 하면 403이어야 한다.
+        PostRequest updateRequest = new PostRequest("몰래 수정", "권한 없음");
+        mockMvc.perform(put("/api/posts/" + postId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + otherToken)
+                        .content(objectMapper.writeValueAsString(updateRequest)))
+                .andExpect(status().isForbidden());
+
+        // 4) 사용자 B가 사용자 A의 게시글을 삭제하려고 하면 403이어야 한다.
+        mockMvc.perform(delete("/api/posts/" + postId)
+                        .header("Authorization", "Bearer " + otherToken))
+                .andExpect(status().isForbidden());
+
+        // 5) 게시글이 삭제되지 않고 그대로 남아 있는지 확인한다.
+        mockMvc.perform(get("/api/posts/" + postId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("소유권 테스트 게시글"));
+    }
 }

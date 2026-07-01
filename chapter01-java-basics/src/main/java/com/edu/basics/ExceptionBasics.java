@@ -89,6 +89,7 @@ public class ExceptionBasics {
 
             } catch (Exception e) {
                 // 위에서 잡지 못한 모든 예외 (가장 마지막에 위치해야 함)
+                // 넓은 catch(Exception)는 예상치 못한 오류까지 삼킬 수 있어 최후의 수단으로만 사용한다.
                 System.out.println("기타 오류: " + e.getMessage());
             }
         }
@@ -171,10 +172,12 @@ public class ExceptionBasics {
 
         // 커스텀 AutoCloseable 리소스
         System.out.println("\n  [커스텀 AutoCloseable 리소스]");
+        // close()가 checked 예외를 던지지 않으므로 구체적 예외(RuntimeException)만 잡는다.
+        // 구체적 예외를 잡아야 의도가 분명하고 예상치 못한 오류를 삼키지 않는다.
         try (MyResource resource = new MyResource("DB 연결")) {
             resource.doWork();
             // 블록 종료 시 close() 자동 호출
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             System.out.println("  오류: " + e.getMessage());
         }
 
@@ -187,7 +190,7 @@ public class ExceptionBasics {
             res1.doWork();
             res2.doWork();
             // 닫히는 순서: res2 → res1 (선언의 역순)
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             System.out.println("  오류: " + e.getMessage());
         }
         System.out.println();
@@ -201,9 +204,11 @@ public class ExceptionBasics {
 
         // 예외를 처리하지 않으면 호출한 메서드로 전파됨
         // method1 → method2 → method3 에서 예외 발생
+        // method3에서 던지는 것은 RuntimeException이므로 구체적으로 그 타입만 잡는다.
+        // 구체적 예외를 잡아야 의도가 분명하고 예상치 못한 오류를 삼키지 않는다.
         try {
             method1();
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             System.out.println("  main에서 예외 처리: " + e.getMessage());
 
             // 스택 트레이스 출력 (디버깅에 유용)
@@ -331,8 +336,11 @@ public class ExceptionBasics {
         }
 
         @Override
-        public void close() throws Exception {
+        public void close() {
             // 리소스 정리 로직 (파일 닫기, 연결 해제 등)
+            // AutoCloseable.close()는 throws Exception이지만, 이 리소스는 checked 예외를
+            // 던지지 않으므로 throws를 좁혀 선언한다. 그래야 호출부가 catch(Exception)에
+            // 묶이지 않고 필요한 예외만 처리할 수 있다.
             System.out.println("    " + name + " 닫힘 (자동 close)");
         }
     }

@@ -59,29 +59,31 @@ public class StreamExample {
         System.out.println("--- 1. Stream 생성 ---");
 
         // 컬렉션에서 생성
+        // .toList()는 Java 16+의 간결한 방식이며 수정 불가(unmodifiable) 리스트를 반환한다.
+        // 결과 리스트를 나중에 수정(add/remove)해야 한다면 collect(Collectors.toList())를 쓴다.
         List<String> list = List.of("a", "b", "c");
         Stream<String> streamFromList = list.stream();
-        System.out.println("  컬렉션에서 생성: " + streamFromList.collect(Collectors.toList()));
+        System.out.println("  컬렉션에서 생성: " + streamFromList.toList());
 
         // Stream.of() 로 직접 생성
         Stream<String> streamOf = Stream.of("x", "y", "z");
-        System.out.println("  Stream.of(): " + streamOf.collect(Collectors.toList()));
+        System.out.println("  Stream.of(): " + streamOf.toList());
 
         // Stream.iterate() - 시드값과 함수로 무한 스트림 생성
         List<Integer> iterateResult = Stream.iterate(0, n -> n + 2)
                 .limit(5)  // 무한 스트림이므로 제한 필요
-                .collect(Collectors.toList());
+                .toList();
         System.out.println("  Stream.iterate(0, n->n+2).limit(5): " + iterateResult);
 
         // Java 9+ iterate with predicate
         List<Integer> iterateWithPredicate = Stream.iterate(1, n -> n <= 100, n -> n * 2)
-                .collect(Collectors.toList());
+                .toList();
         System.out.println("  Stream.iterate(1, n<=100, n*2): " + iterateWithPredicate);
 
         // Stream.generate() - Supplier로 무한 스트림 생성
         List<Double> randomNumbers = Stream.generate(Math::random)
                 .limit(3)
-                .collect(Collectors.toList());
+                .toList();
         System.out.println("  Stream.generate(Math::random).limit(3): " + randomNumbers);
 
         // 배열에서 생성
@@ -92,7 +94,7 @@ public class StreamExample {
         // 범위 스트림
         List<Integer> range = IntStream.rangeClosed(1, 5)
                 .boxed()
-                .collect(Collectors.toList());
+                .toList();
         System.out.println("  IntStream.rangeClosed(1, 5): " + range);
 
         // 문자열에서 생성
@@ -114,13 +116,13 @@ public class StreamExample {
         // filter: 조건에 맞는 요소만 통과
         List<String> kims = names.stream()
                 .filter(name -> name.startsWith("김"))
-                .collect(Collectors.toList());
+                .toList();
         System.out.println("  filter (김씨만): " + kims);
 
         // map: 요소를 변환
         List<Integer> nameLengths = names.stream()
                 .map(String::length)
-                .collect(Collectors.toList());
+                .toList();
         System.out.println("  map (이름 길이): " + nameLengths);
 
         // flatMap: 중첩 구조를 평탄화
@@ -131,33 +133,33 @@ public class StreamExample {
         );
         List<Integer> flattened = nested.stream()
                 .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+                .toList();
         System.out.println("  flatMap (중첩 리스트 평탄화): " + flattened);
 
         // flatMap - 문자열 분리 예시
         List<String> sentences = List.of("Hello World", "Java Stream");
         List<String> words = sentences.stream()
                 .flatMap(sentence -> Arrays.stream(sentence.split(" ")))
-                .collect(Collectors.toList());
+                .toList();
         System.out.println("  flatMap (문장 -> 단어): " + words);
 
         // sorted: 정렬
         List<Integer> numbers = List.of(5, 3, 8, 1, 9, 2);
         List<Integer> sorted = numbers.stream()
                 .sorted()
-                .collect(Collectors.toList());
+                .toList();
         System.out.println("  sorted (오름차순): " + sorted);
 
         List<Integer> sortedDesc = numbers.stream()
                 .sorted(Comparator.reverseOrder())
-                .collect(Collectors.toList());
+                .toList();
         System.out.println("  sorted (내림차순): " + sortedDesc);
 
         // distinct: 중복 제거
         List<Integer> withDups = List.of(1, 2, 2, 3, 3, 3, 4);
         List<Integer> distinct = withDups.stream()
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
         System.out.println("  distinct (중복 제거): " + distinct);
 
         // peek: 디버깅용 중간 확인 (스트림 요소를 소비하지 않음)
@@ -165,13 +167,13 @@ public class StreamExample {
         List<Integer> peekResult = List.of(1, 2, 3, 4, 5).stream()
                 .peek(n -> System.out.print("[peek:" + n + "] "))
                 .filter(n -> n % 2 == 0)
-                .collect(Collectors.toList());
+                .toList();
         System.out.println("-> 결과: " + peekResult);
 
         // limit / skip: 개수 제한 및 건너뛰기
         List<Integer> range = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
         System.out.println("  skip(3).limit(4): " +
-                range.stream().skip(3).limit(4).collect(Collectors.toList()));
+                range.stream().skip(3).limit(4).toList());
 
         // 연산 체이닝
         System.out.println("  [체이닝 예시: 김씨 이름을 정렬하고 대문자로]");
@@ -179,7 +181,7 @@ public class StreamExample {
                 .filter(name -> name.startsWith("김"))    // 김씨만 필터
                 .sorted()                                   // 정렬
                 .map(name -> name + " 님")                  // "님" 추가
-                .collect(Collectors.toList());
+                .toList();
         System.out.println("  결과: " + chained);
         System.out.println();
     }
@@ -195,7 +197,7 @@ public class StreamExample {
         // collect: 결과를 컬렉션으로 수집
         List<Integer> evenList = numbers.stream()
                 .filter(n -> n % 2 == 0)
-                .collect(Collectors.toList());
+                .toList();
         System.out.println("  collect (짝수 리스트): " + evenList);
 
         // reduce: 요소들을 하나의 값으로 누적
@@ -271,7 +273,7 @@ public class StreamExample {
         // toList: 리스트로 수집
         List<String> names = students.stream()
                 .map(Student::getName)
-                .collect(Collectors.toList());
+                .toList();
         System.out.println("  toList (이름): " + names);
 
         // toSet: 셋으로 수집
@@ -345,7 +347,7 @@ public class StreamExample {
 
         List<Integer> bigList = IntStream.rangeClosed(1, 1_000_000)
                 .boxed()
-                .collect(Collectors.toList());
+                .toList();
 
         // 순차 스트림 성능 측정
         long startSeq = System.nanoTime();

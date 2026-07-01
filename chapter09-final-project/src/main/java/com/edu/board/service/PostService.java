@@ -6,6 +6,7 @@ import com.edu.board.entity.Role;
 import com.edu.board.entity.User;
 import com.edu.board.exception.ResourceNotFoundException;
 import com.edu.board.exception.UnauthorizedException;
+import com.edu.board.repository.CommentRepository;
 import com.edu.board.repository.PostRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 게시글 서비스
@@ -26,9 +29,11 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
 
-    public PostService(PostRepository postRepository) {
+    public PostService(PostRepository postRepository, CommentRepository commentRepository) {
         this.postRepository = postRepository;
+        this.commentRepository = commentRepository;
     }
 
     /**
@@ -47,16 +52,31 @@ public class PostService {
 
         Page<Post> postPage;
         if (keyword != null && !keyword.isBlank()) {
-            // 키워드가 있으면 제목 검색
+            // 키워드가 있으면 제목 검색 (author는 @EntityGraph로 함께 로딩됨)
             postPage = postRepository.findByTitleContaining(keyword, pageable);
         } else {
-            // 키워드가 없으면 전체 조회
+            // 키워드가 없으면 전체 조회 (author는 @EntityGraph로 함께 로딩됨)
             postPage = postRepository.findAll(pageable);
         }
 
-        // Post 엔티티 -> PostListResponse DTO 변환
+        // === N+1 방지: 현재 페이지 게시글들의 댓글 수를 COUNT 쿼리 한 번으로 집계 ===
+        // 게시글마다 post.getComments().size()를 호출하면 N번의 추가 쿼리가 나가므로,
+        // postId 목록을 모아 GROUP BY 집계로 한 번에 조회한 뒤 Map으로 만들어 사용한다.
+        List<Long> postIds = postPage.getContent().stream()
+                .map(Post::getId)
+                .toList();
+        Map<Long, Long> commentCounts = postIds.isEmpty()
+                ? Map.of()
+                : commentRepository.countByPostIds(postIds).stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],   // postId
+                        row -> (Long) row[1])); // 댓글 수
+
+        // Post 엔티티 -> PostListResponse DTO 변환 (댓글 수는 미리 집계한 값을 사용)
         List<PostListResponse> content = postPage.getContent().stream()
-                .map(PostListResponse::from)
+                .map(post -> PostListResponse.from(
+                        post,
+                        commentCounts.getOrDefault(post.getId(), 0L)))
                 .toList();
 
         return PageResponse.from(postPage, content);

@@ -60,14 +60,14 @@ public class ArraysAndMethods {
         System.out.println("전체 복사: " + Arrays.toString(copied));
         System.out.println("부분 복사 [1,4): " + Arrays.toString(partial));
 
-        // 배열 정렬
-        int[] unsorted = {5, 2, 8, 1, 9, 3};
-        System.out.println("정렬 전: " + Arrays.toString(unsorted));
-        Arrays.sort(unsorted);
-        System.out.println("정렬 후: " + Arrays.toString(unsorted));
+        // 배열 정렬 (정렬 후에는 sorted라는 이름으로 다룬다)
+        int[] sorted = {5, 2, 8, 1, 9, 3};
+        System.out.println("정렬 전: " + Arrays.toString(sorted));
+        Arrays.sort(sorted);
+        System.out.println("정렬 후: " + Arrays.toString(sorted));
 
-        // 배열 검색 (정렬된 배열에서 이진 탐색)
-        int index = Arrays.binarySearch(unsorted, 5);
+        // 배열 검색 (정렬된 배열에서 이진 탐색 - binarySearch는 정렬된 배열이 전제)
+        int index = Arrays.binarySearch(sorted, 5);
         System.out.println("값 5의 인덱스: " + index);
 
         // 배열 채우기

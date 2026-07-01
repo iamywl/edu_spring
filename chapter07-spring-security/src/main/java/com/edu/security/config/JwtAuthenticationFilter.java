@@ -1,6 +1,8 @@
 package com.edu.security.config;
 
 import com.edu.security.service.JwtService;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -88,10 +90,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
-        } catch (Exception e) {
-            // JWT 파싱 실패(만료, 변조 등)시 인증 없이 다음 필터로 진행
-            logger.warn("JWT 토큰 처리 실패: " + e.getMessage());
+        } catch (ExpiredJwtException e) {
+            // 만료된 토큰: 정상적으로 발급됐으나 유효 기간이 지난 경우.
+            // 재로그인이 필요한 흔한 상황이므로 INFO 수준으로 기록한다.
+            logger.info("만료된 JWT 토큰: " + e.getMessage());
+        } catch (JwtException e) {
+            // 서명 불일치·구조 손상 등 위조 가능성이 있는 토큰.
+            // (JwtException은 SignatureException·MalformedJwtException 등의 상위 예외)
+            //
+            // WHY: 위조·만료 토큰을 조용히 삼키면(catch(Exception)) 공격을 탐지할 수 없으므로
+            //      구체적 예외로 구분해 로깅한다. 위조 시도는 보안 이벤트이므로 WARN 수준으로 남긴다.
+            logger.warn("유효하지 않은(위조 의심) JWT 토큰: " + e.getMessage());
         }
+        // 어느 경우든 예외를 필터 밖으로 던지지 않고 인증 없이 다음 필터로 진행한다.
+        // -> SecurityContext에 인증 정보가 없으므로 보호된 자원 접근 시
+        //    AuthenticationEntryPoint가 401을 반환한다.
 
         // 다음 필터로 요청 전달
         filterChain.doFilter(request, response);

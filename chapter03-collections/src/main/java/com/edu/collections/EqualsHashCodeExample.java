@@ -60,6 +60,8 @@ public class EqualsHashCodeExample {
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
+            // instanceof는 하위 클래스 인스턴스도 true가 될 수 있어 대칭성이 깨질 수 있다.
+            // 상속 계층에서 엄격한 동등성이 필요하면 getClass() != o.getClass() 비교를 쓴다.
             if (!(o instanceof GoodProduct)) return false;
             GoodProduct other = (GoodProduct) o;
             return price == other.price && Objects.equals(name, other.name);

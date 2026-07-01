@@ -139,7 +139,7 @@ public class LambdaExample {
         List<Integer> numbers = List.of(-3, -2, -1, 0, 1, 2, 3);
         List<Integer> evenPositive = numbers.stream()
                 .filter(isEvenAndPositive)
-                .collect(Collectors.toList());
+                .toList();
         System.out.println("  짝수이면서 양수: " + evenPositive);
 
         // ---- Function<T, R>: T -> R (변환) ----
@@ -213,7 +213,7 @@ public class LambdaExample {
         // 메서드 참조: Integer::parseInt
         List<Integer> nums = List.of("1", "2", "3").stream()
                 .map(Integer::parseInt)   // 정적 메서드 참조
-                .collect(Collectors.toList());
+                .toList();
         System.out.println("  Integer::parseInt: " + nums);
 
         // 2) 특정 객체의 인스턴스 메서드 참조: instance::method
@@ -223,7 +223,7 @@ public class LambdaExample {
         // 메서드 참조: prefix::concat
         List<String> prefixed = names.stream()
                 .map(prefix::concat)   // 특정 객체의 인스턴스 메서드
-                .collect(Collectors.toList());
+                .toList();
         System.out.println("  prefix::concat: " + prefixed);
 
         // 3) 임의 객체의 인스턴스 메서드 참조: Class::instanceMethod
@@ -232,7 +232,7 @@ public class LambdaExample {
         // 메서드 참조: String::toUpperCase
         List<String> uppers = names.stream()
                 .map(String::toUpperCase)   // 각 문자열 객체의 메서드
-                .collect(Collectors.toList());
+                .toList();
         System.out.println("  String::toUpperCase: " + uppers);
 
         // 4) 생성자 참조: Class::new
@@ -259,13 +259,13 @@ public class LambdaExample {
         // 이름 기준 정렬 - Comparator.comparing + 메서드 참조
         List<Person> sortedByName = people.stream()
                 .sorted(Comparator.comparing(Person::getName))
-                .collect(Collectors.toList());
+                .toList();
         System.out.println("  이름순 정렬: " + sortedByName);
 
         // 나이 기준 역순 정렬
         List<Person> sortedByAgeDesc = people.stream()
                 .sorted(Comparator.comparing(Person::getAge).reversed())
-                .collect(Collectors.toList());
+                .toList();
         System.out.println("  나이 역순 정렬: " + sortedByAgeDesc);
 
         // forEach에서 메서드 참조
@@ -372,7 +372,7 @@ public class LambdaExample {
         // stream()으로 변환 (Java 9+)
         List<String> optionalToList = Optional.of("값")
                 .stream()
-                .collect(Collectors.toList());
+                .toList();
         System.out.println("  Optional.stream(): " + optionalToList);
         System.out.println();
     }
@@ -399,7 +399,7 @@ public class LambdaExample {
         List<String> over30Names = people.stream()
                 .filter(isOver30)
                 .map(toName)
-                .collect(Collectors.toList());
+                .toList();
         System.out.println("  결과: " + over30Names);
 
         // 예제 2: 함수 조합으로 복잡한 변환

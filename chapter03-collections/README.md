@@ -30,6 +30,9 @@ docker compose up -d
 | 4 | 람다와 함수형 인터페이스 | `./run.sh 9` | `LambdaExample.java` |
 | 5 | Comparable과 Comparator | `./run.sh 14` | `ComparableComparatorExample.java` |
 | 6 | equals와 hashCode 계약 | `./run.sh 15` | `EqualsHashCodeExample.java` |
+| 7 | [심화] Big-O 측정 | `./run.sh 19` | `BigOTiming.java` |
+| 8 | [심화] HashMap 내부 동작 | `./run.sh 20` | `HashMapInternals.java` |
+| 9 | [심화] 제네릭 타입 소거 | `./run.sh 21` | `TypeErasureDemo.java` |
 
 ---
 
@@ -185,6 +188,73 @@ docker compose up -d
 **실습 과제**
 1. `BadProduct`에 올바른 `hashCode()`를 추가해 버그를 고쳐보세요.
 2. 같은 두 필드를 갖는 `record`로 만들면 equals/hashCode가 자동 생성됨을 확인해보세요.
+
+---
+
+### 세션 7: [심화] Big-O 측정
+
+> CS 전공 심화. 추상적으로만 배우던 시간복잡도를 `System.nanoTime`으로 직접 재서 곡선이 갈라지는 것을 봅니다.
+
+**예제 코드 분석**
+- 파일: `src/main/java/com/edu/collections/BigOTiming.java`
+- 선형 탐색 O(n) vs `Arrays.binarySearch` O(log n), `ArrayList.get` O(1) vs `LinkedList.get` O(n), 맨 앞 삽입 O(n²) vs 맨 뒤 삽입 O(1)을 N을 키워가며 표로 비교
+- 주석의 "지배 연산을 센다"는 Big-O 도출 방법을 코드와 함께 읽으세요
+
+**예제 실행**
+- `./run.sh 19`
+- 출력에서 확인할 것들:
+  - N이 10배 커질 때 선형 탐색 시간은 약 10배, 이진 탐색은 거의 일정한 것
+  - `LinkedList.get(mid)`가 N에 비례해 급격히 느려지는 배율
+  - 맨 앞 삽입이 삽입 횟수 2배당 약 4배로 폭발(n²)하는 것
+
+**실습 과제**
+1. `ArrayList` 대신 `ArrayDeque`의 `addFirst`로 맨 앞 삽입을 측정해 O(1)로 개선되는지 확인해보세요.
+2. N 값을 더 키워(예: 200만) 곡선이 더 뚜렷하게 갈라지는지 확인해보세요.
+
+---
+
+### 세션 8: [심화] HashMap 내부 동작
+
+> CS 전공 심화. HashMap이 왜 O(1)인지, 언제 O(n)으로 퇴화하는지를 직접 측정합니다.
+
+**예제 코드 분석**
+- 파일: `src/main/java/com/edu/collections/HashMapInternals.java`
+- 버킷 배열, 해시로 인덱스 계산, 충돌 체이닝, treeify(8), 로드팩터 0.75 resize를 주석으로 설명
+- 좋은 hashCode와 "무조건 42를 반환하는" 나쁜 hashCode의 조회 시간을 비교
+
+**예제 실행**
+- `./run.sh 20`
+- 출력에서 확인할 것들:
+  - key 개수를 100배 늘려도 조회 시간이 거의 그대로인 것(O(1))
+  - 로드팩터 임계값(12, 24, 48...)을 넘을 때마다 용량이 2배로 resize되는 지점
+  - 나쁜 hashCode가 좋은 hashCode보다 수백 배 느린 것(모두 한 버킷으로 충돌)
+  - put 이후 key의 필드를 바꾸면(계약 위반) 같은 객체인데도 조회가 `null`이 되는 것
+
+**실습 과제**
+1. `BadKey`의 `hashCode`를 `id % 100`으로 바꿔 버킷이 100개로 분산되면 속도가 얼마나 회복되는지 확인해보세요.
+2. `MutableKey`를 `record`로 바꿔 필드를 불변으로 만들면 세션 4의 버그가 사라지는 것을 확인해보세요.
+
+---
+
+### 세션 9: [심화] 제네릭 타입 소거
+
+> CS 전공 심화. 제네릭 타입 정보가 런타임에 지워진다는 것을 실행으로 증명합니다.
+
+**예제 코드 분석**
+- 파일: `src/main/java/com/edu/collections/TypeErasureDemo.java`
+- `List<String>`과 `List<Integer>`의 `getClass()`가 같은 것, `new T[]`·`T.class`·`instanceof List<String>`이 불가능한 이유를 주석으로 설명
+- raw type으로 잘못된 원소를 몰래 넣었을 때 `ClassCastException`이 "꺼내는 순간" 터지는 위치 확인
+
+**예제 실행**
+- `./run.sh 21`
+- 출력에서 확인할 것들:
+  - `strings.getClass() == integers.getClass()`가 `true`인 것(타입 소거)
+  - `List<String>`에 raw 캐스트로 넣은 `Integer(42)`가 삽입 시엔 조용하다가, 향상된 for문의 숨은 `(String)` 캐스트에서 예외가 터지는 것
+  - 소거를 택한 이유가 "하위 호환성"인 것
+
+**실습 과제**
+1. `strings.get(1)`을 `Object`로 받아 출력해 예외 없이 42가 나오는 것을 확인하고, 왜 for문에서만 터지는지 설명해보세요.
+2. 제네릭 배열 `new T[]`가 필요한 상황을 `List<T>`로 대체하는 코드를 작성해보세요.
 
 ---
 

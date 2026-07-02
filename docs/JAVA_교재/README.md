@@ -30,6 +30,29 @@ docker exec -it java-edu ./run.sh SortingAlgorithms
 > **직접 코드를 타이핑해 보고**(예제는 답안지로 참고), VS Code에서 **중단점을 찍고 한 줄씩** 따라가 보세요.
 > 방법은 [VS Code 실행·디버깅 가이드](../VSCode_실행_디버깅_가이드.md) 참고. 원리는 이렇게 손으로 익힐 때 남습니다.
 
+## ✍️ 직접 작성하고 실행하는 법 (학습의 핵심)
+
+각 장 끝의 **"✍️ 직접 작성해보기"** 과제는 **읽지 말고 직접 타이핑**하는 게 목적입니다. 방법:
+
+```bash
+# 1) 예제 폴더 안에 '내 파일'을 만든다 (패키지 = 폴더 경로와 일치해야 함)
+#    예) chapter01-java-basics/src/main/java/com/edu/basics/MyTest.java
+#        첫 줄에  package com.edu.basics;  → main 을 가진 public class MyTest { ... }
+
+# 2) 직접 코드를 타이핑한다 (답을 보지 말고 먼저!)
+
+# 3) 실행해서 결과를 확인한다
+docker exec -it java-edu ./compile.sh          # 내 파일까지 다시 컴파일
+docker exec -it java-edu ./run.sh MyTest        # 내 클래스 이름으로 실행
+#   또는 VS Code에서 파일 열고 ▶ Run / 디버그
+
+# 4) 막히거나 다 짰으면, 답안지(예제)와 비교한다
+docker exec -it java-edu ./run.sh <해당 소절 클래스>   # 예) ./run.sh IntegerType
+```
+
+> 핵심 순서: **스펙 읽기 → (답 보지 말고) 직접 작성 → 실행 → 답안 비교.**
+> 예제 코드는 "모범 답안/막힐 때 참고용"입니다. 먼저 스스로 쳐 보세요.
+
 ## 본편 목차
 
 ### PART 01 자바 언어의 기초

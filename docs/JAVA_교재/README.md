@@ -26,6 +26,10 @@ docker exec -it java-edu ./run.sh SortingAlgorithms
 > 실습 코드는 `chapter-java-textbook/src/main/java/com/edu/javabook/chNN/` 에 소절별로 1개씩 있습니다.
 > "왜 그렇게 동작하는가"의 깊은 설명은 [심화편](심화/README.md)을 함께 보세요.
 
+> **더 깊게 배우려면 — 직접 타이핑 + 디버그.** 실행만 하지 말고, 개념을 읽은 뒤
+> **직접 코드를 타이핑해 보고**(예제는 답안지로 참고), VS Code에서 **중단점을 찍고 한 줄씩** 따라가 보세요.
+> 방법은 [VS Code 실행·디버깅 가이드](../VSCode_실행_디버깅_가이드.md) 참고. 원리는 이렇게 손으로 익힐 때 남습니다.
+
 ## 본편 목차
 
 ### PART 01 자바 언어의 기초

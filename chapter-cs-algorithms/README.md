@@ -1,7 +1,7 @@
 # Chapter CS: 자료구조 & 알고리즘 -- 실습 가이드
 
-> 이 문서는 **실습 가이드**입니다. 개념 설명은 [CS_알고리즘_개념서](../docs/CS_알고리즘_개념서.md)를 먼저 읽으세요.
-> Java 자체가 처음이라면 [JAVA_개념서](../docs/JAVA_개념서.md)를 선행하세요 (특히 §5 컬렉션).
+> 이 문서는 **실습 가이드**입니다. 개념 설명은 [CS_알고리즘_개념서](../docs/CS_알고리즘_개념서/README.md)를 먼저 읽으세요.
+> Java 자체가 처음이라면 [JAVA_개념서](../docs/JAVA_개념서/README.md)를 선행하세요 (특히 §5 컬렉션).
 
 ---
 
@@ -114,6 +114,6 @@ javac -d out $(find chapter-cs-algorithms/src/main/java -name "*.java") \
 
 ## 참고
 
-- 개념 설명: [../docs/CS_알고리즘_개념서.md](../docs/CS_알고리즘_개념서.md)
-- Java 기초/컬렉션: [../docs/JAVA_개념서.md](../docs/JAVA_개념서.md)
+- 개념 설명: [../docs/CS_알고리즘_개념서/README.md](../docs/CS_알고리즘_개념서/README.md)
+- Java 기초/컬렉션: [../docs/JAVA_개념서/README.md](../docs/JAVA_개념서/README.md)
 - 관련 심화(Big-O 측정): `../chapter03-collections/src/main/java/com/edu/collections/BigOTiming.java`

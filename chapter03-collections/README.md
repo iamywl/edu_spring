@@ -1,6 +1,6 @@
 # Chapter 03: 컬렉션, 제네릭, 스트림, 람다 -- 실습 가이드
 
-> 이 문서는 **실습 가이드**입니다. 개념 설명은 [JAVA_개념서](../docs/JAVA_개념서.md)와 [JAVA_교육자료](../docs/JAVA_교육자료.md)를 참고하세요.
+> 이 문서는 **실습 가이드**입니다. 개념 설명은 [JAVA_개념서](../docs/JAVA_개념서/README.md)와 [JAVA_교육자료](../docs/JAVA_교육자료.md)를 참고하세요.
 
 ---
 
@@ -40,7 +40,7 @@ docker compose up -d
 ### 세션 1: 제네릭 (Generics)
 
 **개념 학습**
-- 📖 [JAVA_개념서](../docs/JAVA_개념서.md) - Chapter 5: "제네릭" 읽기
+- 📖 [JAVA_개념서](../docs/JAVA_개념서/README.md) - Chapter 5: "제네릭" 읽기
 - 📝 [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 3.1: "Generics와 PECS 원칙" 읽기
 
 **예제 코드 분석**
@@ -66,7 +66,7 @@ docker compose up -d
 ### 세션 2: 컬렉션 프레임워크 List/Set/Map
 
 **개념 학습**
-- 📖 [JAVA_개념서](../docs/JAVA_개념서.md) - Chapter 5: "컬렉션 - 배열의 한계, List/Set/Map, HashMap 내부 구조" 읽기
+- 📖 [JAVA_개념서](../docs/JAVA_개념서/README.md) - Chapter 5: "컬렉션 - 배열의 한계, List/Set/Map, HashMap 내부 구조" 읽기
 - 📝 [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 3.2: "Collection framework와 시간복잡도" 읽기
 
 **예제 코드 분석**
@@ -93,7 +93,7 @@ docker compose up -d
 ### 세션 3: Stream API
 
 **개념 학습**
-- 📖 [JAVA_개념서](../docs/JAVA_개념서.md) - Chapter 6: "함수형 프로그래밍 - Stream (컨베이어 벨트 비유)" 읽기
+- 📖 [JAVA_개념서](../docs/JAVA_개념서/README.md) - Chapter 6: "함수형 프로그래밍 - Stream (컨베이어 벨트 비유)" 읽기
 - 📝 [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 3.3~3.4: "Lambda/Stream API, 메서드 참조" 읽기
 
 **예제 코드 분석**
@@ -121,7 +121,7 @@ docker compose up -d
 ### 세션 4: 람다와 함수형 인터페이스
 
 **개념 학습**
-- 📖 [JAVA_개념서](../docs/JAVA_개념서.md) - Chapter 6: "람다 표현식" 읽기
+- 📖 [JAVA_개념서](../docs/JAVA_개념서/README.md) - Chapter 6: "람다 표현식" 읽기
 - 📝 [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 3.3: "Lambda와 함수형 인터페이스" 읽기
 
 **예제 코드 분석**

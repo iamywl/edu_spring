@@ -1,7 +1,7 @@
 # Chapter CS: 운영체제 · 동시성(Concurrency) - 실습 가이드
 
 > 이 문서는 **실습 가이드(LAB GUIDE)**입니다.
-> 개념 설명은 [`/docs/CS_운영체제_개념서.md`](../docs/CS_운영체제_개념서.md)를 읽고,
+> 개념 설명은 [`/docs/CS_운영체제_개념서/README.md`](../docs/CS_운영체제_개념서/README.md)를 읽고,
 > 여기서는 코드를 직접 실행하며 **동시성 버그를 눈으로 확인**합니다.
 
 비전공자에서 전공자(CS-major) 수준으로 가기 위한 **운영체제 & 동시성** 트랙입니다.
@@ -86,7 +86,7 @@ mkdir -p /tmp/concv && javac -d /tmp/concv $(find "$(pwd)" -name "*.java") && ec
 
 ## 권장 학습 순서
 
-1. **개념서 먼저**: [`/docs/CS_운영체제_개념서.md`](../docs/CS_운영체제_개념서.md)를 Chapter 1~7 순서로 읽습니다.
+1. **개념서 먼저**: [`/docs/CS_운영체제_개념서/README.md`](../docs/CS_운영체제_개념서/README.md)를 Chapter 1~7 순서로 읽습니다.
 2. **`RaceConditionDemo` 실행** — "문제"를 눈으로 봅니다. 여러 번 실행해 결과가 매번 다른 것을 확인하세요.
    > 참고: JIT 최적화로 스레드가 아주 빨라지면 어떤 실행은 우연히 정답이 나올 수도 있습니다.
    > 그것도 관찰 포인트입니다 — **동시성 버그는 "가끔만" 난다**는 것이 바로 무서운 점이니까요.
@@ -112,4 +112,4 @@ mkdir -p /tmp/concv && javac -d /tmp/concv $(find "$(pwd)" -name "*.java") && ec
 
 - `JAVA_개념서 §1.4~1.5` (메모리 구조, 바이트코드/operand stack) → `count++`가 왜 3단계인지
 - `SPRING_개념서 §2.7` (서버는 멀티스레드다, thread-per-request, 스레드 풀·커넥션 풀) → 왜 실무에서 이게 중요한지
-- 본 챕터 `CS_운영체제_개념서.md` → 그 밑바닥의 OS·CPU·JMM
+- 본 챕터 `CS_운영체제_개념서/README.md` → 그 밑바닥의 OS·CPU·JMM

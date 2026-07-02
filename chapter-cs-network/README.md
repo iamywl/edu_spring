@@ -18,14 +18,14 @@
 
 ### 개념서와 함께 보기
 
-핵심 개념서는 **[`docs/CS_네트워크_개념서.md`](../docs/CS_네트워크_개념서.md)** 이다. 먼저 읽고, 아래 실습으로 "정말 그런지" 눈으로 확인하는 흐름을 권장한다.
+핵심 개념서는 **[`docs/CS_네트워크_개념서/README.md`](../docs/CS_네트워크_개념서/README.md)** 이다. 먼저 읽고, 아래 실습으로 "정말 그런지" 눈으로 확인하는 흐름을 권장한다.
 
 이 트랙은 기존 문서와 **중복 없이 이어진다**:
-- HTTP를 API 레벨에서 다룬 **`docs/SPRING_개념서.md` §3(웹 애플리케이션의 구조)** 위에 쌓는다.
-- TLS/비대칭 암호는 **`SPRING_개념서.md` §5.7(HMAC·대칭/비대칭)**이 "미뤄둔" 이야기를 네트워크 개념서 §6에서 본격적으로 편다.
+- HTTP를 API 레벨에서 다룬 **`docs/SPRING_개념서/README.md` §3(웹 애플리케이션의 구조)** 위에 쌓는다.
+- TLS/비대칭 암호는 **`SPRING_개념서/README.md` §5.7(HMAC·대칭/비대칭)**이 "미뤄둔" 이야기를 네트워크 개념서 §6에서 본격적으로 편다.
 
 ```
-  docs/CS_네트워크_개념서.md   (개념: "왜 그런가")
+  docs/CS_네트워크_개념서/README.md   (개념: "왜 그런가")
             │
             ▼  읽은 뒤 관찰
   labs/observe_http.sh         (관찰: dig/curl/openssl/nc 로 실제 계층을 봄)
@@ -93,7 +93,7 @@ java -cp /tmp/netout com.edu.network.RawHttpClient
 
 ## 학습 순서 권장
 
-1. `docs/CS_네트워크_개념서.md`를 Ch1→Ch7 순서로 읽는다. (특히 Ch7 "전부 합치기"가 이 트랙의 지불점)
+1. `docs/CS_네트워크_개념서/README.md`를 Ch1→Ch7 순서로 읽는다. (특히 Ch7 "전부 합치기"가 이 트랙의 지불점)
 2. `bash labs/observe_http.sh`를 돌려, 읽은 계층(DNS/TCP/TLS/HTTP)을 실제로 관찰한다.
 3. `RawHttpClient.java`를 컴파일·실행해, HTTP 요청을 손으로 조립하는 경험을 한다.
 4. 여유가 되면 `Wireshark`/`traceroute`로 캡슐화·라우팅(개념서 §1.3, §2.5)을 더 깊이 본다.

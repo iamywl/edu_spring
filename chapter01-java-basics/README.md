@@ -16,7 +16,7 @@ docker compose up -d
 ./run.sh      # 대화형 메뉴
 ```
 
-> 소스 파일을 수정한 후에는 반드시 `./compile.sh` → `./run.sh N` 순서로 다시 실행하세요.
+> 소스 파일을 수정한 후에는 반드시 `./compile.sh` → `./run.sh <ClassName>` 순서로 다시 실행하세요.
 
 ---
 
@@ -44,7 +44,7 @@ docker compose up -d
 
 **예제 실행**
 - 소스 코드: `src/main/java/com/edu/basics/VariablesAndTypes.java`
-- 실행: `./run.sh 1`
+- 실행: `./run.sh VariablesAndTypes`
 - 주요 출력 확인 포인트:
   - `primitiveTypes()`: 각 기본형의 최대값이 출력됩니다. `int`와 `long`의 범위 차이를 확인하세요.
   - `typeCasting()`: `int(300) → byte`가 **44**가 되는 오버플로우 결과를 확인하세요.
@@ -55,7 +55,7 @@ docker compose up -d
 
 1. `VariablesAndTypes.java` 97번 줄의 `int bigInt = 300;`을 `int bigInt = 128;`로 바꿔보세요.
    - `(byte) 128`의 결과는? 왜 `-128`이 되는지 생각해보세요.
-   - `./compile.sh` → `./run.sh 1`로 확인
+   - `./compile.sh` → `./run.sh VariablesAndTypes`로 확인
 
 2. `VariablesAndTypes.java` 41번 줄의 `float floatVar = 3.14f;`에서 `f`를 제거해보세요.
    - 어떤 컴파일 에러가 나는지 확인하세요.
@@ -73,7 +73,7 @@ docker compose up -d
 
 **예제 실행**
 - 소스 코드: `src/main/java/com/edu/basics/VariablesAndTypes.java` - `operators()` 메서드
-- 실행: `./run.sh 1`
+- 실행: `./run.sh VariablesAndTypes`
 - 주요 출력 확인 포인트:
   - 정수 나눗셈 `10 / 3 = 3`과 실수 나눗셈 `10.0 / 3 = 3.333...`의 차이를 확인하세요.
   - 증감 연산자: `x++`는 5를 출력하고 나서 6이 되지만, `++x`는 7로 먼저 증가한 후 7을 출력합니다.
@@ -105,7 +105,7 @@ docker compose up -d
 
 **예제 실행**
 - 소스 코드: `src/main/java/com/edu/basics/ControlFlow.java`
-- 실행: `./run.sh 2`
+- 실행: `./run.sh ControlFlow`
 - 주요 출력 확인 포인트:
   - `ifElseDemo()`: score=85일 때 "등급: B"가 출력되는 흐름을 추적하세요.
   - `switchExpressionDemo()`: 화살표(`->`) 구문에서 break가 없어도 fall-through가 발생하지 않는 것을 확인하세요.
@@ -116,7 +116,7 @@ docker compose up -d
 
 1. `ControlFlow.java` 76번 줄의 `switchDemo()` 메서드에서 `case 3:`의 `break;` (83번 줄)를 삭제해보세요.
    - `dayNumber = 3`일 때 "수요일"이 아니라 "목요일"이 출력되는 것을 확인하세요 (fall-through).
-   - `./compile.sh` → `./run.sh 2`로 확인
+   - `./compile.sh` → `./run.sh ControlFlow`로 확인
 
 2. `forLoopDemo()`의 177번 줄에서 `i <= 5`를 `i <= 0`으로 바꿔보세요.
    - for 루프가 한 번도 실행되지 않는 것을 확인하세요.
@@ -134,7 +134,7 @@ docker compose up -d
 
 **예제 실행**
 - 소스 코드: `src/main/java/com/edu/basics/ArraysAndMethods.java`
-- 실행: `./run.sh 3`
+- 실행: `./run.sh ArraysAndMethods`
 - 주요 출력 확인 포인트:
   - `oneDimensionalArrays()`: `Arrays.toString()`, `Arrays.sort()`, `Arrays.copyOf()`의 동작을 확인하세요.
   - `twoDimensionalArrays()`: 비정방 배열(jagged array)에서 각 행의 길이가 다른 것을 확인하세요. 학생 성적표에서 평균 계산 로직을 따라가 보세요.
@@ -165,7 +165,7 @@ docker compose up -d
 
 **예제 실행**
 - 소스 코드: `src/main/java/com/edu/basics/ExceptionBasics.java`
-- 실행: `./run.sh 4`
+- 실행: `./run.sh ExceptionBasics`
 - 주요 출력 확인 포인트:
   - `tryCatchFinallyDemo()`: `10 / 0`에서 예외가 발생해도 finally 블록이 실행되는 것을 확인하세요. 예외가 없는 경우에도 finally가 실행됩니다.
   - `multipleCatchDemo()`: 인덱스 0("100")은 성공, 인덱스 1("abc")은 NumberFormatException, 인덱스 2(null)는 NullPointerException, 인덱스 3은 ArrayIndexOutOfBoundsException -- 각각 다른 catch 블록이 실행됩니다.
@@ -197,7 +197,7 @@ docker compose up -d
 
 **예제 실행**
 - 소스 코드: `src/main/java/com/edu/basics/WrappingAndBoxing.java`
-- 실행: `./run.sh 10`
+- 실행: `./run.sh WrappingAndBoxing`
 - 주요 출력 확인 포인트:
   - 오토박싱/언박싱: `int` ↔ `Integer` 자동 변환과 `List<Integer>`에서의 활용을 확인하세요.
   - **Integer 캐시 함정**: `Integer 100 == 100`은 `true`인데 `Integer 1000 == 1000`은 `false`인 이유를 확인하세요 (-128~127 캐시). 값 비교는 항상 `equals()`를 쓰세요.
@@ -214,7 +214,7 @@ docker compose up -d
 
 **예제 실행**
 - 소스 코드: `src/main/java/com/edu/basics/DateTimeExample.java`
-- 실행: `./run.sh 11`
+- 실행: `./run.sh DateTimeExample`
 - 주요 출력 확인 포인트:
   - `LocalDate`/`LocalTime`/`LocalDateTime`의 생성과 필드 조회를 확인하세요. (Spring 엔티티의 생성일시 필드는 보통 `LocalDateTime`을 사용합니다.)
   - `plusDays`/`minusDays` 등은 불변 객체이므로 원본을 바꾸지 않고 **새 객체**를 반환하는 것을 확인하세요.
@@ -231,7 +231,7 @@ docker compose up -d
 
 **예제 실행**
 - 소스 코드: `src/main/java/com/edu/basics/FileIoExample.java`
-- 실행: `./run.sh 12`
+- 실행: `./run.sh FileIoExample`
 - 주요 출력 확인 포인트:
   - `Files.writeString`/`readString`으로 파일 전체를 한 번에 쓰고 읽는 것을 확인하세요. (임시 파일을 사용하므로 비대화형으로 실행됩니다.)
   - `Files.readAllLines`로 줄 단위 읽기, `try-with-resources`로 `BufferedReader`를 자동으로 닫는 패턴을 확인하세요.
@@ -249,7 +249,7 @@ docker compose up -d
 
 **예제 실행**
 - 소스 코드: `src/main/java/com/edu/basics/FloatingPointBits.java`
-- 실행: `./run.sh 16`
+- 실행: `./run.sh FloatingPointBits`
 - 주요 출력 확인 포인트:
   - `0.1 + 0.2 == 0.3`이 `false`이고 `%.17f`로 펼치면 오차가 드러나는 것을 확인하세요.
   - `Double.doubleToLongBits(0.1)`의 64비트를 부호(1)/지수(11)/가수(52)로 분해하고, 그 비트로 값을 다시 재구성하는 과정을 따라가 보세요.
@@ -268,7 +268,7 @@ docker compose up -d
 
 **예제 실행**
 - 소스 코드: `src/main/java/com/edu/basics/TwosComplement.java`
-- 실행: `./run.sh 17`
+- 실행: `./run.sh TwosComplement`
 - 주요 출력 확인 포인트:
   - `(byte)300 == 44`가 되는 이유를 "하위 8비트만 남긴다"는 비트 관점에서 확인하세요.
   - `-5`의 비트 패턴이 `(~5) + 1`(2의 보수)과 같고, `-1 == 0xFFFFFFFF`인 것을 확인하세요.
@@ -287,7 +287,7 @@ docker compose up -d
 
 **예제 실행**
 - 소스 코드: `src/main/java/com/edu/basics/PassByValue.java`
-- 실행: `./run.sh 18`
+- 실행: `./run.sh PassByValue`
 - 주요 출력 확인 포인트:
   - 매개변수(참조)를 재대입해도 호출자의 참조는 그대로인 것(복사본만 바뀜)을 확인하세요.
   - 반대로 참조가 가리키는 객체를 `append`로 직접 수정하면 호출자에게 반영되는 것을 확인하세요.

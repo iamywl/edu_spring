@@ -50,12 +50,12 @@
 docker compose up -d
 # VS Code: F1 → "Dev Containers: Attach to Running Container" → java-edu
 ./compile.sh
-./run.sh <N>    # 메뉴 번호는 코디네이터가 배정합니다 (아래 참고)
+./run.sh <ClassName>    # 클래스 이름으로 직접 실행 (예: SearchAlgorithms), 또는 ./run.sh로 대화형 메뉴
 ```
 
-> **메뉴 번호 안내:** `./run.sh`의 메뉴 번호(`<N>`)는 프로젝트 **코디네이터가 배정**합니다.
-> 배정 전이라면 아래 "방법 B"의 raw 명령으로 바로 실행할 수 있습니다.
-> 배정 후에는 예: `./run.sh 30` (SearchAlgorithms) 처럼 실행하세요.
+> **실행 안내:** `./run.sh <ClassName>`으로 클래스 이름을 직접 지정해 실행하거나,
+> 인자 없이 `./run.sh`를 실행해 대화형 메뉴에서 카테고리 선택 → 개념 선택으로 실행할 수 있습니다.
+> 예: `./run.sh SearchAlgorithms` 처럼 실행하세요. (아래 "방법 B"의 raw 명령으로도 바로 실행 가능)
 
 ### 방법 B: 순수 javac / java (독립 실행)
 

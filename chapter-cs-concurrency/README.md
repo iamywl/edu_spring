@@ -51,11 +51,13 @@ docker compose up -d
 # VS Code: F1 → "Dev Containers: Attach to Running Container" → java-edu
 # 컨테이너 터미널에서:
 ./compile.sh
-./run.sh      # 대화형 메뉴에서 이 챕터의 번호를 선택
+./run.sh      # 대화형 계층 메뉴: 카테고리 선택 → 개념 선택
+./run.sh RaceConditionDemo   # 또는 클래스 이름으로 바로 실행
 ```
 
-> **run.sh 메뉴 번호는 코디네이터가 배정합니다.** 이 README를 쓰는 시점에는 번호가 확정되지
-> 않았으므로, `./run.sh` 실행 후 메뉴에서 "CS 운영체제/동시성" 항목을 골라 각 데모를 실행하세요.
+> **실행 방법:** `./run.sh <ClassName>`으로 클래스 이름을 직접 지정하거나(예: `./run.sh DeadlockDemo`),
+> 인자 없이 `./run.sh`를 실행해 대화형 메뉴에서 "CS 운영체제/동시성" 카테고리를 고른 뒤 각 데모를 선택하세요.
+> 사용 가능한 클래스: `RaceConditionDemo`, `SynchronizationDemo`, `DeadlockDemo`, `ExecutorAndFutures`, `ProducerConsumer`.
 
 ### 방법 B: raw javac / java (Docker 없이 로컬에서)
 

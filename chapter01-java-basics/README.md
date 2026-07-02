@@ -39,7 +39,7 @@ docker compose up -d
 ### 세션 1: 변수와 데이터 타입
 
 **개념 학습**
-- 📖 [JAVA_개념서](../docs/JAVA_개념서/README.md) - Chapter 2: "데이터를 담는 그릇 - 변수" 읽기 (기본형 vs 참조형, 메모리 모델, String Pool)
+- 📖 [JAVA_개념서](../docs/JAVA_교재/심화/README.md) - Chapter 2: "데이터를 담는 그릇 - 변수" 읽기 (기본형 vs 참조형, 메모리 모델, String Pool)
 - 📝 [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 1.2: "변수와 데이터 타입" 읽기 (8가지 기본형, 형변환, var 키워드)
 
 **예제 실행**
@@ -100,7 +100,7 @@ docker compose up -d
 ### 세션 3: 제어문
 
 **개념 학습**
-- 📖 [JAVA_개념서](../docs/JAVA_개념서/README.md) - Chapter 3: "프로그램의 흐름을 제어하다" 읽기
+- 📖 [JAVA_개념서](../docs/JAVA_교재/심화/README.md) - Chapter 3: "프로그램의 흐름을 제어하다" 읽기
 - 📝 [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 1.4: "제어문" 읽기 (if/else, switch, for, while, break/continue, labeled loops)
 
 **예제 실행**

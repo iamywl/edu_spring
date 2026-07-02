@@ -1,7 +1,7 @@
 # Chapter 02: 객체지향 프로그래밍 (OOP) - 실습 가이드
 
 > 이 문서는 **실습 가이드**입니다. OOP 개념의 상세한 설명은 아래 문서를 참고하세요.
-> - [JAVA_개념서](../docs/JAVA_개념서/README.md) - Chapter 4: 객체지향 프로그래밍 (왜 OOP인가, 4대 원칙, SOLID)
+> - [JAVA_개념서](../docs/JAVA_교재/심화/README.md) - Chapter 4: 객체지향 프로그래밍 (왜 OOP인가, 4대 원칙, SOLID)
 > - [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 2: OOP 코드 예제 (2.1~2.8)
 
 ---
@@ -54,7 +54,7 @@ src/main/java/com/edu/oop/
 ### 세션 1: 클래스와 객체, 상속, 다형성
 
 **개념 학습**
-- [JAVA_개념서](../docs/JAVA_개념서/README.md) - Chapter 4: "절차적 vs 객체지향", "캡슐화", "상속", "다형성" 읽기
+- [JAVA_개념서](../docs/JAVA_교재/심화/README.md) - Chapter 4: "절차적 vs 객체지향", "캡슐화", "상속", "다형성" 읽기
 - [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 2.1~2.4: "클래스와 객체", "상속", "다형성" 읽기
 
 **예제 코드 분석**
@@ -82,7 +82,7 @@ src/main/java/com/edu/oop/
 ### 세션 2: 캡슐화
 
 **개념 학습**
-- [JAVA_개념서](../docs/JAVA_개념서/README.md) - Chapter 4: "캡슐화" (자동차 비유) 읽기
+- [JAVA_개념서](../docs/JAVA_교재/심화/README.md) - Chapter 4: "캡슐화" (자동차 비유) 읽기
 - [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 2.2: "캡슐화" 읽기
 
 **예제 코드 분석**
@@ -167,7 +167,7 @@ src/main/java/com/edu/oop/
 ### 세션 5: 인터페이스
 
 **개념 학습**
-- [JAVA_개념서](../docs/JAVA_개념서/README.md) - Chapter 4: "추상 클래스 vs 인터페이스" 읽기
+- [JAVA_개념서](../docs/JAVA_교재/심화/README.md) - Chapter 4: "추상 클래스 vs 인터페이스" 읽기
 - [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 2.5: "추상 클래스와 인터페이스" 읽기
 
 **예제 코드 분석**

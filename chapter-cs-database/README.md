@@ -24,7 +24,7 @@
 
 | 자료 | 위치 | 내용 |
 |------|------|------|
-| 개념서 | [`docs/CS_데이터베이스_개념서.md`](../docs/CS_데이터베이스_개념서.md) | 이론 전체 (7개 장, 다이어그램·"왜?"·JPA 상호참조) |
+| 개념서 | [`docs/CS_데이터베이스_개념서/README.md`](../docs/CS_데이터베이스_개념서/README.md) | 이론 전체 (7개 장, 다이어그램·"왜?"·JPA 상호참조) |
 | 실습 01 | [`labs/01_normalization.sql`](labs/01_normalization.sql) | 정규화: 이상 현상 시연 → 단계별 정규화 |
 | 실습 02 | [`labs/02_transactions_acid.sql`](labs/02_transactions_acid.sql) | 트랜잭션/ACID: 원자성·일관성 실험 |
 | 실습 03 | [`labs/03_isolation_levels.sql`](labs/03_isolation_levels.sql) | 격리 수준: **두 세션**으로 이상 현상 관찰 |

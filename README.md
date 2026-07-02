@@ -33,10 +33,10 @@
 
 | 트랙 | 개념서 | 실습 |
 |------|--------|------|
-| 자료구조·알고리즘 | [docs/CS_알고리즘_개념서.md](docs/CS_알고리즘_개념서.md) | [chapter-cs-algorithms/](chapter-cs-algorithms/) — `./run.sh SearchAlgorithms`, `SortingAlgorithms`, `RecursionAndDP`, `DataStructuresFromScratch`, `TreeAndHeap`, `GraphAlgorithms` (Big-O, 정렬, 재귀/DP, 트리·힙, 그래프) |
-| 운영체제·동시성 | [docs/CS_운영체제_개념서.md](docs/CS_운영체제_개념서.md) | [chapter-cs-concurrency/](chapter-cs-concurrency/) — `./run.sh RaceConditionDemo`, `SynchronizationDemo`, `DeadlockDemo`, `ExecutorAndFutures`, `ProducerConsumer` (경쟁 상태, 동기화, 교착, 스레드풀) |
-| 데이터베이스 이론 | [docs/CS_데이터베이스_개념서.md](docs/CS_데이터베이스_개념서.md) | [chapter-cs-database/](chapter-cs-database/) — PostgreSQL SQL 랩 (정규화, ACID, 격리수준, 인덱스 EXPLAIN) |
-| 컴퓨터 네트워크 | [docs/CS_네트워크_개념서.md](docs/CS_네트워크_개념서.md) | [chapter-cs-network/](chapter-cs-network/) — `./run.sh RawHttpClient`(원시 HTTP 소켓), `labs/observe_http.sh`(DNS/TCP/TLS 관찰) |
+| 자료구조·알고리즘 | [docs/CS_알고리즘_개념서/README.md](docs/CS_알고리즘_개념서/README.md) | [chapter-cs-algorithms/](chapter-cs-algorithms/) — `./run.sh SearchAlgorithms`, `SortingAlgorithms`, `RecursionAndDP`, `DataStructuresFromScratch`, `TreeAndHeap`, `GraphAlgorithms` (Big-O, 정렬, 재귀/DP, 트리·힙, 그래프) |
+| 운영체제·동시성 | [docs/CS_운영체제_개념서/README.md](docs/CS_운영체제_개념서/README.md) | [chapter-cs-concurrency/](chapter-cs-concurrency/) — `./run.sh RaceConditionDemo`, `SynchronizationDemo`, `DeadlockDemo`, `ExecutorAndFutures`, `ProducerConsumer` (경쟁 상태, 동기화, 교착, 스레드풀) |
+| 데이터베이스 이론 | [docs/CS_데이터베이스_개념서/README.md](docs/CS_데이터베이스_개념서/README.md) | [chapter-cs-database/](chapter-cs-database/) — PostgreSQL SQL 랩 (정규화, ACID, 격리수준, 인덱스 EXPLAIN) |
+| 컴퓨터 네트워크 | [docs/CS_네트워크_개념서/README.md](docs/CS_네트워크_개념서/README.md) | [chapter-cs-network/](chapter-cs-network/) — `./run.sh RawHttpClient`(원시 HTTP 소켓), `labs/observe_http.sh`(DNS/TCP/TLS 관찰) |
 
 > Java 개념서·Spring 개념서에도 머신 레이어 심화 섹션(바이트코드/JIT/GC, 2의 보수/IEEE-754, 타입 소거,
 > @Transactional 프록시 원리, ACID/격리수준/B-tree 인덱스, HMAC/대칭·비대칭 암호)이 추가되어 있습니다.
@@ -157,10 +157,10 @@ edu_spring/
 ├── docker-compose.yml             # Ch01~03 Java 통합 실행
 ├── .devcontainer/                 # VS Code Dev Container 설정
 └── docs/                          # 참고 문서
-    ├── JAVA_개념서.md
+    ├── JAVA_개념서/README.md
     ├── JAVA_교육자료.md
     ├── JAVA_코딩표준.md
-    ├── SPRING_개념서.md
+    ├── SPRING_개념서/README.md
     ├── SPRING_교육자료.md
     ├── 학습계획.md / 학습계획.csv
     ├── 트러블슈팅.md              # 자주 겪는 오류 해결 가이드

@@ -121,6 +121,28 @@ CATEGORY_TITLES=(
   "CS 기반 - 컴퓨터 네트워크"
 )
 
+# 자바 교재(이것이 자바다) 챕터: 클래스 목록은 com/edu/javabook/chNN 에서 동적으로 읽는다.
+JB_TITLES=(
+  "ch02|Ch02 변수와 타입"
+  "ch03|Ch03 연산자"
+  "ch04|Ch04 조건문과 반복문"
+  "ch05|Ch05 참조 타입"
+  "ch06|Ch06 클래스"
+  "ch07|Ch07 상속"
+  "ch08|Ch08 인터페이스"
+  "ch09|Ch09 중첩 선언과 익명 객체"
+  "ch11|Ch11 예외 처리"
+  "ch12|Ch12 java.base 모듈"
+  "ch13|Ch13 제네릭"
+  "ch14|Ch14 멀티 스레드"
+  "ch15|Ch15 컬렉션 자료구조"
+  "ch16|Ch16 람다식"
+  "ch17|Ch17 스트림 요소 처리"
+  "ch18|Ch18 데이터 입출력"
+  "ch19|Ch19 네트워크 입출력"
+  "ch21|Ch21 자바 21 강화 기능"
+)
+
 run_class() {
     local class_name=$1
     local title=$2
@@ -215,6 +237,66 @@ run_category() {
     done
 }
 
+# 자바 교재 한 챕터의 소절별 클래스를 동적으로 나열/실행
+run_javabook_chapter() {
+    local chnn="$1" title="$2"
+    while true; do
+        clear
+        echo -e "${BLUE}╔════════════════════════════════════════════════════════════╗${NC}"
+        echo -e "${BLUE}║${NC} ${BOLD}이것이 자바다 · ${title}${NC}"
+        echo -e "${BLUE}╚════════════════════════════════════════════════════════════╝${NC}"
+        echo ""
+        local classes=() c i=0
+        while IFS= read -r c; do [ -n "$c" ] && classes+=("$c"); done < <(cd "$OUT" 2>/dev/null && find "com/edu/javabook/$chnn" -maxdepth 1 -name '*.class' ! -name '*$*' 2>/dev/null | sed 's|/|.|g; s|\.class$||' | sort)
+        if [ ${#classes[@]} -eq 0 ]; then
+            echo -e "  ${RED}컴파일된 클래스가 없습니다. 먼저 ./compile.sh 를 실행하세요.${NC}"
+        fi
+        for c in "${classes[@]}"; do i=$((i+1)); printf "   ${GREEN}%2d)${NC} %s\n" "$i" "${c##*.}"; done
+        echo ""
+        echo -e "   ${CYAN}b) 뒤로${NC}    ${RED}q) 종료${NC}"
+        echo ""
+        echo -ne "${GREEN}선택> ${NC}"; read -r sel
+        case "$sel" in
+            b|B) return ;;
+            q|Q) echo -e "\n${GREEN}학습을 마칩니다. 수고하셨습니다!${NC}\n"; exit 0 ;;
+            ''|*[!0-9]*) echo -e "${RED}숫자를 입력하세요.${NC}"; sleep 1 ;;
+            *)
+                if [ "$sel" -ge 1 ] && [ "$sel" -le "${#classes[@]}" ]; then
+                    local fq="${classes[$((sel-1))]}"; run_class "$fq" "${fq##*.}"; wait_for_enter
+                else echo -e "${RED}잘못된 번호입니다.${NC}"; sleep 1; fi
+                ;;
+        esac
+    done
+}
+
+# 자바 교재(이것이 자바다) 챕터 목록 → 챕터 선택
+run_javabook() {
+    while true; do
+        clear
+        echo -e "${BLUE}╔════════════════════════════════════════════════════════════╗${NC}"
+        echo -e "${BLUE}║${NC} ${BOLD}이것이 자바다 — 교재 (소절별 실습 코드)${NC}"
+        echo -e "${BLUE}║${NC} 챕터를 선택하면 소절 목록이 나옵니다"
+        echo -e "${BLUE}╚════════════════════════════════════════════════════════════╝${NC}"
+        echo ""
+        local i=0 entry
+        for entry in "${JB_TITLES[@]}"; do i=$((i+1)); printf "   ${GREEN}%2d)${NC} %s\n" "$i" "${entry#*|}"; done
+        echo ""
+        echo -e "   ${CYAN}b) 뒤로${NC}    ${RED}q) 종료${NC}"
+        echo ""
+        echo -ne "${GREEN}선택> ${NC}"; read -r sel
+        case "$sel" in
+            b|B) return ;;
+            q|Q) echo -e "\n${GREEN}학습을 마칩니다. 수고하셨습니다!${NC}\n"; exit 0 ;;
+            ''|*[!0-9]*) echo -e "${RED}숫자를 입력하세요.${NC}"; sleep 1 ;;
+            *)
+                if [ "$sel" -ge 1 ] && [ "$sel" -le "${#JB_TITLES[@]}" ]; then
+                    local e="${JB_TITLES[$((sel-1))]}"; run_javabook_chapter "${e%%|*}" "${e#*|}"
+                else echo -e "${RED}잘못된 번호입니다.${NC}"; sleep 1; fi
+                ;;
+        esac
+    done
+}
+
 show_main_menu() {
     clear
     echo -e "${BLUE}╔════════════════════════════════════════════════════════════╗${NC}"
@@ -227,6 +309,7 @@ show_main_menu() {
         printf "${BLUE}║${NC}   ${GREEN}%d)${NC} %s\n" "$n" "$t"
     done
     echo -e "${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}   ${GREEN}j)${NC} ${BOLD}자바 교재 (이것이 자바다 · Ch02~21 소절별 실습)${NC}"
     echo -e "${BLUE}║${NC}   ${CYAN}a) 전체 실행 (네트워크 예제 제외)${NC}"
     echo -e "${BLUE}║${NC}   ${RED}q) 종료${NC}"
     echo -e "${BLUE}╚════════════════════════════════════════════════════════════╝${NC}"
@@ -254,6 +337,7 @@ while true; do
     echo -ne "${GREEN}선택> ${NC}"
     read -r choice
     case "$choice" in
+        j|J) run_javabook ;;
         a|A) run_all; wait_for_enter ;;
         q|Q) echo -e "\n${GREEN}학습을 마칩니다. 수고하셨습니다!${NC}\n"; exit 0 ;;
         ''|*[!0-9]*) echo -e "${RED}숫자를 입력하세요.${NC}"; sleep 1 ;;

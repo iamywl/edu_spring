@@ -11,6 +11,8 @@ services:
       - ./chapter-cs-algorithms/src/main/java/com/edu/algorithms:/app/src/com/edu/algorithms
       - ./chapter-cs-concurrency/src/main/java/com/edu/concurrency:/app/src/com/edu/concurrency
       - ./chapter-cs-network/src/main/java/com/edu/network:/app/src/com/edu/network
+      # 자바 교재(이것이 자바다) — 소절별 실습 코드 (Ch02~21)
+      - ./chapter-java-textbook/src/main/java/com/edu/javabook:/app/src/com/edu/javabook
       # 스크립트도 마운트
       - ./run.sh:/app/run.sh
       - ./compile.sh:/app/compile.sh

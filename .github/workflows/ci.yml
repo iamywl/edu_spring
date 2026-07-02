@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── Java 예제(교재 + 기초 챕터 + CS 트랙) 전체 컴파일 & 스모크 실행 ──
+  java-examples:
+    name: Java 예제 컴파일·실행
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: 전체 Java 예제 컴파일
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/out
+          SRC=$(find chapter01-java-basics chapter02-oop chapter03-collections \
+                     chapter-cs-algorithms chapter-cs-concurrency chapter-cs-network \
+                     chapter-java-textbook -name "*.java")
+          javac -d /tmp/out $SRC
+          echo "컴파일된 클래스: $(find /tmp/out -name '*.class' | wc -l)"
+
+      - name: 대표 예제 스모크 실행 (교재/CS 각 트랙)
+        run: |
+          set -euo pipefail
+          run() { echo "▶ $1"; java -cp /tmp/out "$1" > /dev/null; echo "  OK"; }
+          run com.edu.javabook.ch02.VariableDeclaration
+          run com.edu.javabook.ch07.Polymorphism
+          run com.edu.javabook.ch15.MapCollection
+          run com.edu.javabook.ch17.Collecting
+          run com.edu.javabook.ch21.RecordPattern
+          run com.edu.algorithms.SortingAlgorithms
+          run com.edu.concurrency.RaceConditionDemo
+          run com.edu.basics.StackDemo
+
+      - name: 문서 실습 링크(./run.sh 클래스) ↔ 코드 싱크 검증
+        run: |
+          set -euo pipefail
+          miss=0
+          refs=$(grep -rhoE "run\.sh [A-Za-z][A-Za-z0-9]+" docs/ chapter*/README.md README.md 2>/dev/null \
+                 | awk '{print $2}' | grep -vE '^(all|file|Add)$' | sort -u)
+          for c in $refs; do
+            if ! find chapter01-java-basics chapter02-oop chapter03-collections \
+                      chapter-cs-algorithms chapter-cs-concurrency chapter-cs-network \
+                      chapter-java-textbook -name "${c}.java" | grep -q .; then
+              echo "::error::문서가 참조하는 클래스 없음: $c"; miss=$((miss+1))
+            fi
+          done
+          echo "참조 클래스 $(echo "$refs" | wc -w)개 검사, 누락 $miss개"
+          test "$miss" -eq 0
+
+  # ── Spring 챕터(04~09) 빌드 & 테스트 (Testcontainers 포함) ──
+  spring-chapters:
+    name: Spring ${{ matrix.chapter }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        chapter:
+          - chapter04-spring-boot-intro
+          - chapter05-spring-web
+          - chapter06-spring-data-jpa
+          - chapter07-spring-security
+          - chapter08-testing
+          - chapter09-final-project
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Gradle 빌드 & 테스트
+        working-directory: ${{ matrix.chapter }}
+        run: ./gradlew test --no-daemon --console=plain

@@ -50,7 +50,7 @@ docker compose up -d
 - `copy(List<? extends T> src, List<? super T> dest)` 메서드에서 PECS 원칙이 실제로 어떻게 적용되는지 확인 (`WildcardExample`)
 
 **예제 실행**
-- `./run.sh GenericClassExample`, `./run.sh GenericMethodExample`, `./run.sh BoundedTypeExample`, `./run.sh WildcardExample`
+- `./run.sh GenericClassExample`, `./run.sh GenericMethodExample`, `./run.sh BoundedTypeExample`, `./run.sh WildcardExample`  📁 `chapter03-collections/src/main/java/com/edu/collections/WildcardExample.java`
 - 출력에서 확인할 것들:
   - `Box<String>`과 `Box<Integer>`가 같은 클래스인데 다른 타입을 담는 것
   - `NumberBox<String>` 사용 시 컴파일 에러가 나는 이유 (주석 처리된 코드 참고)
@@ -76,7 +76,7 @@ docker compose up -d
 - `QueueExample`에서 ArrayDeque가 스택과 큐 두 가지로 모두 사용되는 패턴 확인
 
 **예제 실행**
-- `./run.sh ListExample`, `./run.sh SetExample`, `./run.sh MapExample`, `./run.sh QueueExample`, `./run.sh CollectionsUtilExample`
+- `./run.sh ListExample`, `./run.sh SetExample`, `./run.sh MapExample`, `./run.sh QueueExample`, `./run.sh CollectionsUtilExample`  📁 `chapter03-collections/src/main/java/com/edu/collections/CollectionsUtilExample.java`
 - 출력에서 확인할 것들:
   - HashSet의 출력 순서가 삽입 순서와 다른 것
   - TreeSet이 한글 기준으로 자동 정렬되는 것
@@ -103,7 +103,7 @@ docker compose up -d
 - `ParallelStreamExample`에서 순차/병렬 스트림의 실행 시간 비교와 스레드 이름 출력 확인
 
 **예제 실행**
-- `./run.sh StreamCreationExample`, `./run.sh StreamIntermediateExample`, `./run.sh StreamTerminalExample`, `./run.sh CollectorsExample`, `./run.sh ParallelStreamExample`
+- `./run.sh StreamCreationExample`, `./run.sh StreamIntermediateExample`, `./run.sh StreamTerminalExample`, `./run.sh CollectorsExample`, `./run.sh ParallelStreamExample`  📁 `chapter03-collections/src/main/java/com/edu/collections/ParallelStreamExample.java`
 - 출력에서 확인할 것들:
   - `Stream.iterate`와 `Stream.generate`의 차이 (규칙적 vs 무작위)
   - `flatMap`이 중첩 리스트를 어떻게 평탄화하는지
@@ -131,7 +131,7 @@ docker compose up -d
 - `LambdaPracticalExample`에서 Predicate/Function/Consumer/Supplier가 실제 비즈니스 로직에 어떻게 조합되는지 확인, `OptionalExample`에서 Optional 체이닝 확인
 
 **예제 실행**
-- `./run.sh LambdaBasicsExample`, `./run.sh FunctionalInterfaceExample`, `./run.sh MethodReferenceExample`, `./run.sh OptionalExample`, `./run.sh LambdaPracticalExample`
+- `./run.sh LambdaBasicsExample`, `./run.sh FunctionalInterfaceExample`, `./run.sh MethodReferenceExample`, `./run.sh OptionalExample`, `./run.sh LambdaPracticalExample`  📁 `chapter03-collections/src/main/java/com/edu/collections/LambdaPracticalExample.java`
 - 출력에서 확인할 것들:
   - Calculator 인터페이스의 4가지 연산이 모두 람다로 구현된 것
   - `isEven.negate()`가 isOdd와 동일하게 동작하는 것
@@ -157,7 +157,7 @@ docker compose up -d
 - `TreeSet`이 `compareTo`(또는 생성자에 넘긴 Comparator)로 자동 정렬하는 것 확인
 
 **예제 실행**
-- `./run.sh ComparableComparatorExample`
+- `./run.sh ComparableComparatorExample`  📁 `chapter03-collections/src/main/java/com/edu/collections/ComparableComparatorExample.java`
 - 출력에서 확인할 것들:
   - `sort(null)`로 자연 순서 정렬이 동작하는 것
   - 점수 내림차순 + 동점 시 나이 오름차순의 다중 키 정렬 결과
@@ -181,7 +181,7 @@ docker compose up -d
 - equals/hashCode 계약 규칙(주석/출력) 확인
 
 **예제 실행**
-- `./run.sh EqualsHashCodeExample`
+- `./run.sh EqualsHashCodeExample`  📁 `chapter03-collections/src/main/java/com/edu/collections/EqualsHashCodeExample.java`
 - 출력에서 확인할 것들:
   - `BadProduct`: `equals`는 `true`인데 `hashCode`가 달라 HashSet 크기가 2가 되는 것(버그)
   - `GoodProduct`: HashSet 크기가 1이 되고 `contains`로 동일 객체를 찾는 것
@@ -202,7 +202,7 @@ docker compose up -d
 - 주석의 "지배 연산을 센다"는 Big-O 도출 방법을 코드와 함께 읽으세요
 
 **예제 실행**
-- `./run.sh BigOTiming`
+- `./run.sh BigOTiming`  📁 `chapter03-collections/src/main/java/com/edu/collections/BigOTiming.java`
 - 출력에서 확인할 것들:
   - N이 10배 커질 때 선형 탐색 시간은 약 10배, 이진 탐색은 거의 일정한 것
   - `LinkedList.get(mid)`가 N에 비례해 급격히 느려지는 배율
@@ -224,7 +224,7 @@ docker compose up -d
 - 좋은 hashCode와 "무조건 42를 반환하는" 나쁜 hashCode의 조회 시간을 비교
 
 **예제 실행**
-- `./run.sh HashMapInternals`
+- `./run.sh HashMapInternals`  📁 `chapter03-collections/src/main/java/com/edu/collections/HashMapInternals.java`
 - 출력에서 확인할 것들:
   - key 개수를 100배 늘려도 조회 시간이 거의 그대로인 것(O(1))
   - 로드팩터 임계값(12, 24, 48...)을 넘을 때마다 용량이 2배로 resize되는 지점
@@ -247,7 +247,7 @@ docker compose up -d
 - raw type으로 잘못된 원소를 몰래 넣었을 때 `ClassCastException`이 "꺼내는 순간" 터지는 위치 확인
 
 **예제 실행**
-- `./run.sh TypeErasureDemo`
+- `./run.sh TypeErasureDemo`  📁 `chapter03-collections/src/main/java/com/edu/collections/TypeErasureDemo.java`
 - 출력에서 확인할 것들:
   - `strings.getClass() == integers.getClass()`가 `true`인 것(타입 소거)
   - `List<String>`에 raw 캐스트로 넣은 `Integer(42)`가 삽입 시엔 조용하다가, 향상된 for문의 숨은 `(String)` 캐스트에서 예외가 터지는 것

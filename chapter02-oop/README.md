@@ -66,7 +66,7 @@ src/main/java/com/edu/oop/
   - `super(name, age)` 호출로 부모 생성자에 값 전달
 
 **예제 실행**
-- `./run.sh InheritanceExample`, `./run.sh PolymorphismExample`
+- `./run.sh InheritanceExample`, `./run.sh PolymorphismExample`  📁 `chapter02-oop/src/main/java/com/edu/oop/PolymorphismExample.java`
 - 출력에서 확인할 것:
   - 각 동물의 `info()`가 하위 클래스마다 다른 정보를 포함하는지
   - `speak()`가 동물별로 다른 울음소리를 반환하는지
@@ -94,7 +94,7 @@ src/main/java/com/edu/oop/
   - getter/setter를 통해서만 필드 값에 접근 가능
 
 **예제 실행**
-- `./run.sh EncapsulationExample`
+- `./run.sh EncapsulationExample`  📁 `chapter02-oop/src/main/java/com/edu/oop/EncapsulationExample.java`
 - 출력에서 확인할 것:
   - getter로 이름, 나이, 품종 조회 결과
   - setter로 이름/나이 변경 후 `info()` 출력 변화
@@ -120,7 +120,7 @@ src/main/java/com/edu/oop/
   - `equals()`가 true이면 `hashCode()`도 동일해야 하는 규칙
 
 **예제 실행**
-- `./run.sh ObjectMethodsExample`
+- `./run.sh ObjectMethodsExample`  📁 `chapter02-oop/src/main/java/com/edu/oop/ObjectMethodsExample.java`
 - 출력에서 확인할 것:
   - `dog1 == dog2`가 `false`인 이유 (서로 다른 객체)
   - `dog1.equals(dog2)`가 `true`인 이유 (같은 이름, 같은 나이)
@@ -146,7 +146,7 @@ src/main/java/com/edu/oop/
   - 기존 방식 `((Dog) animal).fetch()` 대비 간결함
 
 **예제 실행**
-- `./run.sh PatternMatchingExample`
+- `./run.sh PatternMatchingExample`  📁 `chapter02-oop/src/main/java/com/edu/oop/PatternMatchingExample.java`
 - 출력에서 확인할 것:
   - 각 동물이 자기 타입에 맞는 고유 행동을 출력하는지
 
@@ -179,7 +179,7 @@ src/main/java/com/edu/oop/
   - `Bird`가 `land()`를 오버라이드하여 기본 구현을 대체
 
 **예제 실행**
-- `./run.sh InterfaceExample`
+- `./run.sh InterfaceExample`  📁 `chapter02-oop/src/main/java/com/edu/oop/InterfaceExample.java`
 - 출력에서 확인할 것:
   - `Flyable.description()` static 메서드 호출 결과
   - `flightStatus()` default 메서드의 기본 동작
@@ -207,7 +207,7 @@ src/main/java/com/edu/oop/
   - `fromKoreanName()` 커스텀 검색 메서드와 switch 표현식 활용
 
 **예제 실행**
-- `./run.sh EnumExample`
+- `./run.sh EnumExample`  📁 `chapter02-oop/src/main/java/com/edu/oop/EnumExample.java`
 - 출력에서 확인할 것:
   - 모든 계절 순회 시 ordinal 값 순서
   - `isHot()`, `isCold()` 판별 결과
@@ -234,7 +234,7 @@ src/main/java/com/edu/oop/
   - 정적 팩토리 메서드 `withDefaultEmail()` 패턴
 
 **예제 실행**
-- `./run.sh RecordExample`
+- `./run.sh RecordExample`  📁 `chapter02-oop/src/main/java/com/edu/oop/RecordExample.java`
 - 출력에서 확인할 것:
   - record의 getter가 `getName()`이 아니라 `name()`인 점
   - 자동 생성된 `toString()` 형식
@@ -262,7 +262,7 @@ src/main/java/com/edu/oop/
   - `instanceof` 패턴 매칭으로 sealed class의 하위 타입별 처리
 
 **예제 실행**
-- `./run.sh SealedClassExample`
+- `./run.sh SealedClassExample`  📁 `chapter02-oop/src/main/java/com/edu/oop/SealedClassExample.java`
 - 출력에서 확인할 것:
   - 각 도형의 `describe()` 출력 (색상, 넓이)
   - `instanceof` 패턴 매칭으로 타입별 상세 정보 (반지름/둘레, 가로/세로/정사각형 여부)
@@ -289,7 +289,7 @@ src/main/java/com/edu/oop/
   - **익명 클래스(anonymous)**: 인터페이스를 즉석에서 구현, 함수형 인터페이스는 람다로 대체 가능
 
 **예제 실행**
-- `./run.sh NestedClassExample`
+- `./run.sh NestedClassExample`  📁 `chapter02-oop/src/main/java/com/edu/oop/NestedClassExample.java`
 - 출력에서 확인할 것:
   - 내부 클래스가 바깥 필드(`outerField`)에 접근하는 것
   - 익명 클래스 구현과 동일한 일을 하는 람다 표현식의 간결함

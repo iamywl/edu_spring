@@ -312,7 +312,7 @@ volatileCounter++;   // 결과가 정답보다 작다 → "여전히 틀림"
 - **CAS/`Atomic`**은 락 없이 단일 변수를 원자화하는 낙관적 방식 — 경합 낮으면 빠름, 여러 변수엔 부적합.
 - **`ReentrantLock`**은 `synchronized` + 타임아웃/tryLock/공정성/여러 Condition. 대신 `finally`에서 반드시 `unlock`.
 - **`volatile`**은 **가시성만** 고친다 — 플래그엔 완벽, `count++`엔 무력. 이 구분이 이 장의 핵심.
-- ▶ 데모: `./run.sh SynchronizationDemo`
+- ▶ 데모: `./run.sh SynchronizationDemo`  📁 `chapter-cs-concurrency/src/main/java/com/edu/concurrency/SynchronizationDemo.java`
 
 ---
 

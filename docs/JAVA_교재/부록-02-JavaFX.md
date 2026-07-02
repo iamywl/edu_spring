@@ -235,6 +235,150 @@ fade.play();
 
 ---
 
+## 확인문제
+
+> 💡 JavaFX는 GUI라서 헤드리스 컨테이너에서 실행할 수 없다. 아래 문제는 실행 대신 **개념 이해**를 확인하는 데 초점을 둔다.
+
+**1. (개념 서술)** JavaFX의 세 핵심 구조인 `Application`, `Stage`, `Scene`의 역할을 극장 비유와 함께 각각 한 문장으로 설명하라.
+
+<details>
+<summary>정답</summary>
+
+- **`Application`** — 앱의 진입점(극장 건물 전체). `javafx.application.Application`을 상속하고 `start(Stage)`를 재정의한다.
+- **`Stage`** — 실제 창(윈도우)에 해당하는 최상위 컨테이너(무대).
+- **`Scene`** — 창에 표시되는 화면 한 장(무대 위 장면)으로, 컴포넌트들의 트리인 **Scene Graph**를 담는다.
+
+즉 `Application`이 `Stage`(창)를 받아 그 위에 `Scene`(화면)을 올리는 계층 구조다.
+</details>
+
+**2. (빈칸 채우기)** 다음 문장의 빈칸을 채워라.
+JavaFX 앱은 `main`에서 `______`을(를) 호출해 런타임을 띄우며, 런타임은 자동으로 `______(Stage)` 메서드를 호출한다. 이때 UI 트리를 이루는 레이블·버튼·레이아웃 등 모든 화면 요소는 `______` 클래스를 상속한다.
+
+<details>
+<summary>정답</summary>
+
+- 첫 번째: **`launch`** (`Application.launch`)
+- 두 번째: **`start`**
+- 세 번째: **`Node`**
+
+`launch(args)`가 JavaFX 런타임을 시작하고 `start(Stage)`를 자동 호출하며, 화면에 올라가는 모든 요소는 `Node`를 상속한다.
+</details>
+
+**3. (코드 판단)** 다음 코드에서 창이 화면에 나타나지 않는다. 이유는?
+
+```java
+@Override
+public void start(Stage stage) {
+    Label label = new Label("안녕");
+    Scene scene = new Scene(label, 400, 300);
+    stage.setScene(scene);
+    // stage.show(); 가 없음
+}
+```
+
+<details>
+<summary>정답</summary>
+
+**`stage.show()`를 호출하지 않았기 때문**이다.
+
+`Scene`을 만들고 `setScene`으로 창에 연결하는 것만으로는 창이 표시되지 않는다. `Stage`는 `show()`(또는 `showAndWait()`)를 호출해야 실제로 화면에 나타난다. 마지막 줄에 `stage.show();`를 추가해야 한다.
+</details>
+
+**4. (개념 서술)** JavaFX에서 이벤트를 처리하는 방식을 버튼 클릭을 예로 설명하고, 왜 람다가 잘 어울리는지 말하라.
+
+<details>
+<summary>정답</summary>
+
+버튼 클릭은 `setOnAction`에 **`EventHandler`(함수형 인터페이스)**를 등록해 처리한다.
+
+```java
+button.setOnAction(event -> label.setText("눌렸습니다!"));
+```
+
+`EventHandler`는 추상 메서드가 하나뿐인 함수형 인터페이스이므로 **람다로 간결하게 표현**할 수 있다. 마우스는 `setOnMouseClicked`, 키 입력은 `setOnKeyPressed` 등 `setOn~` 계열 메서드가 준비되어 있다.
+</details>
+
+**5. (빈칸 채우기 / 개념)** 다음 코드는 `input`의 텍스트가 바뀌면 `mirror`가 자동으로 같은 값이 되도록 만든다. 빈칸에 들어갈 메서드 이름과, 이런 동기화 방식을 부르는 용어는?
+
+```java
+mirror.textProperty().______(input.textProperty());
+```
+
+<details>
+<summary>정답</summary>
+
+- 빈칸: **`bind`**
+- 용어: **바인딩(Binding)**
+
+JavaFX 컨트롤의 값은 단순 필드가 아니라 **`Property` 객체**(`textProperty()` 등)로 노출된다. `bind`로 두 속성을 묶으면 한쪽이 바뀔 때 다른 쪽이 자동으로 따라간다. 덕분에 "값이 바뀔 때마다 화면을 수동으로 갱신"하는 반복 코드를 줄이는 **선언적 UI**가 가능하다.
+</details>
+
+**6. (참·거짓 + 이유)** "백그라운드 스레드에서 `label.setText(result)`를 직접 호출해도 안전하다." — 참인가 거짓인가? 이유를 밝혀라.
+
+<details>
+<summary>정답</summary>
+
+**거짓.**
+
+JavaFX는 **UI를 JavaFX Application Thread에서만 변경**하는 규칙이 있다. 백그라운드(다른) 스레드에서 UI를 직접 건드리면 예외가 발생한다. 다른 스레드에서 UI를 바꿔야 한다면 `Platform.runLater(...)`로 작업을 UI 스레드에 넘겨야 한다.
+
+```java
+Platform.runLater(() -> label.setText(result));
+```
+
+더 체계적으로는 `javafx.concurrent.Task`를 써서 진행률·성공·실패를 속성으로 노출하고 바인딩한다.
+</details>
+
+**7. (Swing과 비교)** 컨테이너에 자식 컴포넌트를 넣는 방법이 Swing과 JavaFX에서 어떻게 다른지 코드와 함께 설명하라.
+
+<details>
+<summary>정답</summary>
+
+- **Swing**: 컨테이너에 `add(comp)`로 직접 추가한다.
+- **JavaFX**: 컨테이너의 **`getChildren()`** 리스트를 얻어 `add(...)`/`addAll(...)`로 추가한다.
+
+```java
+VBox root = new VBox(10);
+root.getChildren().addAll(new Label("이름:"), new TextField(), new Button("확인"));
+```
+
+즉 JavaFX는 자식 노드를 담는 `getChildren()` 컬렉션을 노출하고, 그 컬렉션을 조작해 화면 트리를 구성한다.
+</details>
+
+**8. (Swing과 비교)** JavaFX가 Swing보다 앞선다고 평가받는 대표 기능 세 가지를 들고, 각각 한 줄로 설명하라.
+
+<details>
+<summary>정답</summary>
+
+- **속성·바인딩(Property/Binding)** — `textProperty().bind(...)`로 값 동기화를 자동화(선언적 UI). Swing에는 기본 제공되지 않는다.
+- **CSS 스타일링** — 웹처럼 `-fx-` 접두어 CSS로 외형을 코드와 분리해 꾸민다.
+- **애니메이션** — `Timeline`/`KeyFrame`, `FadeTransition` 등으로 프레임 보간을 1급 지원한다.
+
+(이 밖에 미디어 재생, 세련된 기본 컨트롤 등도 강점이다.)
+</details>
+
+**9. (코드 판단)** 다음 코드의 의도는 "2초에 걸쳐 레이블을 서서히 사라지게 한다"이다. 각 메서드가 하는 일을 설명하라.
+
+```java
+FadeTransition fade = new FadeTransition(Duration.seconds(2), label);
+fade.setFromValue(1.0);
+fade.setToValue(0.0);
+fade.play();
+```
+
+<details>
+<summary>정답</summary>
+
+- `new FadeTransition(Duration.seconds(2), label)` — `label`을 대상으로 **2초 동안** 진행되는 페이드 전환을 만든다.
+- `setFromValue(1.0)` — 시작 불투명도 **1.0(완전 불투명)**.
+- `setToValue(0.0)` — 끝 불투명도 **0.0(완전 투명)**.
+- `play()` — 애니메이션을 **실행**한다.
+
+결과적으로 레이블이 2초에 걸쳐 불투명 → 투명으로 부드럽게 사라진다. (`setCycleCount`/`setAutoReverse`를 주면 반복·왕복도 가능하다.)
+</details>
+
+---
+
 ## 요약
 
 - **JavaFX**는 Swing의 후속 현대 GUI 프레임워크로, CSS 스타일·속성 바인딩·애니메이션을 기본 제공한다.

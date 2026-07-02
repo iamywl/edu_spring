@@ -87,7 +87,7 @@ java -cp /tmp/netout com.edu.network.RawHttpClient
 
 ### 3) 통합 Docker Java 실습 환경
 
-이 데모는 `com.edu.network` 패키지의 표준 Java 클래스이므로, 프로젝트의 **통합 Docker 실습 환경(`run.sh`)** 메뉴로도 실행할 수 있다. 메뉴 번호는 코디네이터가 배정한다(`run.sh`는 이 트랙에서 직접 수정하지 않는다). Docker 컨테이너에서 실행할 경우에도 **컨테이너에 네트워크 접속이 열려 있어야** `example.com`에 연결된다.
+이 데모는 `com.edu.network` 패키지의 표준 Java 클래스이므로, 프로젝트의 **통합 Docker 실습 환경(`run.sh`)** 으로도 실행할 수 있다. `./run.sh RawHttpClient`처럼 클래스 이름을 직접 지정하거나 `./run.sh` 대화형 메뉴에서 카테고리 선택 → 개념 선택으로 실행한다(`run.sh`는 이 트랙에서 직접 수정하지 않는다). Docker 컨테이너에서 실행할 경우에도 **컨테이너에 네트워크 접속이 열려 있어야** `example.com`에 연결된다.
 
 ---
 

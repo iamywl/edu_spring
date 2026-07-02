@@ -10,29 +10,30 @@
 docker compose up -d
 # VS Code: F1 → "Dev Containers: Attach to Running Container" → java-edu
 ./compile.sh
-./run.sh 6    # 컬렉션
-./run.sh 7    # 제네릭
-./run.sh 8    # Stream API
-./run.sh 9    # 람다
+./run.sh ListExample          # 컬렉션 - List
+./run.sh GenericClassExample  # 제네릭
+./run.sh StreamCreationExample # Stream API
+./run.sh LambdaBasicsExample  # 람다
+# 또는 대화형 메뉴: ./run.sh 실행 후 카테고리(Chapter 03) 선택 → 개념 선택
 ```
 
-> 소스 파일을 수정한 후 `./compile.sh` → `./run.sh N`으로 바로 결과를 확인하세요.
+> 각 개념은 이제 독립 실행 스크립트로 분리되어 있습니다(**개념당 스크립트 1개**). 소스 파일을 수정한 후 `./compile.sh` → `./run.sh <ClassName>`으로 바로 결과를 확인하세요. 인자 없이 `./run.sh`를 실행하면 대화형 메뉴에서 카테고리(Chapter 03)를 고른 뒤 개념을 선택할 수 있습니다.
 
 ---
 
 ## 세션 순서
 
-| 세션 | 토픽 | 실행 명령 | 소스 파일 |
-|------|------|-----------|-----------|
-| 1 | 제네릭 | `./run.sh 7` | `GenericExample.java` |
-| 2 | 컬렉션 프레임워크 | `./run.sh 6` | `CollectionExample.java` |
-| 3 | Stream API | `./run.sh 8` | `StreamExample.java` |
-| 4 | 람다와 함수형 인터페이스 | `./run.sh 9` | `LambdaExample.java` |
-| 5 | Comparable과 Comparator | `./run.sh 14` | `ComparableComparatorExample.java` |
-| 6 | equals와 hashCode 계약 | `./run.sh 15` | `EqualsHashCodeExample.java` |
-| 7 | [심화] Big-O 측정 | `./run.sh 19` | `BigOTiming.java` |
-| 8 | [심화] HashMap 내부 동작 | `./run.sh 20` | `HashMapInternals.java` |
-| 9 | [심화] 제네릭 타입 소거 | `./run.sh 21` | `TypeErasureDemo.java` |
+| 세션 | 토픽 | 실행 스크립트 |
+|------|------|---------------|
+| 1 | 제네릭 | `GenericClassExample`, `GenericMethodExample`, `BoundedTypeExample`, `WildcardExample` |
+| 2 | 컬렉션 프레임워크 | `ListExample`, `SetExample`, `MapExample`, `QueueExample`, `CollectionsUtilExample` |
+| 3 | Stream API | `StreamCreationExample`, `StreamIntermediateExample`, `StreamTerminalExample`, `CollectorsExample`, `ParallelStreamExample` |
+| 4 | 람다와 함수형 인터페이스 | `LambdaBasicsExample`, `FunctionalInterfaceExample`, `MethodReferenceExample`, `OptionalExample`, `LambdaPracticalExample` |
+| 5 | Comparable과 Comparator | `ComparableComparatorExample` |
+| 6 | equals와 hashCode 계약 | `EqualsHashCodeExample` |
+| 7 | [심화] Big-O 측정 | `BigOTiming` |
+| 8 | [심화] HashMap 내부 동작 | `HashMapInternals` |
+| 9 | [심화] 제네릭 타입 소거 | `TypeErasureDemo` |
 
 ---
 
@@ -43,13 +44,13 @@ docker compose up -d
 - 📝 [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 3.1: "Generics와 PECS 원칙" 읽기
 
 **예제 코드 분석**
-- 파일: `src/main/java/com/edu/collections/GenericExample.java`
-- `Box<T>` 클래스가 어떻게 String, Integer, Double 등 다양한 타입을 하나의 클래스로 처리하는지 확인
-- `NumberBox<T extends Number>`에서 바운디드 타입이 어떻게 `doubleValue()` 호출을 가능하게 하는지 확인
-- `copy(List<? extends T> src, List<? super T> dest)` 메서드에서 PECS 원칙이 실제로 어떻게 적용되는지 확인
+- 파일: `GenericClassExample.java`(제네릭 클래스 `Box<T>`), `GenericMethodExample.java`(제네릭 메서드), `BoundedTypeExample.java`(바운디드 타입 `<T extends Number>`), `WildcardExample.java`(와일드카드/PECS)
+- `Box<T>` 클래스가 어떻게 String, Integer, Double 등 다양한 타입을 하나의 클래스로 처리하는지 확인 (`GenericClassExample`)
+- `NumberBox<T extends Number>`에서 바운디드 타입이 어떻게 `doubleValue()` 호출을 가능하게 하는지 확인 (`BoundedTypeExample`)
+- `copy(List<? extends T> src, List<? super T> dest)` 메서드에서 PECS 원칙이 실제로 어떻게 적용되는지 확인 (`WildcardExample`)
 
 **예제 실행**
-- `./run.sh 7`
+- `./run.sh GenericClassExample`, `./run.sh GenericMethodExample`, `./run.sh BoundedTypeExample`, `./run.sh WildcardExample`
 - 출력에서 확인할 것들:
   - `Box<String>`과 `Box<Integer>`가 같은 클래스인데 다른 타입을 담는 것
   - `NumberBox<String>` 사용 시 컴파일 에러가 나는 이유 (주석 처리된 코드 참고)
@@ -69,13 +70,13 @@ docker compose up -d
 - 📝 [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 3.2: "Collection framework와 시간복잡도" 읽기
 
 **예제 코드 분석**
-- 파일: `src/main/java/com/edu/collections/CollectionExample.java`
-- `demonstrateSet()`에서 HashSet, TreeSet, LinkedHashSet의 출력 순서 차이를 주목 -- 같은 데이터를 넣어도 순서가 다름
-- `demonstrateMap()`에서 `putIfAbsent`, `computeIfAbsent`, `merge` 같은 Java 8+ 메서드들이 기존 if-null 패턴을 어떻게 대체하는지 확인
-- `demonstrateQueue()`에서 ArrayDeque가 스택과 큐 두 가지로 모두 사용되는 패턴 확인
+- 파일: `ListExample.java`, `SetExample.java`, `MapExample.java`, `QueueExample.java`, `CollectionsUtilExample.java`
+- `SetExample`에서 HashSet, TreeSet, LinkedHashSet의 출력 순서 차이를 주목 -- 같은 데이터를 넣어도 순서가 다름
+- `MapExample`에서 `putIfAbsent`, `computeIfAbsent`, `merge` 같은 Java 8+ 메서드들이 기존 if-null 패턴을 어떻게 대체하는지 확인
+- `QueueExample`에서 ArrayDeque가 스택과 큐 두 가지로 모두 사용되는 패턴 확인
 
 **예제 실행**
-- `./run.sh 6`
+- `./run.sh ListExample`, `./run.sh SetExample`, `./run.sh MapExample`, `./run.sh QueueExample`, `./run.sh CollectionsUtilExample`
 - 출력에서 확인할 것들:
   - HashSet의 출력 순서가 삽입 순서와 다른 것
   - TreeSet이 한글 기준으로 자동 정렬되는 것
@@ -96,13 +97,13 @@ docker compose up -d
 - 📝 [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 3.3~3.4: "Lambda/Stream API, 메서드 참조" 읽기
 
 **예제 코드 분석**
-- 파일: `src/main/java/com/edu/collections/StreamExample.java`
-- `demonstrateIntermediateOperations()`에서 `peek`의 출력 순서를 통해 Lazy 평가가 실제로 어떻게 동작하는지 확인 -- filter에 걸리지 않는 요소도 peek은 실행됨
-- `demonstrateCollectors()`의 Student 데이터로 `groupingBy`, `partitioningBy`, `summarizingInt`가 어떻게 데이터를 집계하는지 확인
-- `demonstrateParallelStream()`에서 순차/병렬 스트림의 실행 시간 비교와 스레드 이름 출력 확인
+- 파일: `StreamCreationExample.java`, `StreamIntermediateExample.java`, `StreamTerminalExample.java`, `CollectorsExample.java`, `ParallelStreamExample.java`
+- `StreamIntermediateExample`에서 `peek`의 출력 순서를 통해 Lazy 평가가 실제로 어떻게 동작하는지 확인 -- filter에 걸리지 않는 요소도 peek은 실행됨
+- `CollectorsExample`의 Student 데이터로 `groupingBy`, `partitioningBy`, `summarizingInt`가 어떻게 데이터를 집계하는지 확인
+- `ParallelStreamExample`에서 순차/병렬 스트림의 실행 시간 비교와 스레드 이름 출력 확인
 
 **예제 실행**
-- `./run.sh 8`
+- `./run.sh StreamCreationExample`, `./run.sh StreamIntermediateExample`, `./run.sh StreamTerminalExample`, `./run.sh CollectorsExample`, `./run.sh ParallelStreamExample`
 - 출력에서 확인할 것들:
   - `Stream.iterate`와 `Stream.generate`의 차이 (규칙적 vs 무작위)
   - `flatMap`이 중첩 리스트를 어떻게 평탄화하는지
@@ -124,13 +125,13 @@ docker compose up -d
 - 📝 [JAVA_교육자료](../docs/JAVA_교육자료.md) - Part 3.3: "Lambda와 함수형 인터페이스" 읽기
 
 **예제 코드 분석**
-- 파일: `src/main/java/com/edu/collections/LambdaExample.java`
-- `demonstrateFunctionalInterfaces()`에서 Predicate, Function, Consumer, Supplier 4가지 핵심 인터페이스가 각각 "조건 검사 / 변환 / 소비 / 생성" 역할을 하는 것 확인
-- `demonstrateMethodReferences()`에서 람다 `s -> s.toUpperCase()`가 메서드 참조 `String::toUpperCase`로 변환되는 4가지 패턴 확인
-- `demonstratePracticalExamples()`에서 Predicate/Function/Consumer/Supplier가 실제 비즈니스 로직에 어떻게 조합되는지 확인
+- 파일: `LambdaBasicsExample.java`, `FunctionalInterfaceExample.java`, `MethodReferenceExample.java`, `OptionalExample.java`, `LambdaPracticalExample.java`
+- `FunctionalInterfaceExample`에서 Predicate, Function, Consumer, Supplier 4가지 핵심 인터페이스가 각각 "조건 검사 / 변환 / 소비 / 생성" 역할을 하는 것 확인
+- `MethodReferenceExample`에서 람다 `s -> s.toUpperCase()`가 메서드 참조 `String::toUpperCase`로 변환되는 4가지 패턴 확인
+- `LambdaPracticalExample`에서 Predicate/Function/Consumer/Supplier가 실제 비즈니스 로직에 어떻게 조합되는지 확인, `OptionalExample`에서 Optional 체이닝 확인
 
 **예제 실행**
-- `./run.sh 9`
+- `./run.sh LambdaBasicsExample`, `./run.sh FunctionalInterfaceExample`, `./run.sh MethodReferenceExample`, `./run.sh OptionalExample`, `./run.sh LambdaPracticalExample`
 - 출력에서 확인할 것들:
   - Calculator 인터페이스의 4가지 연산이 모두 람다로 구현된 것
   - `isEven.negate()`가 isOdd와 동일하게 동작하는 것
@@ -138,7 +139,7 @@ docker compose up -d
   - Optional 체이닝에서 null이 중간에 있을 때 안전하게 기본값이 반환되는 것
 
 **실습 과제**
-1. `LambdaExample`에서 새로운 `Predicate<String>`을 만들어 이름 리스트에서 3글자 이상인 이름만 필터링해보세요.
+1. `FunctionalInterfaceExample`에서 새로운 `Predicate<String>`을 만들어 이름 리스트에서 3글자 이상인 이름만 필터링해보세요.
 2. `Calculator` 인터페이스를 사용하여 거듭제곱(`Math.pow`) 연산을 구현해보세요. (힌트: 반환 타입이 int이므로 캐스팅 필요)
 3. `demonstratePracticalExamples()`에서 `Function` 조합을 사용하여 Person의 이름을 대문자로 변환 후 "님" 접미사를 붙이는 파이프라인을 만들어보세요.
 
@@ -156,7 +157,7 @@ docker compose up -d
 - `TreeSet`이 `compareTo`(또는 생성자에 넘긴 Comparator)로 자동 정렬하는 것 확인
 
 **예제 실행**
-- `./run.sh 14`
+- `./run.sh ComparableComparatorExample`
 - 출력에서 확인할 것들:
   - `sort(null)`로 자연 순서 정렬이 동작하는 것
   - 점수 내림차순 + 동점 시 나이 오름차순의 다중 키 정렬 결과
@@ -180,7 +181,7 @@ docker compose up -d
 - equals/hashCode 계약 규칙(주석/출력) 확인
 
 **예제 실행**
-- `./run.sh 15`
+- `./run.sh EqualsHashCodeExample`
 - 출력에서 확인할 것들:
   - `BadProduct`: `equals`는 `true`인데 `hashCode`가 달라 HashSet 크기가 2가 되는 것(버그)
   - `GoodProduct`: HashSet 크기가 1이 되고 `contains`로 동일 객체를 찾는 것
@@ -201,7 +202,7 @@ docker compose up -d
 - 주석의 "지배 연산을 센다"는 Big-O 도출 방법을 코드와 함께 읽으세요
 
 **예제 실행**
-- `./run.sh 19`
+- `./run.sh BigOTiming`
 - 출력에서 확인할 것들:
   - N이 10배 커질 때 선형 탐색 시간은 약 10배, 이진 탐색은 거의 일정한 것
   - `LinkedList.get(mid)`가 N에 비례해 급격히 느려지는 배율
@@ -223,7 +224,7 @@ docker compose up -d
 - 좋은 hashCode와 "무조건 42를 반환하는" 나쁜 hashCode의 조회 시간을 비교
 
 **예제 실행**
-- `./run.sh 20`
+- `./run.sh HashMapInternals`
 - 출력에서 확인할 것들:
   - key 개수를 100배 늘려도 조회 시간이 거의 그대로인 것(O(1))
   - 로드팩터 임계값(12, 24, 48...)을 넘을 때마다 용량이 2배로 resize되는 지점
@@ -246,7 +247,7 @@ docker compose up -d
 - raw type으로 잘못된 원소를 몰래 넣었을 때 `ClassCastException`이 "꺼내는 순간" 터지는 위치 확인
 
 **예제 실행**
-- `./run.sh 21`
+- `./run.sh TypeErasureDemo`
 - 출력에서 확인할 것들:
   - `strings.getClass() == integers.getClass()`가 `true`인 것(타입 소거)
   - `List<String>`에 raw 캐스트로 넣은 `Integer(42)`가 삽입 시엔 조용하다가, 향상된 for문의 숨은 `(String)` 캐스트에서 예외가 터지는 것
@@ -261,5 +262,5 @@ docker compose up -d
 ## 학습 팁
 
 - 각 세션의 **개념 학습**을 먼저 읽고 코드를 분석하면 이해가 빠릅니다.
-- 실습 과제를 수행한 후 반드시 `./compile.sh` → `./run.sh N`으로 결과를 확인하세요.
+- 실습 과제를 수행한 후 반드시 `./compile.sh` → `./run.sh <ClassName>`으로 결과를 확인하세요.
 - 컴파일 에러가 나면 에러 메시지를 읽어보세요 -- 제네릭 관련 에러 메시지를 해석하는 것도 중요한 학습입니다.

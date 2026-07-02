@@ -33,10 +33,10 @@
 
 | 트랙 | 개념서 | 실습 |
 |------|--------|------|
-| 자료구조·알고리즘 | [docs/CS_알고리즘_개념서.md](docs/CS_알고리즘_개념서.md) | [chapter-cs-algorithms/](chapter-cs-algorithms/) — `./run.sh 22~27` (Big-O, 정렬, 재귀/DP, 트리·힙, 그래프) |
-| 운영체제·동시성 | [docs/CS_운영체제_개념서.md](docs/CS_운영체제_개념서.md) | [chapter-cs-concurrency/](chapter-cs-concurrency/) — `./run.sh 28~32` (경쟁 상태, 동기화, 교착, 스레드풀) |
+| 자료구조·알고리즘 | [docs/CS_알고리즘_개념서.md](docs/CS_알고리즘_개념서.md) | [chapter-cs-algorithms/](chapter-cs-algorithms/) — `./run.sh SearchAlgorithms`, `SortingAlgorithms`, `RecursionAndDP`, `DataStructuresFromScratch`, `TreeAndHeap`, `GraphAlgorithms` (Big-O, 정렬, 재귀/DP, 트리·힙, 그래프) |
+| 운영체제·동시성 | [docs/CS_운영체제_개념서.md](docs/CS_운영체제_개념서.md) | [chapter-cs-concurrency/](chapter-cs-concurrency/) — `./run.sh RaceConditionDemo`, `SynchronizationDemo`, `DeadlockDemo`, `ExecutorAndFutures`, `ProducerConsumer` (경쟁 상태, 동기화, 교착, 스레드풀) |
 | 데이터베이스 이론 | [docs/CS_데이터베이스_개념서.md](docs/CS_데이터베이스_개념서.md) | [chapter-cs-database/](chapter-cs-database/) — PostgreSQL SQL 랩 (정규화, ACID, 격리수준, 인덱스 EXPLAIN) |
-| 컴퓨터 네트워크 | [docs/CS_네트워크_개념서.md](docs/CS_네트워크_개념서.md) | [chapter-cs-network/](chapter-cs-network/) — `./run.sh 33`(원시 HTTP 소켓), `labs/observe_http.sh`(DNS/TCP/TLS 관찰) |
+| 컴퓨터 네트워크 | [docs/CS_네트워크_개념서.md](docs/CS_네트워크_개념서.md) | [chapter-cs-network/](chapter-cs-network/) — `./run.sh RawHttpClient`(원시 HTTP 소켓), `labs/observe_http.sh`(DNS/TCP/TLS 관찰) |
 
 > Java 개념서·Spring 개념서에도 머신 레이어 심화 섹션(바이트코드/JIT/GC, 2의 보수/IEEE-754, 타입 소거,
 > @Transactional 프록시 원리, ACID/격리수준/B-tree 인덱스, HMAC/대칭·비대칭 암호)이 추가되어 있습니다.
@@ -57,20 +57,23 @@ docker compose up -d
 # 2. VS Code에서 접속 (추천!)
 #    F1 → "Dev Containers: Attach to Running Container" → java-edu 선택
 #    터미널 열기(Ctrl+`) 후:
-./compile.sh                  # 컴파일
-./run.sh                      # 대화형 메뉴
-./run.sh 1                    # Ch01 - 변수와 타입
-./run.sh 5                    # Ch02 - OOP 종합 데모
-./run.sh 8                    # Ch03 - Stream API
-./run.sh 16                   # [심화] 부동소수점 비트 (IEEE-754)
-./run.sh 23                   # CS 알고리즘 - 정렬 5종 측정
-./run.sh 28                   # CS 동시성 - 경쟁 상태(레이스 컨디션)
+./compile.sh                          # 컴파일
+./run.sh                              # 대화형 계층 메뉴 (카테고리 선택 → 개념 선택)
+./run.sh VariablesAndTypes            # Ch01 - 변수와 타입
+./run.sh PolymorphismExample          # Ch02 - 다형성 (개념당 스크립트 1개)
+./run.sh StreamCreationExample        # Ch03 - Stream API
+./run.sh FloatingPointBits            # [심화] 부동소수점 비트 (IEEE-754)
+./run.sh SortingAlgorithms            # CS 알고리즘 - 정렬 5종 측정
+./run.sh RaceConditionDemo            # CS 동시성 - 경쟁 상태(레이스 컨디션)
+
+# 인자 없이 실행하면 대화형 계층 메뉴(카테고리 선택 → 개념 선택)가 뜨고,
+# ./run.sh <ClassName>으로 클래스 이름을 지정하면 해당 개념이 바로 실행됩니다.
 
 # 3. 또는 터미널에서 직접 실행
 docker exec -it java-edu ./compile.sh
-docker exec -it java-edu ./run.sh      # 대화형 메뉴
-docker exec -it java-edu ./run.sh 1    # 번호로 직접 실행
-docker exec -it java-edu ./run.sh all  # 전체 실행
+docker exec -it java-edu ./run.sh                    # 대화형 계층 메뉴
+docker exec -it java-edu ./run.sh VariablesAndTypes  # 클래스 이름으로 직접 실행
+docker exec -it java-edu ./run.sh all                # 전체 실행
 
 # 4. 종료
 docker compose down

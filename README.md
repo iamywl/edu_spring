@@ -1,5 +1,7 @@
 # Java & Spring Boot 교육 과정
 
+[![CI](https://github.com/iamywl/edu_spring/actions/workflows/ci.yml/badge.svg)](https://github.com/iamywl/edu_spring/actions/workflows/ci.yml)
+
 ## 소개
 이 프로젝트는 Java 기초부터 Spring Boot 실전까지 단계별로 학습할 수 있는 교육 자료입니다.
 각 챕터의 README에서 개념을 학습하고, Docker로 예제 코드를 바로 실행하며 체험할 수 있습니다.

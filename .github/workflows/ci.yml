@@ -46,8 +46,9 @@ jobs:
         run: |
           set -euo pipefail
           miss=0
+          # all/file 은 실행 명령/본문, My* 는 학생이 만들 '내 파일' 플레이스홀더(예: MyTest) 이므로 제외
           refs=$(grep -rhoE "run\.sh [A-Za-z][A-Za-z0-9]+" docs/ chapter*/README.md README.md 2>/dev/null \
-                 | awk '{print $2}' | grep -vE '^(all|file|Add)$' | sort -u)
+                 | awk '{print $2}' | grep -vE '^(all|file|My[A-Za-z0-9]*)$' | sort -u)
           for c in $refs; do
             if ! find chapter01-java-basics chapter02-oop chapter03-collections \
                       chapter-cs-algorithms chapter-cs-concurrency chapter-cs-network \

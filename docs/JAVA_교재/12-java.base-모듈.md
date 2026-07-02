@@ -44,7 +44,7 @@ Module m = String.class.getModule();
 System.out.println(m.getName());  // java.base
 ```
 
-> 💻 실습: `./run.sh ApiDocument`
+> 💻 실습: `./run.sh ApiDocument`  📁 `chapter-java-textbook/src/main/java/com/edu/javabook/ch12/ApiDocument.java`
 
 ---
 
@@ -76,7 +76,7 @@ int n = Integer.parseInt("100");
 double r = Math.sqrt(16);
 ```
 
-> 💻 실습: `./run.sh JavaBaseModule`
+> 💻 실습: `./run.sh JavaBaseModule`  📁 `chapter-java-textbook/src/main/java/com/edu/javabook/ch12/JavaBaseModule.java`
 
 ---
 
@@ -119,7 +119,7 @@ double r = Math.sqrt(16);
 
 > 이 개념의 배경은 JAVA_개념서 『04-객체지향이란-무엇인가』(상속과 다형성)와 『05-데이터를-효율적으로-다루다-컬렉션』(equals/hashCode 계약)을 함께 보면 더 깊게 이해된다.
 
-> 💻 실습: `./run.sh ObjectClass`
+> 💻 실습: `./run.sh ObjectClass`  📁 `chapter-java-textbook/src/main/java/com/edu/javabook/ch12/ObjectClass.java`
 
 ---
 
@@ -156,7 +156,7 @@ int[] dest = new int[5];
 System.arraycopy(src, 1, dest, 0, 3);   // src[1..3] → dest[0..2]
 ```
 
-> 💻 실습: `./run.sh SystemClass`
+> 💻 실습: `./run.sh SystemClass`  📁 `chapter-java-textbook/src/main/java/com/edu/javabook/ch12/SystemClass.java`
 
 ---
 
@@ -197,7 +197,7 @@ sb.reverse();        // 뒤집기
 String result = sb.toString();
 ```
 
-> 💻 실습: `./run.sh StringClass`
+> 💻 실습: `./run.sh StringClass`  📁 `chapter-java-textbook/src/main/java/com/edu/javabook/ch12/StringClass.java`
 
 ---
 
@@ -235,7 +235,7 @@ System.out.println(b1.equals(b2));   // true  (값 비교는 반드시 equals)
 
 > 포장 클래스와 오토박싱은 JAVA_개념서 『05-데이터를-효율적으로-다루다-컬렉션』에서 제네릭 컬렉션과 함께 다룬다.
 
-> 💻 실습: `./run.sh WrapperClass`
+> 💻 실습: `./run.sh WrapperClass`  📁 `chapter-java-textbook/src/main/java/com/edu/javabook/ch12/WrapperClass.java`
 
 ---
 
@@ -272,7 +272,7 @@ Math.addExact(Integer.MAX_VALUE, 1);     // ArithmeticException: integer overflo
 
 > 오버플로와 2의 보수의 원리는 JAVA_개념서 『02-데이터를-담는-그릇-변수』, 예외 처리는 『07-예외처리-실패에-대비하다』를 참고하라.
 
-> 💻 실습: `./run.sh MathClass`
+> 💻 실습: `./run.sh MathClass`  📁 `chapter-java-textbook/src/main/java/com/edu/javabook/ch12/MathClass.java`
 
 ---
 
@@ -307,7 +307,7 @@ String text = LocalDateTime.of(2026,6,30,14,30).format(fmt);
 LocalDate parsed = LocalDate.parse("2026-12-25");   // 문자열 → 날짜
 ```
 
-> 💻 실습: `./run.sh DateTimeClass`
+> 💻 실습: `./run.sh DateTimeClass`  📁 `chapter-java-textbook/src/main/java/com/edu/javabook/ch12/DateTimeClass.java`
 
 ---
 
@@ -342,7 +342,7 @@ NumberFormat.getCurrencyInstance(Locale.KOREA).format(50000); // "₩50,000"
 NumberFormat.getPercentInstance().format(0.875);              // "88%"
 ```
 
-> 💻 실습: `./run.sh FormatClass`
+> 💻 실습: `./run.sh FormatClass`  📁 `chapter-java-textbook/src/main/java/com/edu/javabook/ch12/FormatClass.java`
 
 ---
 
@@ -387,7 +387,7 @@ while (m.find()) {
 }
 ```
 
-> 💻 실습: `./run.sh RegexClass`
+> 💻 실습: `./run.sh RegexClass`  📁 `chapter-java-textbook/src/main/java/com/edu/javabook/ch12/RegexClass.java`
 
 ---
 
@@ -424,7 +424,7 @@ Object result = greet.invoke(obj);   // obj.greet() 를 동적으로 호출
 
 > 리플렉션은 강력하지만 컴파일러의 타입 검증을 우회하므로, 일반 코드에서는 정적 호출을 쓰고 꼭 필요한 프레임워크 수준에서만 사용한다.
 
-> 💻 실습: `./run.sh ReflectionClass`
+> 💻 실습: `./run.sh ReflectionClass`  📁 `chapter-java-textbook/src/main/java/com/edu/javabook/ch12/ReflectionClass.java`
 
 ---
 
@@ -471,7 +471,7 @@ for (Method m : Calculator.class.getDeclaredMethods()) {
 
 > 어노테이션과 리플렉션의 조합은 SPRING_개념서에서 `@Component`, `@Autowired`가 어떻게 동작하는지 이해하는 기반이 된다.
 
-> 💻 실습: `./run.sh AnnotationClass`
+> 💻 실습: `./run.sh AnnotationClass`  📁 `chapter-java-textbook/src/main/java/com/edu/javabook/ch12/AnnotationClass.java`
 
 ---
 
@@ -518,7 +518,7 @@ for (Method m : Calculator.class.getDeclaredMethods()) {
 - 힌트: `trim()`으로 공백을 없앤 뒤 `toUpperCase()`를 이어서 호출한다(연쇄 호출). 위치 찾기는 `indexOf("...")`이며, 없으면 `-1`을 돌려준다.
 - 힌트: `String`은 불변이라 `trim()`·`toUpperCase()`는 원본을 바꾸지 않고 **새 문자열을 반환**한다. 반환값을 반드시 변수에 받아야 한다. 뒤집기는 `new StringBuilder(문자열).reverse().toString()`.
 
-> 답안 비교: `./run.sh StringClass`
+> 답안 비교: `./run.sh StringClass`  📁 `chapter-java-textbook/src/main/java/com/edu/javabook/ch12/StringClass.java`
 
 ### 과제 2. 문자열을 숫자로 (Wrapper / 파싱)
 
@@ -532,7 +532,7 @@ for (Method m : Calculator.class.getDeclaredMethods()) {
 - 힌트: 문자열 → 숫자 변환은 `Integer.parseInt(...)`, `Double.parseDouble(...)`, `Boolean.parseBoolean(...)`이다. 변환한 값은 진짜 숫자라 `+ 1` 같은 계산이 된다(문자열 이어 붙이기와 다르다).
 - 힌트: `Integer 1000`은 캐시 범위(`-128~127`)를 벗어나므로 `==`는 `false`, `equals()`는 `true`가 나온다. 이게 12.6에서 다룬 캐시 함정이다.
 
-> 답안 비교: `./run.sh WrapperClass`
+> 답안 비교: `./run.sh WrapperClass`  📁 `chapter-java-textbook/src/main/java/com/edu/javabook/ch12/WrapperClass.java`
 
 ### 과제 3. 간단 계산기 (Math)
 
@@ -547,7 +547,7 @@ for (Method m : Calculator.class.getDeclaredMethods()) {
 - 힌트: 반올림은 `Math.round`, 올림은 `Math.ceil`, 내림은 `Math.floor`다. `ceil`/`floor`는 `double`을 돌려준다는 점에 유의.
 - 응용: 큰 두 수를 `Math.addExact(a, b)`로 더해 보고, `Integer.MAX_VALUE`에 `1`을 더하면 어떤 예외가 나는지 `try-catch`로 확인해 보자.
 
-> 답안 비교: `./run.sh MathClass`
+> 답안 비교: `./run.sh MathClass`  📁 `chapter-java-textbook/src/main/java/com/edu/javabook/ch12/MathClass.java`
 
 ### 과제 4. D-day 계산기 (LocalDate / Duration)
 
@@ -561,7 +561,7 @@ for (Method m : Calculator.class.getDeclaredMethods()) {
 - 힌트: 날짜 생성은 `LocalDate.of(년, 월, 일)`, 날짜+시각은 `LocalDateTime.of(...)`. 요일은 `getDayOfWeek()`, 1주일 뒤는 `plusDays(7)`(불변이라 새 객체를 반환한다).
 - 힌트: 날짜 간격은 `Period.between(시작, 끝)` → `getMonths()`, `getDays()`. 시간 간격은 `Duration.between(시작, 끝)` → `toMinutes()`. 형식화는 `DateTimeFormatter.ofPattern("...")`을 만들어 `dateTime.format(fmt)`.
 
-> 답안 비교: `./run.sh DateTimeClass`
+> 답안 비교: `./run.sh DateTimeClass`  📁 `chapter-java-textbook/src/main/java/com/edu/javabook/ch12/DateTimeClass.java`
 
 ### 과제 5. 영수증 서식 맞추기 (String.format / printf)
 
@@ -576,7 +576,7 @@ for (Method m : Calculator.class.getDeclaredMethods()) {
 - 힌트: `printf`는 바로 출력하고, `String.format`은 **문자열을 반환**한다(변수에 받아 두었다가 나중에 출력 가능). `%` 자체를 출력하려면 `%%`로 쓴다.
 - 응용: `%-10s`로 왼쪽 정렬을 시험해 보고, `NumberFormat.getCurrencyInstance(Locale.KOREA)`로 `₩13,500`처럼 통화 형식을 만들어 비교해 보자.
 
-> 답안 비교: `./run.sh FormatClass`
+> 답안 비교: `./run.sh FormatClass`  📁 `chapter-java-textbook/src/main/java/com/edu/javabook/ch12/FormatClass.java`
 
 ### 과제 6. 형식 검사기 (정규 표현식)
 
@@ -590,11 +590,43 @@ for (Method m : Calculator.class.getDeclaredMethods()) {
 - 힌트: 부분 추출은 `Pattern.compile("(\\d{2,3})-(\\d{3,4})-(\\d{4})")`로 컴파일한 뒤 `matcher(text)`를 만들고 `while (m.find())` 안에서 `m.group()`(전체), `m.group(1)`(첫 그룹)을 꺼낸다. 괄호 `( )`가 그룹을 만든다.
 - 힌트: 치환은 `text.replaceAll("정규식", "대체문자열")`을 쓴다.
 
-> 답안 비교: `./run.sh RegexClass`
+> 답안 비교: `./run.sh RegexClass`  📁 `chapter-java-textbook/src/main/java/com/edu/javabook/ch12/RegexClass.java`
+
+### 과제 7. 같은 학번은 같은 학생 (Object / equals / hashCode)
+
+"학번(id)이 같으면 같은 학생"으로 취급되는 `Student` 클래스를 직접 만들고, 아래를 확인하는 프로그램을 작성하라. 학번 `1`·이름 `"홍길동"`인 `s1`, 학번 `1`·이름 `"홍길순"`인 `s2`, 학번 `2`·이름 `"김철수"`인 `s3`를 준비한다.
+
+1. `s1.equals(s2)`(학번 같음 → `true`)와 `s1.equals(s3)`(학번 다름 → `false`), 그리고 `s1 == s2`(주소는 다름 → `false`)를 출력
+2. `s1.hashCode()`와 `s2.hashCode()`가 **같은 값**임을 출력해 계약이 지켜졌는지 눈으로 확인
+3. `HashSet<Student>`에 `s1`을 넣은 뒤 `set.contains(s2)`가 `true`가 나오는지 출력(계약을 지켰다면 true여야 한다)
+4. `toString()`을 재정의해 `Student{id=1, name='홍길동'}`처럼 사람이 읽기 좋게 출력
+
+- 힌트: `equals`는 `if (this == o) return true;` → `if (o == null || getClass() != o.getClass()) return false;` → `id`만 비교의 순서로 작성한다. `hashCode`는 `Objects.hash(id)`로, **equals에서 쓴 필드와 같은 필드(id)** 로 만들어야 한다.
+- 힌트: `equals`만 재정의하고 `hashCode`를 빠뜨리면 3번의 `contains`가 `false`로 나올 수 있다(12.3의 계약 위반). 두 메서드는 반드시 세트로 재정의한다.
+
+> 답안 비교: `./run.sh ObjectClass`  📁 `chapter-java-textbook/src/main/java/com/edu/javabook/ch12/ObjectClass.java`
+
+### 과제 8. 실행 환경 들여다보기 (System)
+
+`System` 클래스만 사용해 실행 환경 정보를 조회하고 간단한 성능 측정을 하는 프로그램을 작성하라.
+
+1. `getProperty`로 자바 버전(`"java.version"`)과 운영체제 이름(`"os.name"`)을 조회해 출력
+2. `nanoTime()`으로 시작 시각을 재고, `1`부터 `1_000_000`까지 더하는 반복문을 돈 뒤, 다시 `nanoTime()`을 재서 **경과 시간(나노초)**을 출력
+3. `arraycopy`로 배열 `{10, 20, 30, 40, 50}`의 인덱스 `1`부터 `3`개를 새 배열의 앞부분으로 복사해 결과를 출력 → `[20, 30, 40, 0, 0]`
+
+- 힌트: 시스템 속성은 `System.getProperty("java.version")`처럼 문자열 키로 조회한다. 환경 변수는 `System.getenv("PATH")`로 조회한다(속성과 다르다).
+- 힌트: 경과 시간은 `long start = System.nanoTime();` … `long elapsed = System.nanoTime() - start;`로 구한다. 벽시계 시각인 `currentTimeMillis()`가 아니라 단조 증가하는 `nanoTime()`을 써야 하는 이유를 12.4에서 확인하자.
+- 힌트: `System.arraycopy(원본, 원본시작, 대상, 대상시작, 개수)` 순서다. 배열 출력은 `Arrays.toString(배열)`을 쓰면 편하다(`import java.util.Arrays;` 필요).
+
+> 답안 비교: `./run.sh SystemClass`  📁 `chapter-java-textbook/src/main/java/com/edu/javabook/ch12/SystemClass.java`
 
 ---
 
 ## 확인문제
+
+> 객관식·출력 예측·오류 찾기·개념 서술·빈칸 채우기·참·거짓까지 유형을 섞어 15문항을 준비했다. 먼저 스스로 답을 적어 본 뒤 `<details>`를 펼쳐 정답과 해설을 확인하자. 출력 예측 문제는 **머릿속으로 실행**한 결과를 종이에 적고 나서 답을 여는 습관을 들이면 좋다.
+
+### 유형 A. 객관식
 
 **1.** `java.base` 모듈에 대한 설명으로 옳지 않은 것은?
 
@@ -604,11 +636,61 @@ for (Method m : Calculator.class.getDeclaredMethods()) {
 ④ `java.util`, `java.io`, `java.time` 패키지도 이 모듈에 속한다.
 
 <details><summary>힌트</summary>java.base가 "항상 자동으로" 포함되는지 떠올려 보자.</details>
-<details><summary>해설</summary>정답 ②. java.base는 선언하지 않아도 항상 자동 포함된다. requires를 쓰지 않아도 된다. (12.2 참고)</details>
+<details><summary>정답 및 해설</summary>정답 ②. java.base는 선언하지 않아도 항상 자동 포함된다. requires를 쓰지 않아도 된다. 참고로 java.lang은 import까지 자동이지만, java.util·java.io는 같은 java.base 소속이어도 import는 직접 해야 한다. (12.2 참고)</details>
 
 ---
 
-**2.** 다음 코드의 출력 결과로 옳은 것은?
+**2.** `Integer`의 `==` 비교에 대한 설명으로 옳은 것은?
+
+① 모든 값에서 `==`는 항상 `true`를 반환한다.
+② `-128 ~ 127` 범위는 캐시 재사용으로 `==`가 `true`가 될 수 있다.
+③ 값 비교에는 `==`가 `equals()`보다 안전하다.
+④ 포장 클래스는 `==` 연산을 지원하지 않는다.
+
+<details><summary>힌트</summary>Integer 캐시 범위와, 값 비교의 올바른 방법을 떠올려 보자.</details>
+<details><summary>정답 및 해설</summary>정답 ②. -128~127은 캐시된 같은 객체를 재사용해 ==가 true가 되지만, 범위를 벗어나면 false다. 값 비교는 항상 equals()를 써야 한다. (12.6 참고)</details>
+
+---
+
+**3.** `equals()`를 재정의할 때 함께 재정의해야 하는 메서드와 그 이유로 옳은 것은?
+
+① `toString()` — 출력 형식을 맞추기 위해
+② `getClass()` — 타입을 확인하기 위해
+③ `hashCode()` — HashMap/HashSet에서 올바르게 동작하게 하기 위해
+④ `clone()` — 복제 시 값을 유지하기 위해
+
+<details><summary>힌트</summary>"equals가 true인 두 객체는 hashCode도 같아야 한다"는 계약을 떠올려 보자.</details>
+<details><summary>정답 및 해설</summary>정답 ③. equals가 true면 hashCode도 같아야 한다는 계약이 있다. 이를 지키지 않으면 해시 기반 자료구조가 "같은 객체"를 찾지 못한다. (12.3 참고)</details>
+
+---
+
+**4.** 커스텀 어노테이션을 리플렉션으로 **실행 중에** 읽으려면 반드시 지정해야 하는 `@Retention` 정책은?
+
+① `RetentionPolicy.SOURCE`
+② `RetentionPolicy.CLASS`
+③ `RetentionPolicy.RUNTIME`
+④ 지정하지 않아도 항상 읽을 수 있다
+
+<details><summary>힌트</summary>SOURCE는 컴파일 후 사라지고, CLASS는 클래스파일까지만 남는다. 실행 중까지 남기려면?</details>
+<details><summary>정답 및 해설</summary>정답 ③. RUNTIME으로 지정해야 실행 시점까지 정보가 유지되어 리플렉션(isAnnotationPresent, getAnnotation)으로 읽을 수 있다. 지정하지 않으면 기본값은 CLASS라 실행 중에는 읽을 수 없다. (12.12 참고)</details>
+
+---
+
+**5.** 경과 시간(코드 실행에 걸린 시간)을 측정할 때 가장 적절한 것은?
+
+① `System.currentTimeMillis()` — 벽시계 시각이라 가장 정확하다
+② `System.nanoTime()` — 단조 증가하는 값이라 경과 측정에 적합하다
+③ `Math.random()`으로 근사한다
+④ `LocalDateTime.now()`의 차이를 밀리초로 환산한다
+
+<details><summary>힌트</summary>시스템 시각이 도중에 조정되면 currentTimeMillis는 음수가 나올 수도 있다.</details>
+<details><summary>정답 및 해설</summary>정답 ②. nanoTime()은 임의 기준점 기준으로 단조 증가하므로 경과 시간 측정에 적합하다. currentTimeMillis()는 벽시계 시각이라 시스템 시간이 조정되면 오차·음수가 발생할 수 있다. (12.4 참고)</details>
+
+---
+
+### 유형 B. 출력 예측
+
+**6.** 다음 코드의 출력 결과는? (String 불변성)
 
 ```java
 String origin = "java";
@@ -619,43 +701,176 @@ System.out.println(origin);
 ① `JAVA`  ② `java`  ③ 컴파일 오류  ④ 빈 문자열
 
 <details><summary>힌트</summary>String은 불변(immutable)이다. toUpperCase()의 반환값을 어디에도 받지 않았다.</details>
-<details><summary>해설</summary>정답 ②. String은 불변이므로 toUpperCase()는 새 문자열("JAVA")을 반환할 뿐 origin은 바뀌지 않는다. 반환값을 버렸으므로 origin은 여전히 "java". (12.5 참고)</details>
+<details><summary>정답 및 해설</summary>정답 ②. String은 불변이므로 toUpperCase()는 새 문자열("JAVA")을 반환할 뿐 origin은 바뀌지 않는다. 반환값을 버렸으므로 origin은 여전히 "java". (12.5 참고)</details>
 
 ---
 
-**3.** `Integer`의 `==` 비교에 대한 설명으로 옳은 것은?
+**7.** 다음 코드의 세 줄 출력 결과를 순서대로 예측하라. (Integer 캐시)
 
-① 모든 값에서 `==`는 항상 `true`를 반환한다.
-② `-128 ~ 127` 범위는 캐시 재사용으로 `==`가 `true`가 될 수 있다.
-③ 값 비교에는 `==`가 `equals()`보다 안전하다.
-④ 포장 클래스는 `==` 연산을 지원하지 않는다.
+```java
+Integer a1 = 127, a2 = 127;
+Integer b1 = 128, b2 = 128;
+System.out.println(a1 == a2);
+System.out.println(b1 == b2);
+System.out.println(b1.equals(b2));
+```
 
-<details><summary>힌트</summary>Integer 캐시 범위와, 값 비교의 올바른 방법을 떠올려 보자.</details>
-<details><summary>해설</summary>정답 ②. -128~127은 캐시된 같은 객체를 재사용해 ==가 true가 되지만, 범위를 벗어나면 false다. 값 비교는 항상 equals()를 써야 한다. (12.6 참고)</details>
-
----
-
-**4.** `equals()`를 재정의할 때 함께 재정의해야 하는 메서드와 그 이유로 옳은 것은?
-
-① `toString()` — 출력 형식을 맞추기 위해
-② `getClass()` — 타입을 확인하기 위해
-③ `hashCode()` — HashMap/HashSet에서 올바르게 동작하게 하기 위해
-④ `clone()` — 복제 시 값을 유지하기 위해
-
-<details><summary>힌트</summary>"equals가 true인 두 객체는 hashCode도 같아야 한다"는 계약을 떠올려 보자.</details>
-<details><summary>해설</summary>정답 ③. equals가 true면 hashCode도 같아야 한다는 계약이 있다. 이를 지키지 않으면 해시 기반 자료구조가 같은 객체를 찾지 못한다. (12.3 참고)</details>
+<details><summary>힌트</summary>-128~127은 캐시 객체를 재사용한다. 128은 캐시 범위 밖이다. equals는 항상 값을 비교한다.</details>
+<details><summary>정답 및 해설</summary>정답: `true` / `false` / `true`. 127은 캐시된 같은 객체라 ==가 true, 128은 범위를 벗어나 서로 다른 객체이므로 ==가 false, 그러나 equals는 값을 비교하므로 true다. 값 비교는 항상 equals를 써야 한다는 근거가 여기에 있다. (12.6 참고)</details>
 
 ---
 
-**5.** 커스텀 어노테이션을 리플렉션으로 **실행 중에** 읽으려면 반드시 지정해야 하는 `@Retention` 정책은?
+**8.** 다음 `StringBuilder` 코드의 최종 출력은? (가변 문자열)
 
-① `RetentionPolicy.SOURCE`
-② `RetentionPolicy.CLASS`
-③ `RetentionPolicy.RUNTIME`
-④ 지정하지 않아도 항상 읽을 수 있다
+```java
+StringBuilder sb = new StringBuilder();
+sb.append("Hello");
+sb.insert(5, "!");
+sb.reverse();
+System.out.println(sb);
+```
 
-<details><summary>힌트</summary>SOURCE는 컴파일 후 사라지고, CLASS는 클래스파일까지만 남는다. 실행 중까지 남기려면?</details>
-<details><summary>해설</summary>정답 ③. RUNTIME으로 지정해야 실행 시점까지 정보가 유지되어 리플렉션(isAnnotationPresent, getAnnotation)으로 읽을 수 있다. 지정하지 않으면 기본값은 CLASS라 실행 중에는 읽을 수 없다. (12.12 참고)</details>
+<details><summary>힌트</summary>append 후 "Hello"(길이 5), insert(5,"!")는 인덱스 5(맨 끝)에 "!"를 끼운다. 그다음 전체를 뒤집는다.</details>
+<details><summary>정답 및 해설</summary>정답: `!olleH`. `append("Hello")`로 "Hello"가 되고, `insert(5, "!")`는 인덱스 5(문자열 맨 끝)에 "!"를 넣어 "Hello!"가 된다. `reverse()`로 뒤집으면 "!olleH". StringBuilder는 가변이라 원본 자체가 바뀐다(String과 다르다). (12.5 참고)</details>
+
+---
+
+**9.** 다음 정규식 코드의 출력은? (그룹 추출)
+
+```java
+Pattern phone = Pattern.compile("(\\d{2,3})-(\\d{3,4})-(\\d{4})");
+Matcher m = phone.matcher("전화 02-9876-5432 끝");
+if (m.find()) {
+    System.out.println(m.group() + " / " + m.group(1) + " / " + m.group(2));
+}
+```
+
+<details><summary>힌트</summary>group()은 전체 매칭, group(1)은 첫 번째 괄호 그룹, group(2)는 두 번째 괄호 그룹이다. "02"는 \d{2,3}에, "9876"은 \d{3,4}에 걸린다.</details>
+<details><summary>정답 및 해설</summary>정답: `02-9876-5432 / 02 / 9876`. group()은 매칭된 전체 문자열, group(1)은 첫 그룹 `(\d{2,3})` → "02", group(2)는 둘째 그룹 `(\d{3,4})` → "9876". 그룹 번호는 여는 괄호 순서대로 1부터 매겨진다(group(0)은 전체와 같다). (12.10 참고)</details>
+
+---
+
+**10.** 다음 날짜 연산 코드의 출력은? 여기에는 초심자가 자주 빠지는 함정이 있다. (Period)
+
+```java
+LocalDate start = LocalDate.of(2026, 1, 1);
+LocalDate end   = LocalDate.of(2026, 6, 30);
+Period p = Period.between(start, end);
+System.out.println(p.getMonths() + "개월 " + p.getDays() + "일");
+System.out.println("총 일수처럼 보이는 값: " + p.getDays());
+```
+
+<details><summary>힌트</summary>Period는 "년/월/일" 단위로 나눠 저장한다. getDays()는 "총 일수"가 아니라 "월을 뺀 나머지 일수"다. 총 일수는 ChronoUnit.DAYS.between(...)으로 구한다.</details>
+<details><summary>정답 및 해설</summary>정답: 첫 줄 `5개월 29일`, 둘째 줄 `29`. 함정은 `getDays()`가 **총 일수가 아니라 개월을 뺀 나머지 일수(29)**라는 점이다. 1월 1일부터 6월 30일까지는 5개월 29일이며, 실제 총 일수(180일)를 구하려면 `ChronoUnit.DAYS.between(start, end)`를 써야 한다. Period의 get 메서드를 총량으로 오해하면 안 된다. (12.8 참고)</details>
+
+---
+
+**11.** 다음 형식화 코드의 출력을 예측하라. (printf / NumberFormat)
+
+```java
+System.out.printf("[%,d]%n", 13500);
+System.out.printf("[%.2f]%n", 3.14159);
+System.out.println(NumberFormat.getPercentInstance().format(0.875));
+```
+
+<details><summary>힌트</summary>%,d는 천 단위 콤마, %.2f는 소수 둘째 자리까지. 백분율은 0.875를 87.5%로 만든 뒤 반올림해 소수 없이 표시한다.</details>
+<details><summary>정답 및 해설</summary>정답: `[13,500]` / `[3.14]` / `88%`. `%,d`는 천 단위 콤마를 넣어 13,500, `%.2f`는 반올림해 3.14. `getPercentInstance()`는 0.875를 87.5%로 환산한 뒤 기본적으로 소수 없이 반올림해 "88%"로 출력한다(87%가 아님에 주의). (12.9 참고)</details>
+
+---
+
+### 유형 C. 오류 찾기
+
+**12.** 다음 코드는 "학번이 같으면 같은 학생"으로 취급하려 한다. 컴파일은 되지만 `HashSet`에 넣었을 때 **의도대로 동작하지 않는 버그**가 있다. 어디가 문제이고 어떻게 고쳐야 하는가?
+
+```java
+static class Student {
+    int id;
+    Student(int id) { this.id = id; }
+    @Override public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return id == ((Student) o).id;
+    }
+    // hashCode 재정의 없음
+}
+// 사용:
+Set<Student> set = new HashSet<>();
+set.add(new Student(1));
+System.out.println(set.contains(new Student(1)));  // 기대: true
+```
+
+<details><summary>힌트</summary>equals는 재정의했는데 hashCode는 재정의하지 않았다. HashSet은 먼저 무엇으로 버킷을 찾는가?</details>
+<details><summary>정답 및 해설</summary>버그: `equals()`만 재정의하고 `hashCode()`를 재정의하지 않았다. HashSet은 먼저 hashCode로 버킷을 찾은 뒤 그 안에서 equals로 비교한다. 두 Student의 hashCode(기본은 주소 기반)가 다르면 서로 다른 버킷으로 가서 equals까지 도달하지 못하므로 `contains`가 `false`가 될 수 있다. 해결: `@Override public int hashCode() { return Objects.hash(id); }`를 추가해 equals와 같은 필드(id)로 해시를 만든다. (12.3 참고)</details>
+
+---
+
+**13.** 다음 코드는 이메일 형식을 검사하려는 의도지만 항상 컴파일 오류가 나거나 원하는 대로 매칭되지 않는다. 무엇이 문제인가?
+
+```java
+boolean ok = Pattern.matches("\w+@\w+\.\w+", "user@test.com");
+```
+
+<details><summary>힌트</summary>자바 문자열 리터럴 안에서 백슬래시(`\`)는 특별한 의미를 갖는다. `\w`, `\.`을 문자열에 그대로 쓸 수 있을까?</details>
+<details><summary>정답 및 해설</summary>문제: 자바 문자열 안에서 `\`는 이스케이프 문자다. `"\w"`, `"\."`는 유효한 이스케이프 시퀀스가 아니므로 컴파일 오류(illegal escape character)가 난다. 정규식의 `\d`·`\w`·`\.`을 문자열에 담으려면 백슬래시를 **두 번** 써야 한다: `Pattern.matches("\\w+@\\w+\\.\\w+", "user@test.com")`. 즉 정규식 엔진이 볼 때는 `\w`, 자바 문자열로 쓸 때는 `\\w`. (12.10 참고)</details>
+
+---
+
+### 유형 D. 개념 서술
+
+**14.** 다음 두 개념을 각각 서술하라.
+
+(a) `String`과 `StringBuilder`의 차이를 "불변/가변"과 "성능" 관점에서 설명하고, 언제 어느 것을 써야 하는지 밝혀라.
+
+(b) `equals()`와 `hashCode()`의 "계약(contract)"이 무엇인지 한 문장으로 쓰고, 이 계약을 어겼을 때 `HashMap`/`HashSet`에서 어떤 문제가 생기는지 설명하라.
+
+<details><summary>정답 및 해설</summary>
+
+(a) `String`은 **불변(immutable)**이라 내용을 바꾸는 메서드가 매번 새 객체를 만든다. 그래서 문자열을 반복해서 이어 붙이면(예: 루프 안 `s += x`) 그때마다 새 객체가 생겨 비효율적이다. `StringBuilder`는 **가변(mutable)**이라 내부 버퍼를 직접 수정하므로 반복 수정에 효율적이다. 정리: 한두 번의 단순 조합·상수 문자열은 `String`, 루프 등에서 문자열을 여러 번 조립·수정할 때는 `StringBuilder`.
+
+(b) 계약: **"equals가 true인 두 객체는 hashCode도 반드시 같아야 한다."** 이를 어기면(예: equals만 재정의) 논리적으로 같은 두 객체가 서로 다른 hashCode를 가질 수 있고, HashMap/HashSet은 hashCode로 버킷을 먼저 찾으므로 "같은 객체"를 다른 버킷에서 찾게 되어 `get`/`contains`가 실패하거나 중복 저장이 발생한다. (12.3, 12.5 참고)
+
+</details>
+
+---
+
+### 유형 E. 빈칸 채우기
+
+**15.** 다음 문장의 빈칸 (가)~(마)를 채워라.
+
+- 자바 표준 API에서 `java.base` 모듈 안의 `(가)` 패키지는 import 문 없이 자동으로 사용할 수 있다.
+- `-128 ~ 127` 범위의 `Integer`는 미리 만들어 둔 `(나)` 객체를 재사용하므로 `==`가 우연히 `true`가 된다.
+- 두 **날짜** 사이의 간격은 `(다)` 클래스로, 두 **시간** 사이의 간격은 `(라)` 클래스로 구한다.
+- 커스텀 어노테이션을 리플렉션으로 실행 중에 읽으려면 `@Retention(RetentionPolicy.`(마)`)`를 지정해야 한다.
+
+<details><summary>정답 및 해설</summary>(가) `java.lang` / (나) 캐시(cache) / (다) `Period` / (라) `Duration` / (마) `RUNTIME`. (각각 12.2, 12.6, 12.8, 12.12 참고)</details>
+
+---
+
+### 유형 F. 참·거짓 (이유 포함)
+
+**16.** 다음 각 명제가 참인지 거짓인지 판단하고 **이유**를 한 줄로 쓰라.
+
+(a) `str.trim()`을 호출하면 원본 문자열 `str`의 앞뒤 공백이 제거된다.
+
+(b) `java.util`도 `java.lang`처럼 import 없이 자동으로 사용할 수 있다.
+
+(c) `a + b`가 오버플로되면 자동으로 `ArithmeticException`이 발생한다.
+
+(d) `Class<?>` 객체는 `클래스.class`, `객체.getClass()`, `Class.forName("...")` 세 방법으로 얻을 수 있고, 같은 클래스라면 셋 다 동일한 Class 객체를 가리킨다.
+
+<details><summary>정답 및 해설</summary>
+
+(a) **거짓.** String은 불변이라 trim()은 원본을 바꾸지 않고 새 문자열을 반환한다. 원본을 바꾸려면 `str = str.trim();`처럼 반환값을 다시 받아야 한다.
+
+(b) **거짓.** 자동 import되는 것은 `java.lang`뿐이다. `List`, `Map`, `Objects` 등 `java.util`은 직접 `import java.util.*;`가 필요하다(같은 java.base 소속이어도 import는 별개).
+
+(c) **거짓.** 일반 산술 연산은 오버플로가 나도 조용히 잘못된 값(2의 보수 순환 값)을 반환한다. 예외로 감지하려면 `Math.addExact` 계열을 써야 한다.
+
+(d) **참.** 세 방법 모두 같은 클래스에 대해서는 JVM이 클래스당 하나만 유지하는 동일한 Class 객체를 반환한다(`c1 == c2 == c3`).
+
+(12.5, 12.2, 12.7, 12.11 참고)
+
+</details>
 
 ---
 

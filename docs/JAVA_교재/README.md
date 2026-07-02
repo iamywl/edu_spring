@@ -26,6 +26,24 @@ docker exec -it java-edu ./run.sh SortingAlgorithms
 > 실습 코드는 `chapter-java-textbook/src/main/java/com/edu/javabook/chNN/` 에 소절별로 1개씩 있습니다.
 > "왜 그렇게 동작하는가"의 깊은 설명은 [심화편](심화/README.md)을 함께 보세요.
 
+### 코드를 디렉토리로 찾기 (run.sh 없이도)
+
+`./run.sh <클래스>` 로 실행할 수도 있지만, **파일 위치를 직접 열어** 보고·고쳐도 됩니다. 규칙은 단순합니다.
+
+```
+chapter-java-textbook/src/main/java/com/edu/javabook/chNN/<클래스명>.java
+                                                   └ 교재 장 번호   └ 실습 줄의 클래스명 그대로
+```
+
+- **교재 장 번호 = 패키지 번호**: 12장 → `ch12/`, 21장 → `ch21/`.
+- **클래스명 = 파일명**: 실습 줄의 `./run.sh IntegerType` → `.../ch02/IntegerType.java`.
+- 그래서 각 소절의 실습 줄에는 **`📁 경로`** 를 함께 표기해 두었습니다. 예:
+  > 💻 실습: `./run.sh IntegerType`  📁 `chapter-java-textbook/src/main/java/com/edu/javabook/ch02/IntegerType.java`
+- 기초 챕터(1~3장 일부)·CS 트랙 예제는 각각 `chapter01-java-basics/…/com/edu/basics/`,
+  `chapter-cs-algorithms/…/com/edu/algorithms/` 처럼 자기 챕터 폴더 아래에 있으며, 이 경우에도 실습 줄의 `📁 경로`가 정확한 파일을 가리킵니다.
+
+> VS Code에서는 이 경로 파일을 열고 ▶ Run / 디버그(중단점·한 줄씩)로도 실습할 수 있습니다 → [VS Code 실행·디버깅 가이드](../VSCode_실행_디버깅_가이드.md).
+
 > **더 깊게 배우려면 — 직접 타이핑 + 디버그.** 실행만 하지 말고, 개념을 읽은 뒤
 > **직접 코드를 타이핑해 보고**(예제는 답안지로 참고), VS Code에서 **중단점을 찍고 한 줄씩** 따라가 보세요.
 > 방법은 [VS Code 실행·디버깅 가이드](../VSCode_실행_디버깅_가이드.md) 참고. 원리는 이렇게 손으로 익힐 때 남습니다.

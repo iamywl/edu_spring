@@ -96,7 +96,7 @@
 
 이 책은 읽기만 하는 책이 아니다. 핵심 개념 곁에는 다음과 같은 표시가 있다.
 
-> 실행 데모: `./run.sh FloatingPointBits`
+> 실행 데모: `./run.sh FloatingPointBits`  📁 `chapter01-java-basics/src/main/java/com/edu/basics/FloatingPointBits.java`
 
 이것은 그 개념을 **직접 눈으로 확인할 수 있는 실행 예제**가 프로젝트에 준비되어 있다는 뜻이다.
 프로젝트 루트에서 위 명령을 실행하면 해당 데모가 돌아간다. 개념을 읽었다면 꼭 데모를 돌려보자.

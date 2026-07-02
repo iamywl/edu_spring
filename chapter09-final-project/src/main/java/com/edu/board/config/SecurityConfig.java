@@ -40,13 +40,15 @@ import java.util.Map;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthFilter;
     private final UserRepository userRepository;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter, UserRepository userRepository) {
-        this.jwtAuthFilter = jwtAuthFilter;
+    public SecurityConfig(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
+    // 주의: JwtAuthenticationFilter는 생성자로 주입하지 않는다.
+    // 필터가 UserDetailsService(이 클래스의 @Bean)에 의존하고, 이 클래스는 필터에 의존하면
+    // 순환 참조(BeanCurrentlyInCreationException)가 발생한다.
+    // → 아래 securityFilterChain의 "메서드 파라미터"로 주입받아 순환을 끊는다.
 
     /**
      * Security 필터 체인 설정
@@ -58,7 +60,7 @@ public class SecurityConfig {
      * - 그 외 API : 인증 필요
      */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthFilter) throws Exception {
         http
                 // CSRF 비활성화 (REST API는 토큰 기반이므로 불필요)
                 .csrf(AbstractHttpConfigurer::disable)

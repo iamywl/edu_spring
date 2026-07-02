@@ -25,9 +25,9 @@ if javac -d /app/out $SOURCES 2>&1; then
     echo -e "${GREEN}컴파일 성공!${NC}"
     echo ""
     echo -e "실행 방법:"
-    echo -e "  ${GREEN}./run.sh${NC}        # 대화형 메뉴"
-    echo -e "  ${GREEN}./run.sh 1${NC}      # 번호로 직접 실행"
-    echo -e "  ${GREEN}./run.sh all${NC}    # 전체 실행"
+    echo -e "  ${GREEN}./run.sh${NC}                    # 대화형 메뉴 (카테고리 → 개념 선택)"
+    echo -e "  ${GREEN}./run.sh SortingAlgorithms${NC}  # 개념 이름으로 직접 실행"
+    echo -e "  ${GREEN}./run.sh all${NC}                # 전체 실행"
 else
     echo -e "${RED}컴파일 실패! 위의 오류를 확인하세요.${NC}"
     exit 1

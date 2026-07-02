@@ -1,6 +1,8 @@
 package com.edu.board.config;
 
 import com.edu.board.service.JwtService;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -88,11 +90,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
-        } catch (Exception e) {
-            // 토큰 파싱/검증 실패 시 인증 없이 계속 진행
-            // (공개 API는 인증 없이도 접근 가능)
-            logger.debug("JWT 인증 실패: " + e.getMessage());
+        } catch (ExpiredJwtException e) {
+            // 만료된 토큰: 흔한 정상 상황(재로그인 필요)이므로 debug 수준
+            logger.debug("만료된 JWT: " + e.getMessage());
+        } catch (JwtException e) {
+            // 서명 위조/형식 오류 등: 공격 가능성이 있으므로 warn 수준으로 구분해 로깅한다.
+            // (구체적 예외를 잡아야 위조 토큰을 '무토큰'과 뭉뚱그려 삼키지 않는다)
+            logger.warn("유효하지 않은 JWT: " + e.getMessage());
         }
+        // 인증 실패 시에도 예외를 던지지 않고 인증 없이 진행한다.
+        // 보호된 자원이면 이후 AuthenticationEntryPoint가 401을 반환한다.
 
         // 다음 필터로 요청 전달
         filterChain.doFilter(request, response);

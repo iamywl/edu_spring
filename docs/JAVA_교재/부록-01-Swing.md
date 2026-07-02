@@ -201,6 +201,102 @@ class DrawPanel extends JPanel {
 
 ---
 
+## 확인문제
+
+> 이 부록은 GUI라 헤드리스 컨테이너에서 실행할 수 없어 **개념 위주**로 확인한다.
+
+**1. (개념 서술)** Swing에서 **EDT(Event Dispatch Thread)**란 무엇이며, 왜 모든 UI 접근을 EDT 위에서 해야 하는지 설명하라.
+
+<details>
+<summary>정답</summary>
+
+EDT는 Swing이 내부적으로 돌리는 **단 하나의 UI 전용 스레드**로, 버튼 클릭·다시 그리기 같은 모든 이벤트를 순서대로 처리한다. Swing 컴포넌트는 **스레드 안전(thread-safe)하지 않기** 때문에 여러 스레드가 동시에 UI를 건드리면 화면이 깨지거나 멈출 수 있다. 그래서 모든 UI 생성·수정은 EDT라는 단일 스레드에서만 수행해 동시 접근 문제를 원천 차단한다.
+</details>
+
+**2. (빈칸 채우기)** `main`에서 UI를 만들 때도 EDT에 작업을 넘기기 위해 `______.invokeLater(...)`를 사용한다. 빈칸에 들어갈 클래스 이름은?
+
+<details>
+<summary>정답</summary>
+
+`SwingUtilities` (즉 `SwingUtilities.invokeLater(...)`). 이 메서드는 전달한 작업(`Runnable`)을 EDT의 이벤트 큐에 넣어 EDT에서 안전하게 실행되도록 한다. JavaFX의 `Platform.runLater`와 대응된다.
+</details>
+
+**3. (참·거짓 + 이유)** "네트워크 요청이나 파일 읽기 같은 오래 걸리는 작업은 EDT에서 직접 실행해야 UI가 매끄럽게 갱신된다." 참인가 거짓인가? 이유를 밝혀라.
+
+<details>
+<summary>정답</summary>
+
+**거짓.** 오래 걸리는 작업을 EDT에서 직접 실행하면 EDT가 그 작업에 묶여 다른 이벤트(클릭·다시 그리기)를 처리하지 못하므로 **화면이 얼어붙는다**. 무거운 작업은 `SwingWorker`의 `doInBackground()`에서 백그라운드 스레드로 처리하고, 결과 반영(UI 갱신)은 `done()`에서 EDT로 돌려받아 수행해야 한다. 원칙은 "**UI 갱신은 EDT, 무거운 작업은 백그라운드**"이다.
+</details>
+
+**4. (개념 서술)** Swing에서 컴포넌트를 컨테이너에 담을 때 좌표를 일일이 지정하지 않고 **레이아웃 매니저**에게 배치를 맡기는 이유는 무엇인가?
+
+<details>
+<summary>정답</summary>
+
+레이아웃 매니저에게 배치를 맡기면 **창 크기가 바뀌어도 컴포넌트가 알아서 재배치**되기 때문이다. 좌표를 고정하면 창이 커지거나 작아질 때 컴포넌트 위치·크기가 어긋나지만, 레이아웃 매니저는 규칙에 따라 자동으로 재계산해 배치한다.
+</details>
+
+**5. (개념 서술)** 다음 세 레이아웃 매니저의 배치 방식을 각각 한 줄로 설명하라: `BorderLayout`, `FlowLayout`, `GridLayout`.
+
+<details>
+<summary>정답</summary>
+
+- **`BorderLayout`** (JFrame 기본): 상(NORTH)/하(SOUTH)/좌(WEST)/우(EAST)/중앙(CENTER) 다섯 구역으로 나누며, 중앙이 남는 공간을 다 차지한다.
+- **`FlowLayout`** (JPanel 기본): 왼쪽부터 한 줄로 흐르듯 배치하고, 자리가 없으면 다음 줄로 넘긴다.
+- **`GridLayout`**: 지정한 행×열 격자에 컴포넌트를 균등하게 배치한다(계산기 버튼판처럼).
+</details>
+
+**6. (코드 판단)** 아래 코드에서 `setDefaultCloseOperation` 호출을 빠뜨리면 어떤 문제가 생기는가?
+
+```java
+JFrame frame = new JFrame("창");
+frame.setSize(400, 300);
+// frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  // 빠뜨림
+frame.setVisible(true);
+```
+
+<details>
+<summary>정답</summary>
+
+기본 닫기 동작을 지정하지 않으면 창의 X 버튼을 눌러 창이 사라져도 **JVM 프로세스가 종료되지 않고 계속 살아 있다**. 프로그램을 완전히 종료하려면 `frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);`를 지정해야 한다.
+</details>
+
+**7. (빈칸 채우기)** 버튼 클릭에 반응하려면 버튼에 리스너를 등록한다. 버튼 클릭·메뉴 선택 같은 "행동"에 반응하는 리스너 인터페이스는 `______`이고, 이 리스너가 구현하는 콜백 메서드 이름은 `______`이다.
+
+<details>
+<summary>정답</summary>
+
+`ActionListener`, `actionPerformed`. 사용자가 버튼을 누르면 EDT가 등록된 `actionPerformed(ActionEvent e)`를 호출한다. `ActionListener`는 함수형 인터페이스라 람다로 `button.addActionListener(e -> ...)`처럼 간결하게 등록할 수 있다.
+</details>
+
+**8. (코드 판단)** 아래 `paintComponent`에서 첫 줄 `super.paintComponent(g);`를 생략하면 어떤 문제가 생길 수 있는가? 그리고 다시 그리기가 필요할 때 우리가 직접 호출해야 하는 메서드는 무엇인가?
+
+```java
+@Override
+protected void paintComponent(Graphics g) {
+    super.paintComponent(g);   // 이 줄을 생략하면?
+    g.setColor(Color.BLUE);
+    g.fillRect(20, 20, 100, 60);
+}
+```
+
+<details>
+<summary>정답</summary>
+
+`super.paintComponent(g)`는 **이전에 그려진 내용을 지우고 배경을 다시 칠하는** 역할을 한다. 생략하면 이전 그림이 지워지지 않아 잔상이 남거나 화면이 지저분해질 수 있다. 또한 `paintComponent`는 우리가 직접 부르지 않고 Swing이 EDT에서 호출하며, 다시 그려야 할 때는 **`repaint()`**를 호출해 Swing에 다시 그리기를 요청한다.
+</details>
+
+**9. (참·거짓 + 이유)** "`JTable`이나 `JList`처럼 데이터가 많은 컴포넌트는 스크롤을 위해 `JScrollPane`으로 감싸는 것이 관례다." 참인가 거짓인가? 이유를 밝혀라.
+
+<details>
+<summary>정답</summary>
+
+**참.** `JList`·`JTable`·`JTree`처럼 항목이 많아 화면을 넘칠 수 있는 컴포넌트는 스크롤 기능을 제공하는 `JScrollPane`으로 감싸는 것이 관례다. 예: `JScrollPane scroll = new JScrollPane(table);`. 또한 `JTable`은 데이터를 `TableModel`이 관리하는 모델-뷰 분리 구조를 따른다.
+</details>
+
+---
+
 ## 요약
 
 - **Swing**은 JDK에 포함된 데스크톱 GUI 툴킷으로, 클래스 이름 앞에 대부분 `J`가 붙는다.

@@ -1,4 +1,0 @@
-services:
-  oop:
-    build: .
-    command: java -cp out com.edu.oop.OopMain

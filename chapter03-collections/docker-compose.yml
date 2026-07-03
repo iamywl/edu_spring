@@ -1,4 +1,0 @@
-services:
-  collections:
-    build: .
-    command: java -cp out com.edu.collections.StreamExample

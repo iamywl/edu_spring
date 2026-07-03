@@ -1,0 +1,126 @@
+### Chapter 06 - Spring Data JPA (Member / Team API) 요청 모음
+#
+# 사용법
+#  - VS Code: "REST Client" 확장 설치 후 각 요청 위의 "Send Request" 클릭
+#  - IntelliJ IDEA: 우측 상단의 초록색 ▶ 버튼 클릭
+#
+# 사전 준비 (DB가 필요합니다!)
+#  방법 A) 챕터 docker-compose 로 DB + 앱을 함께 실행
+#     cd chapter06-spring-data-jpa
+#     docker compose up postgres -d      # DB 먼저
+#     docker compose up -d                # 앱까지 (또는 --build)
+#  방법 B) 공통 인프라 + 로컬 실행
+#     cd docker && docker compose -f docker-compose-infra.yml up -d
+#     cd ../chapter06-spring-data-jpa && ./gradlew bootRun
+#
+#  DB 접속정보: edu / edu1234 / edu_spring  (Adminer: http://localhost:8081)
+#  인증은 필요 없습니다.
+
+@baseUrl = http://localhost:8080
+
+### 1) 팀 생성 (POST /api/teams) → 201 Created
+POST {{baseUrl}}/api/teams
+Content-Type: application/json
+
+{
+  "name": "개발팀"
+}
+
+### 2) 팀 전체 조회 (GET /api/teams)
+GET {{baseUrl}}/api/teams
+
+### 3) 팀 단건 조회 - 소속 회원 포함 (GET /api/teams/{id})
+GET {{baseUrl}}/api/teams/1
+
+### 4) 회원 등록 (POST /api/members) → 201 Created
+# teamId 는 선택값입니다. 1번 팀이 존재해야 연결됩니다. (팀 미소속이면 null 가능)
+POST {{baseUrl}}/api/members
+Content-Type: application/json
+
+{
+  "name": "홍길동",
+  "email": "hong@example.com",
+  "teamId": 1
+}
+
+### 5) 회원 전체 조회 - 페이징/정렬 (GET /api/members?page=0&size=10&sort=createdAt,desc)
+GET {{baseUrl}}/api/members?page=0&size=10&sort=createdAt,desc
+
+### 6) 회원 단건 조회 (GET /api/members/{id})
+GET {{baseUrl}}/api/members/1
+
+### 7) 이름으로 검색 - 페이징 (GET /api/members/search?keyword=홍)
+GET {{baseUrl}}/api/members/search?keyword=홍&page=0&size=10
+
+### 8) 이메일 도메인으로 검색 (GET /api/members/search/email?domain=example.com)
+GET {{baseUrl}}/api/members/search/email?domain=example.com
+
+### 9) 팀별 회원 조회 (GET /api/teams/{id}/members)
+GET {{baseUrl}}/api/teams/1/members
+
+### 10) 회원 수정 (PUT /api/members/{id})
+PUT {{baseUrl}}/api/members/1
+Content-Type: application/json
+
+{
+  "name": "홍길동2",
+  "email": "hong2@example.com",
+  "teamId": 1
+}
+
+### 11) 회원 삭제 (DELETE /api/members/{id}) → 204 No Content
+DELETE {{baseUrl}}/api/members/1
+
+### 12) 팀 삭제 (DELETE /api/teams/{id}) → 204 No Content
+DELETE {{baseUrl}}/api/teams/1
+
+### 13) [에러 체험] 잘못된 이메일 형식 → 400 Bad Request
+# email 은 @Email 검증이 걸려 있습니다.
+POST {{baseUrl}}/api/members
+Content-Type: application/json
+
+{
+  "name": "테스트",
+  "email": "not-an-email",
+  "teamId": 1
+}
+
+###############################################################
+# @Transactional 실습 (tx-demo) — README의 "@Transactional 깊게 보기" 절 참고
+#
+# 각 요청은 응답 JSON의 details(단계별 설명)와
+# memberCountBefore/After(회원 수 변화)로 커밋/롤백 여부를 알려줍니다.
+# 요청을 보낸 뒤 반드시 서버 콘솔에서 [TX-DEMO] 로그와
+# Hibernate의 insert/update 문을 함께 관찰하세요. (show-sql: true)
+###############################################################
+
+### 14) [롤백 1-a] RuntimeException → 롤백 (기본 규칙)
+# 관찰 포인트: 콘솔에 insert 문이 찍히지만, memberCountBefore == memberCountAfter.
+# "이미 실행된 INSERT"가 롤백으로 없던 일이 됩니다.
+POST {{baseUrl}}/api/tx-demo/rollback-runtime
+
+### 15) [롤백 1-b] checked 예외 → 커밋 (★ 함정!)
+# 관찰 포인트: 예외가 났는데도 memberCountAfter가 1 증가.
+# 스프링 기본 롤백 규칙은 RuntimeException/Error만 대상입니다.
+POST {{baseUrl}}/api/tx-demo/commit-checked
+
+### 16) [롤백 1-c] rollbackFor 지정 → checked 예외도 롤백
+# 관찰 포인트: 15번과 코드는 같고 옵션(rollbackFor)만 다른데 회원 수가 그대로.
+POST {{baseUrl}}/api/tx-demo/rollback-for
+
+### 17) [전파 2-a] REQUIRED — 내부 실패가 전체를 롤백
+# 관찰 포인트 1: 콘솔의 [TX-DEMO] 로그에서 바깥/내부의 "트랜잭션 이름이 같음" (합류)
+# 관찰 포인트 2: 바깥에서 예외를 catch했는데도 UnexpectedRollbackException이 나고
+#               바깥 회원까지 롤백 → 회원 수 그대로.
+POST {{baseUrl}}/api/tx-demo/propagation-required
+
+### 18) [전파 2-b] REQUIRES_NEW — 내부만 롤백, 바깥은 커밋
+# 관찰 포인트 1: [TX-DEMO] 로그에서 바깥/내부의 "트랜잭션 이름이 다름" (새 트랜잭션)
+# 관찰 포인트 2: 회원 수 1 증가 — '바깥회원(REQ_NEW)'만 저장됨. 17번과 결과 비교!
+POST {{baseUrl}}/api/tx-demo/propagation-requires-new
+
+### 19) [readOnly 3] readOnly=true — 변경 감지가 flush되지 않음
+# 관찰 포인트 1: setName()을 호출했는데 콘솔에 UPDATE 문이 없음.
+# 관찰 포인트 2: 응답의 재조회 이름이 여전히 "원본이름".
+# 관찰 포인트 3: [TX-DEMO] 로그의 readOnly=true 표시.
+POST {{baseUrl}}/api/tx-demo/read-only

@@ -1,0 +1,15 @@
+# Chapter 05: Spring Web MVC REST API
+# docker compose up --build 명령으로 실행한다
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spring-ch05-web
+    ports:
+      - "8080:8080"
+    environment:
+      # JVM 메모리 설정 (컨테이너 환경에 적합하게 제한)
+      - JAVA_OPTS=-Xms256m -Xmx512m
+    restart: unless-stopped

@@ -23,9 +23,9 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p /tmp/out
-          SRC=$(find chapter01-java-basics chapter02-oop chapter03-collections \
-                     chapter-cs-algorithms chapter-cs-concurrency chapter-cs-network \
-                     chapter-java-textbook -name "*.java")
+          SRC=$(find java/chapter01-java-basics java/chapter02-oop java/chapter03-collections \
+                     java/chapter-cs-algorithms java/chapter-cs-concurrency java/chapter-cs-network \
+                     java/chapter-java-textbook -name "*.java")
           javac -d /tmp/out $SRC
           echo "컴파일된 클래스: $(find /tmp/out -name '*.class' | wc -l)"
 
@@ -40,6 +40,7 @@ jobs:
           run com.edu.javabook.ch21.RecordPattern
           run com.edu.algorithms.SortingAlgorithms
           run com.edu.concurrency.RaceConditionDemo
+          run com.edu.concurrency.AtomicCasDemo
           run com.edu.basics.StackDemo
 
       - name: 문서 실습 링크(./run.sh 클래스) ↔ 코드 싱크 검증
@@ -47,12 +48,12 @@ jobs:
           set -euo pipefail
           miss=0
           # all/file 은 실행 명령/본문, My* 는 학생이 만들 '내 파일' 플레이스홀더(예: MyTest) 이므로 제외
-          refs=$(grep -rhoE "run\.sh [A-Za-z][A-Za-z0-9]+" docs/ chapter*/README.md README.md 2>/dev/null \
+          refs=$(grep -rhoE "run\.sh [A-Za-z][A-Za-z0-9]+" java/docs/ java/chapter*/README.md java/README.md README.md 2>/dev/null \
                  | awk '{print $2}' | grep -vE '^(all|file|My[A-Za-z0-9]*)$' | sort -u)
           for c in $refs; do
-            if ! find chapter01-java-basics chapter02-oop chapter03-collections \
-                      chapter-cs-algorithms chapter-cs-concurrency chapter-cs-network \
-                      chapter-java-textbook -name "${c}.java" | grep -q .; then
+            if ! find java/chapter01-java-basics java/chapter02-oop java/chapter03-collections \
+                      java/chapter-cs-algorithms java/chapter-cs-concurrency java/chapter-cs-network \
+                      java/chapter-java-textbook -name "${c}.java" | grep -q .; then
               echo "::error::문서가 참조하는 클래스 없음: $c"; miss=$((miss+1))
             fi
           done
@@ -82,5 +83,5 @@ jobs:
           java-version: '21'
 
       - name: Gradle 빌드 & 테스트
-        working-directory: ${{ matrix.chapter }}
+        working-directory: spring/${{ matrix.chapter }}
         run: ./gradlew test --no-daemon --console=plain

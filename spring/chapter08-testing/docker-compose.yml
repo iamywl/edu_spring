@@ -1,0 +1,36 @@
+services:
+  # PostgreSQL 데이터베이스
+  db:
+    image: postgres:16-alpine
+    container_name: spring-ch08-postgres
+    environment:
+      POSTGRES_DB: edu_db
+      POSTGRES_USER: edu_user
+      POSTGRES_PASSWORD: edu_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U edu_user -d edu_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Spring Boot 애플리케이션
+  app:
+    build: .
+    container_name: spring-ch08-testing
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/edu_db
+      SPRING_DATASOURCE_USERNAME: edu_user
+      SPRING_DATASOURCE_PASSWORD: edu_pass
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

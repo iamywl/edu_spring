@@ -1,0 +1,11 @@
+services:
+  java-sandbox:
+    build: .
+    container_name: java-sandbox
+    volumes:
+      # java/ 디렉토리 전체를 /app에 통마운트
+      #   호스트 java/chapter01-java-basics/... ↔ 컨테이너 /app/chapter01-java-basics/...
+      # VS Code에서 파일을 수정하면 컨테이너에 바로 반영된다.
+      - .:/app
+    stdin_open: true
+    tty: true

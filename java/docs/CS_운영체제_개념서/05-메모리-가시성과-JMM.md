@@ -1,0 +1,271 @@
+# 5장 · 메모리 가시성과 자바 메모리 모델(JMM)
+
+> [← 4장 동기화](04-동기화-락-cas-volatile.md) · [책 표지](README.md) · [다음: 6장 교착 상태 →](06-교착-상태-데드락.md)
+
+> **🐳 실습 환경 — 이 장의 데모는 `java-sandbox` 컨테이너에서 실행한다**
+> ```bash
+> cd java && docker compose up -d              # 컨테이너 켜기 (이미 떠 있으면 생략)
+> docker exec -it java-sandbox ./run.sh VolatileVisibilityDemo
+> ```
+
+---
+
+## 왜 이 장이 필요한가 — 백엔드 개발자 관점
+
+4장에서 "원자성 vs 가시성"을 나눴다. 원자성(3단계 쪼개짐)은 직관적이지만, **가시성**은 더 미묘하고 더 무섭다.
+"분명히 `true`로 바꿨는데 다른 스레드가 영영 `false`만 본다"는, 논리적으로 불가능해 보이는 일이 실제로 일어난다.
+그 결과가 **끝나지 않는 루프**, **초기화 안 된 객체를 다 만들어졌다고 착각하는 버그** 같은 것이다.
+
+이 장을 끝내면 다음을 설명할 수 있다.
+
+- 왜 한 스레드가 쓴 값이 다른 스레드에 안 보일 수 있는지(CPU 캐시, 명령 재배치).
+- **자바 메모리 모델(JMM)**과 그 핵심인 **happens-before** 관계.
+- `synchronized`/`volatile`/`Atomic`이 왜 원자성뿐 아니라 **가시성까지** 공짜로 주는지.
+
+---
+
+## 5.1 "쓴 값이 왜 안 보이는가"
+
+### 개념
+
+지금까지는 "3단계가 쪼개진다"(원자성)만 얘기했다. 그런데 더 미묘한 문제가 있다.
+**한 스레드가 변수에 쓴 값을, 다른 스레드가 영영 못 볼 수도 있다.** 심지어 순서가 뒤바뀌어 보일 수도 있다.
+
+### 원리 — 캐시와 재배치
+
+왜? 성능 때문에 CPU와 컴파일러가 다음을 한다.
+
+**1) CPU 캐시.** 메인 메모리(RAM)는 CPU 코어 입장에서 느리다. 그래서 각 코어는 자기 **캐시(cache)**를 갖는다.
+스레드가 변수를 쓰면 일단 자기 코어의 캐시에만 쓰고, 메인 메모리로 내려가는 것(flush)은 나중일 수 있다.
+→ 다른 코어의 스레드는 자기 캐시의 **낡은 값**을 계속 본다.
+
+```
+  코어 1 (Thread A)          메인 메모리          코어 2 (Thread B)
+  ┌──────────┐              ┌──────────┐        ┌──────────┐
+  │ 캐시      │ ──느리게──▶  │ ready=?  │ ◀──?── │ 캐시      │
+  │ ready=true│              └──────────┘        │ ready=? │
+  └──────────┘                                    └──────────┘
+   A가 true로 썼지만 캐시에만 있으면, B는 아직 false를 본다 → 무한 대기 가능
+```
+
+**2) 명령 재배치(reordering).** 컴파일러와 CPU는 성능을 위해 명령 순서를 바꾼다. 예를 들어
+
+```java
+a = 1;   //  ①
+b = 2;   //  ②
+```
+
+두 문장은 서로 의존이 없으니 순서를 바꿔 실행해도 **단일 스레드 관점에선 결과가 같다**(이 원칙을 "as-if-serial"이라
+한다). 그래서 최적화기가 자유롭게 순서를 바꾼다. 문제는 **다른 스레드가 보면** ②가 ①보다 먼저 일어난 것처럼
+보일 수 있다는 것이다.
+
+### 위험한 실제 예 — 안 멈추는 루프
+
+```java
+boolean running = true;    // volatile 없음!
+
+// 워커 스레드:
+while (running) { /* 일함 */ }   // running=false를 영영 못 보고 무한 루프!
+
+// 다른 스레드:
+running = false;                 // 캐시에만 남아 워커에게 안 보일 수 있다
+```
+
+`running`에 `volatile`이 없으면, 워커 스레드는 자기 캐시의 `running=true`만 계속 보며 영영 안 멈출 수 있다.
+게다가 컴파일러가 `while(running)`을 `while(true)`로 최적화해 버리는 것도 허용된다(값이 안 변한다고 가정하므로).
+**이 버그는 원자성과 무관하다** — 순수한 가시성 문제다. 그래서 [4장](04-동기화-락-cas-volatile.md)에서 플래그엔
+`volatile`이면 충분하다고 한 것이다.
+
+---
+
+## 5.2 자바 메모리 모델(JMM)과 happens-before
+
+### 개념
+
+이 혼돈에 질서를 주는 규약이 **자바 메모리 모델(Java Memory Model, JMM)**이고, 그 핵심 개념이
+**happens-before(선행 발생)** 관계다.
+
+직관적으로: **"연산 A가 연산 B보다 happens-before이면, A의 결과(쓴 값)는 B에게 반드시 보인다.
+그리고 A는 B 이전에 일어난 것으로 (재배치 없이) 관찰된다."**
+
+주의: happens-before는 "시간상 먼저"가 아니라 **"메모리 가시성과 순서를 보장하는 규칙 관계"**다. 이 관계가
+성립하지 않으면 값이 보인다는 보장이 없다.
+
+### 원리 — happens-before가 성립하는 대표 경우
+
+- **프로그램 순서(단일 스레드)**: 한 스레드 안에서 앞 문장은 뒤 문장보다 happens-before. (그래서 단일 스레드는
+  안심할 수 있다 — 재배치가 있어도 그 스레드 관점의 결과는 유지된다.)
+- **락(모니터)**: 어떤 락을 **해제(unlock)**한 것은, 그 락을 다음에 **획득(lock)**하는 것보다 happens-before.
+  → `synchronized` 블록 안에서 쓴 값은, 다음에 그 락을 잡은 스레드에게 보인다.
+- **volatile**: `volatile` 변수에 **쓴** 것은, 그 변수를 다음에 **읽는** 것보다 happens-before.
+  → volatile 쓰기 이전의 (일반 변수 포함) 모든 쓰기가 그 읽는 스레드에 보인다.
+- **스레드 시작/종료**: `thread.start()` 이전의 모든 것은 새 스레드에게 보인다.
+  `thread.join()`이 끝나면 그 스레드가 한 모든 것이 보인다.
+- **전이성(transitivity)**: A hb B 이고 B hb C 이면 A hb C.
+
+```
+  Thread A                          Thread B
+  data = 42;                        │
+  synchronized(lock){ ready=true; } │  ← unlock
+        ─────── happens-before ─────▶ synchronized(lock){ if(ready) ... }  ← lock
+                                      여기서 data==42, ready==true 가 보장된다
+```
+
+위 그림에서 놀라운 점: **`data`는 volatile도 아니고 synchronized로 감싸지도 않았는데** B에게 `42`로 보인다.
+이유는 "락 해제 → 락 획득" happens-before가 그 **경계 이전의 모든 쓰기**를 밀어내 주기 때문이다.
+volatile 쓰기/읽기도 마찬가지로 경계 역할을 한다. 그래서 4장에서 본 도구들이 원자성뿐 아니라 **가시성까지**
+따라온 것이다.
+
+### 자바 코드로 — volatile로 안전 발행하기
+
+```java
+class Holder {
+    private int data;
+    private volatile boolean ready = false;   // volatile 쓰기/읽기가 happens-before 경계
+
+    void publish(int v) {
+        data = v;          // ① 일반 쓰기
+        ready = true;      // ② volatile 쓰기 (① 이후로 순서 고정)
+    }
+    int read() {
+        if (ready) {       // ③ volatile 읽기 (true를 봤다면)
+            return data;   // ④ ①의 결과가 반드시 보인다 (data==v 보장)
+        }
+        return -1;
+    }
+}
+```
+
+`ready`가 `volatile`이므로 ②(쓰기)가 ③(읽기)보다 happens-before이고, 전이성에 의해 ①이 ④에게 보인다.
+이것이 "안전 발행(safe publication)"의 기본 패턴이다.
+
+> ### 왜 JMM이라는 규칙이 필요한가?
+>
+> "재배치·캐시를 절대 하지 마라"고 하면 성능이 폭락한다. 그래서 JMM은 **"대부분은 자유롭게 최적화하되,
+> happens-before 경계에서는 반드시 보이게/순서대로 하라"**는 절충안이다. `synchronized`/`volatile`/`Atomic`은
+> 이 경계를 만들어준다. 그래서 이들을 쓰면 원자성뿐 아니라 **가시성까지 공짜로** 따라온다. 반대로 이 경계가
+> 하나도 없는 공유 변수는 "언제 보일지, 순서가 맞을지" 아무 보장이 없다.
+
+### 곁가지 — DB의 MVCC와의 대비
+
+가시성 문제는 자바 메모리에만 있는 게 아니다. [`CS_데이터베이스_개념서`](../CS_데이터베이스_개념서/)의
+**MVCC(Multi-Version Concurrency Control)**도 "누가 어떤 버전의 데이터를 보는가"를 다룬다. DB는 트랜잭션마다
+일관된 스냅샷을 보여줘 "읽는 도중 남이 바꾼 값이 튀어나오지" 않게 한다. JMM이 스레드 간 메모리 가시성을 규칙으로
+다스리듯, MVCC는 트랜잭션 간 데이터 가시성을 버전으로 다스린다. **"동시 접근 시 무엇을 보게 할 것인가"**라는
+같은 질문이 메모리 계층과 DB 계층에서 각각 다른 방식으로 풀리는 것이다.
+
+---
+
+## 5.3 실습 — 눈으로 보는 가시성: `VolatileVisibilityDemo`
+
+이 장에서 글로 배운 세 가지 — ① volatile 없는 플래그의 무한 대기, ② volatile 의 즉각 반영,
+③ happens-before 를 이용한 안전 발행 — 를 한 프로그램으로 확인한다.
+
+```bash
+./run.sh VolatileVisibilityDemo
+# 또는 로컬에서
+javac -d out $(find chapter-cs-concurrency/src -name "*.java")
+java -cp out com.edu.concurrency.VolatileVisibilityDemo
+```
+
+**무엇이 나오는가 (예상 출력 해석).**
+
+1. **1부 — volatile 없는 플래그**: 워커가 `while (plainFlag) { spins++ }` 순수 루프를 돌고,
+   메인이 300ms 뒤 `plainFlag = false`로 바꾼다. 대부분의 환경에서
+   `"1505 ms를 기다려도 워커가 안 멈춤 → 가시성 문제 재현 성공!"`이 나온다 —
+   메인은 분명히 썼는데 워커는 낡은 `true`만 본다(JIT이 검사를 루프 밖으로 빼버렸을 가능성이 크다).
+   워커는 데몬 스레드라 프로그램은 절대 hang 하지 않는다.
+2. **2부 — volatile 플래그**: 키워드 하나만 바꾼 같은 코드. `"워커 종료까지 0 ms"` — **항상, 즉시** 멈춘다.
+3. **3부 — 안전 발행**: 일반 변수 `payload = 42` 뒤에 `volatile published = true`를 쓰면,
+   읽는 스레드가 `published == true`를 본 순간 `payload == 42`까지 **반드시** 보인다(전이성).
+
+> **재현이 안 되면?** 1부에서 워커가 우연히 멈추는 환경도 있다(CPU 아키텍처·JIT 워밍업 정도에 따라).
+> 그것도 배울 점이다 — **가시성 버그는 "가끔만" 터지므로 테스트로 잡기 가장 어렵다.**
+> 핵심은 "우연히 되는 것"과 "JMM이 보장하는 것"의 차이다. 보장이 필요하면 `volatile`.
+
+### 확인문제
+
+1. 1부의 워커가 안 멈추는 이유를 "캐시"와 "JIT 최적화" 두 관점에서 각각 한 문장으로 설명하라.
+   <details><summary>정답</summary>
+   캐시 관점: 메인이 쓴 false가 메인 메모리/다른 코어 캐시로 전파된다는 보장이 없어, 워커는 자기 캐시의
+   낡은 true만 계속 읽는다. JIT 관점: 루프 안에서 plainFlag를 바꾸는 코드가 없으므로 JIT이
+   `while(plainFlag)`를 `while(true)`로(검사를 루프 밖으로 호이스팅) 최적화하는 것이 허용된다.
+   volatile이 붙으면 두 최적화 모두 금지된다.</details>
+
+2. 3부에서 `payload`는 volatile이 아닌데도 42가 보이는 것이 보장된다. 어떤 happens-before 규칙들의
+   조합인가?
+   <details><summary>정답</summary>
+   ① 프로그램 순서: `payload=42`는 `published=true`(volatile 쓰기)보다 앞. ② volatile 규칙:
+   volatile 쓰기는 이후의 volatile 읽기보다 happens-before. ③ 전이성: 따라서 `payload=42`가
+   읽는 스레드의 `payload` 읽기에 반드시 보인다. 이것이 안전 발행(safe publication) 패턴이다.</details>
+
+3. `VolatileVisibilityDemo`를 실행했더니 1부의 워커가 곧바로 멈췄다. 이 결과로 "volatile 없이도
+   안전하다"고 결론 내릴 수 있는가?
+   <details><summary>정답</summary>
+   없다. JMM은 volatile 없는 플래그가 보인다는 것을 보장하지 않으며, 이번 실행에서 우연히 전파됐을
+   뿐이다. 다른 머신·다른 JVM·다른 부하에서는 영영 안 멈출 수 있다. 동시성 코드는 "돌려보니 됐다"가
+   아니라 "JMM이 보장하는가"로 판단해야 한다.</details>
+
+---
+
+## ⚠️ 흔한 오해와 함정
+
+- **"내가 쓴 값은 당연히 다른 스레드가 본다"** → 아니다. happens-before 경계가 없으면 캐시에 갇혀 영영 안 보일 수
+  있다. 안 멈추는 while 루프가 대표 증상.
+- **"가시성 문제는 멀티코어에서만 생긴다"** → 재배치는 단일 코어에서도 컴파일러 최적화로 일어날 수 있다.
+  코어 수와 무관하게 happens-before가 답이다.
+- **"`volatile`은 성능을 위해 웬만하면 다 붙이면 좋다"** → 아니다. volatile은 캐시 활용을 제한해 비용이 있다.
+  꼭 필요한 공유 플래그/발행 지점에만 붙여야 한다.
+- **"happens-before는 시간 순서다"** → 정확히는 "가시성/순서를 보장하는 규칙 관계"다. 시간상 먼저 실행됐어도
+  happens-before 관계가 없으면 보인다는 보장이 없다.
+- **"동기화하면 재배치가 아예 사라진다"** → 재배치 자체는 계속 일어난다. 다만 happens-before 경계를 **넘는**
+  재배치가 금지되어, 경계 기준으로 순서와 가시성이 보장될 뿐이다.
+
+---
+
+## 연습문제
+
+1. **(핵심)** `volatile` 없는 `boolean running` 플래그로 워커 스레드를 멈추려 했더니 안 멈춘다. 원자성 문제인가
+   가시성 문제인가? 왜?
+   <details><summary>힌트/해설</summary>
+   가시성 문제. `running=false` 쓰기가 워커의 캐시로 전파되지 않아(happens-before 경계 없음) 낡은 true만 본다.
+   또 컴파일러가 while(running)을 while(true)로 최적화할 수도 있다. `volatile`을 붙이면 해결.</details>
+
+2. **(개념)** happens-before가 성립하는 경우를 세 가지 이상 나열하고, 각각이 무엇을 보장하는지 설명하라.
+   <details><summary>힌트/해설</summary>
+   ① 프로그램 순서(단일 스레드 앞→뒤), ② unlock→lock, ③ volatile write→read, ④ start()→새 스레드,
+   ⑤ 스레드 종료→join() 이후, ⑥ 전이성. 각각 "이전 쓰기가 이후 읽기에 보인다"를 보장.</details>
+
+3. **(응용)** §5.2의 `Holder` 예에서 `ready`의 `volatile`을 빼면 무엇이 깨지는가?
+   <details><summary>힌트/해설</summary>
+   happens-before 경계가 사라져, ready=true를 봤더라도 data가 아직 옛 값(0)으로 보일 수 있다. 게다가 ①②의
+   재배치로 ready가 먼저 true가 되고 data는 아직 안 써진 상태를 다른 스레드가 볼 수도 있다. 안전 발행 실패.</details>
+
+4. **(함정)** "이 코드는 멀티코어에서만 위험하고 코어 1개짜리 서버에선 가시성 문제가 없다"는 주장의 문제점은?
+   <details><summary>힌트/해설</summary>
+   가시성 문제의 원인은 캐시뿐 아니라 컴파일러/CPU의 명령 재배치도 있다. 재배치는 단일 코어에서도 일어난다.
+   따라서 코어 1개여도 happens-before 없는 공유 변수는 위험하다.</details>
+
+5. **(심화)** `synchronized`로 감싼 블록 안에서 쓴 **일반(비 volatile) 변수**가 왜 다음에 그 락을 잡은 스레드에게
+   보이는지를 happens-before로 설명하라.
+   <details><summary>힌트/해설</summary>
+   "unlock → 이후의 lock"이 happens-before. 블록 안 쓰기는 프로그램 순서상 unlock보다 앞(hb), 다음 스레드의
+   블록 안 읽기는 lock보다 뒤(hb). 전이성으로 앞 스레드의 쓰기가 뒤 스레드의 읽기에 보인다. 그래서 락은
+   원자성뿐 아니라 가시성까지 준다.</details>
+
+---
+
+## 요약
+
+- 성능을 위해 CPU는 **코어별 캐시**를 쓰고 컴파일러/CPU는 **명령을 재배치**한다. 그래서 한 스레드의 쓰기가
+  다른 스레드에 **안 보이거나 순서가 뒤바뀌어 보일** 수 있다 — 이것이 **가시성** 문제.
+- 대표 증상: `volatile` 없는 플래그로 인한 **안 멈추는 루프**, 초기화 전 객체를 완성됐다고 착각하는 발행 버그.
+- **JMM**은 "대부분 자유롭게 최적화하되 **happens-before 경계**에서는 보이게/순서대로"라는 절충안이다.
+- happens-before 경계: 프로그램 순서, **unlock→lock**, **volatile write→read**, start()·join(), 전이성.
+- 그래서 `synchronized`/`volatile`/`Atomic`은 원자성뿐 아니라 **가시성까지** 준다. 경계가 없는 공유 변수는 보장이 없다.
+- 같은 "동시 접근 시 무엇을 보는가" 질문이 DB에서는 **MVCC**로 풀린다(계층을 넘는 반복).
+- ▶ 데모: `./run.sh VolatileVisibilityDemo`  📁 `chapter-cs-concurrency/src/main/java/com/edu/concurrency/VolatileVisibilityDemo.java`
+
+---
+
+> [← 4장 동기화](04-동기화-락-cas-volatile.md) · [책 표지](README.md) · [다음: 6장 교착 상태 →](06-교착-상태-데드락.md)

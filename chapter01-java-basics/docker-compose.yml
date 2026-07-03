@@ -1,4 +1,0 @@
-services:
-  java-basics:
-    build: .
-    command: java -cp out com.edu.basics.VariablesAndTypes

@@ -803,7 +803,7 @@ Java가 맥북에 설치되어 있지 않아도 Docker만 있으면 Java 코드�
 ### 프로젝트 디렉토리로 이동
 
 ```bash
-cd ~/edu_spring/chapter01-java-basics
+cd ~/edu_spring/java/chapter01-java-basics
 ```
 
 ### Java 컨테이너에서 직접 컴파일 및 실행
@@ -865,16 +865,20 @@ docker run --rm -v $(pwd):/app -w /app eclipse-temurin:21-jdk \
 Dockerfile은 Docker 이미지를 만들기 위한 **레시피(설계서)**이다.
 어떤 베이스 이미지를 사용하고, 어떤 파일을 복사하고, 어떤 명령을 실행할지 정의한다.
 
-### chapter01의 Dockerfile 분석
+### java 샌드박스의 Dockerfile 분석
 
-`chapter01-java-basics/Dockerfile` 파일의 내용:
+`java/Dockerfile` 파일의 내용:
 
 ```dockerfile
 FROM eclipse-temurin:21-jdk
 WORKDIR /app
-COPY src/ src/
-RUN mkdir -p out && javac -d out src/main/java/com/edu/basics/*.java
-CMD ["java", "-cp", "out", "com.edu.basics.VariablesAndTypes"]
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    bash-completion vim less && \
+    rm -rf /var/lib/apt/lists/*
+COPY run.sh /app/run.sh
+COPY compile.sh /app/compile.sh
+RUN chmod +x /app/run.sh /app/compile.sh
+CMD ["sleep", "infinity"]
 ```
 
 **각 줄의 의미:**
@@ -883,120 +887,109 @@ CMD ["java", "-cp", "out", "com.edu.basics.VariablesAndTypes"]
 |----|--------|------|
 | 1 | `FROM eclipse-temurin:21-jdk` | **베이스 이미지**: Java 21 JDK가 설치된 리눅스 환경을 시작점으로 사용 |
 | 2 | `WORKDIR /app` | **작업 디렉토리**: 이후 명령어가 실행될 디렉토리를 `/app`으로 설정 |
-| 3 | `COPY src/ src/` | **파일 복사**: 맥북의 `src/` 폴더를 컨테이너의 `/app/src/`로 복사 |
-| 4 | `RUN mkdir -p out && javac ...` | **빌드 명령**: 이미지 빌드 시 Java 소스를 컴파일 |
-| 5 | `CMD ["java", "-cp", "out", "..."]` | **실행 명령**: 컨테이너 시작 시 실행할 기본 명령 |
+| 3 | `RUN apt-get ...` | **도구 설치**: 이미지 빌드 시 vim, less 같은 편의 도구를 설치 |
+| 4~5 | `COPY run.sh / compile.sh` | **파일 복사**: 실행/컴파일 스크립트를 이미지에 복사 |
+| 6 | `RUN chmod +x ...` | **실행 권한**: 스크립트를 실행 가능하게 만듦 |
+| 7 | `CMD ["sleep", "infinity"]` | **실행 명령**: 컨테이너를 "켜 둔 채 대기"시킴 — 우리가 `docker exec`로 들어가서 쓰는 방식 |
 
 > **FROM**: 모든 Dockerfile은 반드시 `FROM`으로 시작한다. "이 이미지를 기반으로 시작한다"는 의미이다.
 >
 > **RUN vs CMD**:
 > - `RUN`은 이미지를 **빌드할 때** 실행된다 (한 번만)
 > - `CMD`는 컨테이너를 **실행할 때마다** 실행된다
+>
+> **왜 `sleep infinity`?** 이 컨테이너는 "한 번 실행하고 끝나는 프로그램"이 아니라
+> **켜 놓고 계속 드나드는 실습용 샌드박스**이기 때문이다. 소스는 이미지에 굽지 않고
+> 볼륨 마운트로 연결한다(3.3절).
 
 ### 이미지 빌드하기
 
 ```bash
-cd ~/edu_spring/chapter01-java-basics
+cd ~/edu_spring/java
 
-docker build -t java-basics .
+docker build -t java-sandbox .
 ```
 
 **예상 출력:**
 ```
-[+] Building 12.5s (8/8) FINISHED
+[+] Building 25.3s (10/10) FINISHED
  => [internal] load build definition from Dockerfile                    0.0s
  => [internal] load metadata for docker.io/library/eclipse-temurin:21-jdk  1.2s
- => [internal] load .dockerignore                                       0.0s
- => [1/4] FROM docker.io/library/eclipse-temurin:21-jdk@sha256:...     0.0s
- => [internal] load build context                                       0.0s
- => [2/4] WORKDIR /app                                                 0.0s
- => [3/4] COPY src/ src/                                               0.0s
- => [4/4] RUN mkdir -p out && javac -d out src/main/java/com/edu/basics/*.java  2.3s
+ => [1/5] FROM docker.io/library/eclipse-temurin:21-jdk@sha256:...     0.0s
+ => [2/5] WORKDIR /app                                                 0.0s
+ => [3/5] RUN apt-get update && apt-get install ...                    18.4s
+ => [4/5] COPY run.sh /app/run.sh                                      0.0s
+ => [5/5] RUN chmod +x /app/run.sh /app/compile.sh                     0.1s
  => exporting to image                                                  0.1s
- => => naming to docker.io/library/java-basics                         0.0s
+ => => naming to docker.io/library/java-sandbox                        0.0s
 ```
 
 > **명령어 설명:**
 > - `docker build`: 이미지를 빌드한다
-> - `-t java-basics`: 빌드된 이미지에 `java-basics`라는 이름(태그)을 붙인다
+> - `-t java-sandbox`: 빌드된 이미지에 `java-sandbox`라는 이름(태그)을 붙인다
 > - `.`: 현재 디렉토리의 Dockerfile을 사용한다 (마지막 점이 중요!)
 
-### 이미지 실행하기
-
-```bash
-# 기본 클래스 (VariablesAndTypes) 실행
-docker run --rm java-basics
-```
-
-**예상 출력:**
-```
-=== 변수와 타입 실습 ===
-...
-```
-
-### 다른 클래스 실행하기
-
-CMD를 오버라이드하여 다른 클래스를 실행할 수 있다:
-
-```bash
-# ControlFlow 실행
-docker run --rm java-basics java -cp out com.edu.basics.ControlFlow
-```
-
-```bash
-# ArraysAndMethods 실행
-docker run --rm java-basics java -cp out com.edu.basics.ArraysAndMethods
-```
-
-```bash
-# ExceptionBasics 실행
-docker run --rm java-basics java -cp out com.edu.basics.ExceptionBasics
-```
-
-> `docker run` 뒤에 명령어를 추가하면 Dockerfile의 `CMD`를 덮어쓴다.
+> 실제 실습에서는 `docker build`를 직접 칠 일이 거의 없다 — 다음 절의
+> `docker compose up -d`가 빌드까지 알아서 해 준다.
 
 ---
 
 ## 3.3 docker-compose로 Java 실행하기
 
-### chapter01의 docker-compose.yml 분석
+### java 샌드박스의 docker-compose.yml 분석
 
-`chapter01-java-basics/docker-compose.yml` 파일의 내용:
+`java/docker-compose.yml` 파일의 내용:
 
 ```yaml
 services:
-  java-basics:
+  java-sandbox:
     build: .
-    command: java -cp out com.edu.basics.VariablesAndTypes
+    container_name: java-sandbox
+    volumes:
+      - .:/app        # java/ 디렉토리 전체를 /app에 통마운트
+    stdin_open: true
+    tty: true
 ```
 
 | 항목 | 설명 |
 |------|------|
 | `services` | 실행할 서비스(컨테이너) 목록 |
-| `java-basics` | 서비스 이름 |
+| `java-sandbox` | 서비스 이름 (= 컨테이너 이름) |
 | `build: .` | 현재 디렉토리의 Dockerfile로 빌드 |
-| `command` | 컨테이너 실행 시 명령어 (CMD 오버라이드) |
+| `volumes: - .:/app` | **통마운트**: 맥북의 `java/` 폴더 전체 ↔ 컨테이너의 `/app` (파일 수정이 즉시 반영) |
+| `stdin_open`/`tty` | 대화형 터미널로 접속할 수 있게 함 |
+
+> **통마운트라서 단순하다**: 맥북에서 보이는 파일 = 컨테이너에서 보이는 파일.
+> `java/chapter01-java-basics/src/...`는 컨테이너에서 `/app/chapter01-java-basics/src/...`이다.
 
 ### 실행하기
 
 ```bash
-cd ~/edu_spring/chapter01-java-basics
+cd ~/edu_spring/java
 
-docker compose up --build
+docker compose up -d        # 컨테이너를 백그라운드로 켠다 (최초 1회 빌드 포함)
+
+docker exec -it java-sandbox ./compile.sh              # 전체 컴파일
+docker exec -it java-sandbox ./run.sh VariablesAndTypes  # 예제 실행
 ```
 
 **예상 출력:**
 ```
-[+] Building 3.2s (8/8) FINISHED
 [+] Running 1/1
- ✔ Container chapter01-java-basics-java-basics-1  Created
-Attaching to java-basics-1
-java-basics-1  | === 변수와 타입 실습 ===
-java-basics-1  | ...
-java-basics-1 exited with code 0
+ ✔ Container java-sandbox  Started
+
+컴파일 중...
+컴파일 성공!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  실행: VariablesAndTypes   (com.edu.basics.VariablesAndTypes)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+=== 변수와 타입 실습 ===
+...
 ```
 
-> 프로그램이 실행된 후 자동으로 종료된다 (서버가 아닌 일반 프로그램이므로).
+> 컨테이너는 `sleep infinity`로 계속 떠 있으므로, `docker exec`로 몇 번이고 드나들며
+> 예제를 실행할 수 있다. 끌 때는 `docker compose down`.
 
 ---
 
@@ -1052,7 +1045,7 @@ Chapter 04는 가장 기본적인 Spring Boot 애플리케이션이다.
 
 ### Dockerfile 분석 (멀티 스테이지 빌드)
 
-`chapter04-spring-boot-intro/Dockerfile`:
+`spring/chapter04-spring-boot-intro/Dockerfile`:
 
 ```dockerfile
 FROM eclipse-temurin:21-jdk AS builder
@@ -1085,7 +1078,7 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 ### 실행하기
 
 ```bash
-cd ~/edu_spring/chapter04-spring-boot-intro
+cd ~/edu_spring/spring/chapter04-spring-boot-intro
 
 docker compose up --build
 ```
@@ -1139,7 +1132,7 @@ curl http://localhost:8080/api/time
 원래 터미널에서 `Ctrl + C`를 누르거나:
 
 ```bash
-cd ~/edu_spring/chapter04-spring-boot-intro
+cd ~/edu_spring/spring/chapter04-spring-boot-intro
 docker compose down
 ```
 
@@ -1152,7 +1145,7 @@ Chapter 05는 REST API를 구현한 Spring Boot 애플리케이션이다.
 ### 실행하기
 
 ```bash
-cd ~/edu_spring/chapter05-spring-web
+cd ~/edu_spring/spring/chapter05-spring-web
 
 docker compose up --build
 ```
@@ -1220,7 +1213,7 @@ curl -s http://localhost:8080/api/todos | python3 -m json.tool
 ### 종료
 
 ```bash
-cd ~/edu_spring/chapter05-spring-web
+cd ~/edu_spring/spring/chapter05-spring-web
 docker compose down
 ```
 
@@ -1264,7 +1257,7 @@ services:
 ### 실행하기
 
 ```bash
-cd ~/edu_spring/chapter06-spring-data-jpa
+cd ~/edu_spring/spring/chapter06-spring-data-jpa
 
 docker compose up --build
 ```
@@ -1272,8 +1265,8 @@ docker compose up --build
 **예상 출력 (주요 부분):**
 ```
 [+] Running 2/2
- ✔ Container chapter06-spring-data-jpa-postgres-1  Healthy
- ✔ Container chapter06-spring-data-jpa-app-1       Started
+ ✔ Container spring/chapter06-spring-data-jpa-postgres-1  Healthy
+ ✔ Container spring/chapter06-spring-data-jpa-app-1       Started
 postgres-1  | ... database system is ready to accept connections
 app-1       | ... Started Application in 3.245 seconds
 ```
@@ -1283,7 +1276,7 @@ app-1       | ... Started Application in 3.245 seconds
 새 터미널에서 다음을 실행한다:
 
 ```bash
-cd ~/edu_spring/chapter06-spring-data-jpa
+cd ~/edu_spring/spring/chapter06-spring-data-jpa
 
 docker compose exec postgres psql -U edu -d edu_spring
 ```
@@ -1307,7 +1300,7 @@ SELECT * FROM member;
 ### 한 줄 명령으로 SQL 실행하기
 
 ```bash
-cd ~/edu_spring/chapter06-spring-data-jpa
+cd ~/edu_spring/spring/chapter06-spring-data-jpa
 
 docker compose exec postgres psql -U edu -d edu_spring -c "SELECT * FROM member;"
 ```
@@ -1323,7 +1316,7 @@ docker compose exec postgres psql -U edu -d edu_spring -c "SELECT * FROM member;
 ### 종료
 
 ```bash
-cd ~/edu_spring/chapter06-spring-data-jpa
+cd ~/edu_spring/spring/chapter06-spring-data-jpa
 
 # 컨테이너만 중지 (DB 데이터 유지)
 docker compose down
@@ -1341,7 +1334,7 @@ Chapter 07은 Spring Security와 JWT(JSON Web Token) 인증을 포함한다.
 ### 실행하기
 
 ```bash
-cd ~/edu_spring/chapter07-spring-security
+cd ~/edu_spring/spring/chapter07-spring-security
 
 docker compose up --build
 ```
@@ -1433,7 +1426,7 @@ curl -s http://localhost:8080/api/users/me \
 ### 종료
 
 ```bash
-cd ~/edu_spring/chapter07-spring-security
+cd ~/edu_spring/spring/chapter07-spring-security
 docker compose down -v
 ```
 
@@ -1447,7 +1440,7 @@ PostgreSQL, Redis, Adminer(DB 관리 UI)가 함께 실행된다.
 ### 실행하기
 
 ```bash
-cd ~/edu_spring/chapter09-final-project
+cd ~/edu_spring/spring/chapter09-final-project
 
 docker compose up --build
 ```
@@ -1455,10 +1448,10 @@ docker compose up --build
 **예상 출력:**
 ```
 [+] Running 4/4
- ✔ Container chapter09-final-project-redis-1     Started
- ✔ Container chapter09-final-project-postgres-1   Healthy
- ✔ Container chapter09-final-project-adminer-1    Started
- ✔ Container chapter09-final-project-app-1        Started
+ ✔ Container spring/chapter09-final-project-redis-1     Started
+ ✔ Container spring/chapter09-final-project-postgres-1   Healthy
+ ✔ Container spring/chapter09-final-project-adminer-1    Started
+ ✔ Container spring/chapter09-final-project-app-1        Started
 ```
 
 > 4개의 서비스가 실행된다:
@@ -1544,7 +1537,7 @@ curl -s -X DELETE http://localhost:8080/api/posts/1 \
 ### 종료 및 정리
 
 ```bash
-cd ~/edu_spring/chapter09-final-project
+cd ~/edu_spring/spring/chapter09-final-project
 
 # 컨테이너 중지 (데이터 유지)
 docker compose down
@@ -1562,7 +1555,7 @@ docker compose down -v
 교육 프로젝트 전체에서 공유하는 인프라(PostgreSQL, Redis, Adminer)를 먼저 실행한다.
 
 ```bash
-cd ~/edu_spring/docker
+cd ~/edu_spring/spring/docker
 
 docker compose -f docker-compose-infra.yml up -d
 ```
@@ -1570,25 +1563,25 @@ docker compose -f docker-compose-infra.yml up -d
 **예상 출력:**
 ```
 [+] Running 3/3
- ✔ Container docker-postgres-1  Healthy
- ✔ Container docker-redis-1     Started
- ✔ Container docker-adminer-1   Started
+ ✔ Container spring-postgres  Healthy
+ ✔ Container spring-redis     Started
+ ✔ Container spring-adminer   Started
 ```
 
 ### 상태 확인
 
 ```bash
-cd ~/edu_spring/docker
+cd ~/edu_spring/spring/docker
 
 docker compose -f docker-compose-infra.yml ps
 ```
 
 **예상 출력:**
 ```
-NAME                IMAGE              COMMAND                  SERVICE    CREATED          STATUS                    PORTS
-docker-adminer-1    adminer            "entrypoint.sh php..."   adminer    30 seconds ago   Up 28 seconds             0.0.0.0:8081->8080/tcp
-docker-postgres-1   postgres:16-alpine "docker-entrypoint.s..." postgres   30 seconds ago   Up 29 seconds (healthy)   0.0.0.0:5432->5432/tcp
-docker-redis-1      redis:7-alpine     "docker-entrypoint.s..." redis      30 seconds ago   Up 28 seconds             0.0.0.0:6379->6379/tcp
+NAME              IMAGE              COMMAND                  SERVICE    CREATED          STATUS                    PORTS
+spring-adminer    adminer            "entrypoint.sh php..."   adminer    30 seconds ago   Up 28 seconds             0.0.0.0:8081->8080/tcp
+spring-postgres   postgres:16-alpine "docker-entrypoint.s..." postgres   30 seconds ago   Up 29 seconds (healthy)   0.0.0.0:5432->5432/tcp
+spring-redis      redis:7-alpine     "docker-entrypoint.s..." redis      30 seconds ago   Up 28 seconds             0.0.0.0:6379->6379/tcp
 ```
 
 ### 접속 정보
@@ -1616,7 +1609,7 @@ docker-redis-1      redis:7-alpine     "docker-entrypoint.s..." redis      30 se
 ### Chapter 01: Java 기초
 
 ```bash
-cd ~/edu_spring/chapter01-java-basics
+cd ~/edu_spring/java/chapter01-java-basics
 docker compose up --build
 ```
 
@@ -1625,23 +1618,23 @@ docker compose up --build
 ### Chapter 02: 객체지향 프로그래밍
 
 ```bash
-cd ~/edu_spring/chapter02-oop
-docker build -t chapter02-oop .
-docker run --rm chapter02-oop
+cd ~/edu_spring/java/chapter02-oop
+docker build -t java/chapter02-oop .
+docker run --rm java/chapter02-oop
 ```
 
 ### Chapter 03: 컬렉션
 
 ```bash
-cd ~/edu_spring/chapter03-collections
-docker build -t chapter03-collections .
-docker run --rm chapter03-collections
+cd ~/edu_spring/java/chapter03-collections
+docker build -t java/chapter03-collections .
+docker run --rm java/chapter03-collections
 ```
 
 ### Chapter 04: Spring Boot 입문
 
 ```bash
-cd ~/edu_spring/chapter04-spring-boot-intro
+cd ~/edu_spring/spring/chapter04-spring-boot-intro
 docker compose up --build
 ```
 
@@ -1656,7 +1649,7 @@ curl http://localhost:8080/api/time
 ### Chapter 05: Spring Web
 
 ```bash
-cd ~/edu_spring/chapter05-spring-web
+cd ~/edu_spring/spring/chapter05-spring-web
 docker compose up --build
 ```
 
@@ -1674,7 +1667,7 @@ curl -s http://localhost:8080/api/todos | python3 -m json.tool
 ### Chapter 06: Spring Data JPA
 
 ```bash
-cd ~/edu_spring/chapter06-spring-data-jpa
+cd ~/edu_spring/spring/chapter06-spring-data-jpa
 docker compose up --build
 ```
 
@@ -1685,7 +1678,7 @@ docker compose up --build
 ### Chapter 07: Spring Security
 
 ```bash
-cd ~/edu_spring/chapter07-spring-security
+cd ~/edu_spring/spring/chapter07-spring-security
 docker compose up --build
 ```
 
@@ -1694,7 +1687,7 @@ docker compose up --build
 ### Chapter 08: 테스팅
 
 ```bash
-cd ~/edu_spring/chapter08-testing
+cd ~/edu_spring/spring/chapter08-testing
 docker compose up --build
 ```
 
@@ -1703,7 +1696,7 @@ docker compose up --build
 ### Chapter 09: 종합 프로젝트
 
 ```bash
-cd ~/edu_spring/chapter09-final-project
+cd ~/edu_spring/spring/chapter09-final-project
 docker compose up --build
 ```
 
@@ -1731,7 +1724,7 @@ docker compose down -v
 ### 인프라 정리
 
 ```bash
-cd ~/edu_spring/docker
+cd ~/edu_spring/spring/docker
 docker compose -f docker-compose-infra.yml down -v
 ```
 
@@ -2109,14 +2102,14 @@ docker network ls
 ```
 NETWORK ID     NAME                           DRIVER    SCOPE
 a1b2c3d4e5f6   bridge                         bridge    local
-b2c3d4e5f6a7   chapter06-spring-data-jpa_default   bridge    local
+b2c3d4e5f6a7   spring/chapter06-spring-data-jpa_default   bridge    local
 c3d4e5f6a7b8   host                           host      local
 d4e5f6a7b8c9   none                           null      local
 ```
 
 ```bash
 # 특정 네트워크 상세 정보 (연결된 컨테이너 확인)
-docker network inspect chapter06-spring-data-jpa_default
+docker network inspect spring/chapter06-spring-data-jpa_default
 ```
 
 ### 리소스 사용량 모니터링
@@ -2191,7 +2184,7 @@ docker image prune -f
 
 ```bash
 # PostgreSQL만 Docker로 실행하고, Spring Boot는 IDE에서 실행
-cd ~/edu_spring/chapter06-spring-data-jpa
+cd ~/edu_spring/spring/chapter06-spring-data-jpa
 docker compose up postgres -d
 
 # IDE에서 Spring Boot 실행 시 application.yml의 datasource URL을 localhost로 설정
@@ -2281,7 +2274,7 @@ docker system prune -a -f     # dprune
 **사용 예:**
 
 ```bash
-cd ~/edu_spring/chapter06-spring-data-jpa
+cd ~/edu_spring/spring/chapter06-spring-data-jpa
 
 # 빌드 및 실행
 dcu

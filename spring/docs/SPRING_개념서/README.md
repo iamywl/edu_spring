@@ -1,0 +1,89 @@
+# Spring Boot 개념서: 왜 이렇게 만들어졌는가?
+
+> "좋은 개발자는 코드를 작성하는 사람이 아니라, 왜 그 코드가 필요한지 설명할 수 있는 사람이다."
+>
+> *코드는 변하지만, 원리는 오래간다.*
+
+---
+
+## 이 책은 무엇인가
+
+Spring Boot의 **"어떻게"가 아니라 "왜"**를 설명하는 책이다. `@Autowired`를 쓰는 법이 아니라 **왜 의존성 주입이 필요한지**, `@Transactional`을 붙이는 법이 아니라 **그 뒤에서 누가·언제·어떻게 트랜잭션을 여는지**를 다룬다. 어노테이션을 마법으로 외우는 대신, 프록시·리플렉션·AOP·스레드 모델·ACID·B-tree 인덱스·HMAC 같은 **CS의 뿌리까지** 파고든다.
+
+각 장은 이 저장소의 실습 모듈(`chapter0X`)과 연결된다. 특히 프록시가 실재한다는 증거는 `chapter06-spring-data-jpa`의 `ProxyRevealRunner`로 눈으로 확인한다.
+
+> **🐳 실습 환경 — 각 장의 실습은 아래 Docker 컨테이너로 진행한다** (각 챕터 디렉토리에서 `docker compose up --build`)
+>
+> | 개념서 장 | 실습 챕터 | 컨테이너 |
+> |---|---|---|
+> | 1~2장 | `spring/chapter04-spring-boot-intro` | `spring-ch04-intro` (DB 불필요) |
+> | 3장 | `spring/chapter05-spring-web` | `spring-ch05-web` (DB 불필요) |
+> | 4장 | `spring/chapter06-spring-data-jpa` | `spring-ch06-jpa` + `spring-ch06-postgres` |
+> | 5장 | `spring/chapter07-spring-security` | `spring-ch07-security` + `spring-ch07-postgres` |
+> | 6장 | `spring/chapter08-testing` | `spring-ch08-testing` + `spring-ch08-postgres` |
+> | 7장 | `spring/docker` (공통 인프라) | `spring-postgres`, `spring-redis`, `spring-adminer`(8081) |
+> | 8장 | `spring/chapter09-final-project` | `spring-ch09-board` + `spring-ch09-postgres`/`-redis`/`-adminer` |
+
+## 학습 목표
+
+이 책을 다 읽고 나면 다음 질문에 스스로 답할 수 있다.
+
+- 왜 Spring은 객체를 대신 만들어주는가? (IoC/DI)
+- `@Transactional`은 실제로 무엇이 실행하는가? (프록시와 AOP)
+- 서버는 왜 싱글톤 Bean에 상태를 저장하면 안 되는가? (thread-per-request)
+- 왜 Controller에 비즈니스 로직을 넣으면 안 되는가? (레이어드 아키텍처)
+- `WHERE email = ?`는 왜 그렇게 빠른가, `@Transactional`이 보장하는 ACID는 무엇인가? (JPA와 DB 이론)
+- 비밀번호는 왜 "복호화할 수 없게" 저장하는가, JWT 서명의 정체는 무엇인가? (보안과 암호학)
+- 왜 테스트를 작성하고, 왜 Docker로 배포하는가?
+
+## 이 책의 대상
+
+- Java 기본 문법과 OOP를 알지만 Spring은 처음이거나 "어노테이션을 외워서" 쓰고 있는 개발자
+- HTTP·SQL을 어렴풋이 알고, 이제 "왜"를 이해하고 싶은 학생/주니어
+- 면접에서 "프록시 self-invocation", "N+1", "격리 수준", "대칭/비대칭 키"를 설명해야 하는 사람
+
+> 사전 지식(Java, OOP, HTTP, SQL)은 [들어가며](00-들어가며.md)에서 안내한다. 완벽할 필요는 없다 — 필요한 부분은 각 장에서 다시 짚는다.
+
+---
+
+## 목차
+
+| 장 | 제목 | 한 줄 설명 |
+|----|------|-----------|
+| — | [들어가며](00-들어가며.md) | 이 책의 목적, 사전 지식, 웹 애플리케이션의 기본 구조 |
+| 1 | [Spring이 해결하는 문제](01-spring이-해결하는-문제.md) | Servlet/EJB의 고통 → Spring → Spring Boot, "왜 이 기술이 태어났는가" |
+| 2 | [IoC/DI - Spring의 심장](02-ioc-di-프록시-aop-멀티스레드.md) | 제어의 역전, 생성자 주입, Bean, **프록시·AOP·리플렉션**, thread-per-request |
+| 3 | [웹 애플리케이션의 구조](03-웹-애플리케이션-구조.md) | HTTP/REST, DispatcherServlet 흐름, 레이어드 아키텍처, DTO, Validation |
+| 4 | [데이터베이스와 JPA](04-데이터베이스와-jpa.md) | ORM/Entity/영속성 컨텍스트, 연관관계·N+1, **ACID·격리 수준·B-tree 인덱스** |
+| 5 | [보안 - Spring Security](05-보안-spring-security.md) | 인증/인가, BCrypt·솔트, 세션 vs JWT, **해싱 vs 암호화, HMAC·대칭/비대칭** |
+| 6 | [테스트](06-테스트.md) | 테스트의 가치, 단위 vs 통합, Mock, Testcontainers, Given-When-Then |
+| 7 | [Docker](07-docker.md) | "내 컴퓨터에서는 되는데" 문제, 이미지/컨테이너, Compose, 멀티 스테이지 빌드 |
+| 8 | [전체 그림](08-전체-그림.md) | 모든 개념이 하나의 요청에서 어떻게 연결되는가 + 마무리(좋은 개발자가 되려면) |
+
+각 장은 **도입(문제 제기) → 개념/원리/다이어그램/코드/실행 연결 → ⚠️ 흔한 오해와 함정 → 연습문제 → 요약** 순서로 구성된다.
+
+---
+
+## 추천 학습 순서
+
+**정독(처음 읽는 경우):** 순서대로 읽는 것을 권한다. 각 장은 앞 장의 개념 위에 쌓이도록 설계되었다. 특히 **2장(IoC/DI·프록시)은 나머지 모든 장의 토대**이므로 건너뛰지 말 것.
+
+```
+들어가며 → 1장 → 2장 → 3장 → 4장 → 5장 → 6장 → 7장 → 8장
+(왜 필요) (문제)  (심장)  (구조)  (데이터) (보안)  (검증)  (배포)  (전체 그림)
+```
+
+**속성(맥락은 있는 경우):**
+- Spring이 왜 그렇게 생겼는지 궁금하다면 → 1장 → 2장
+- 어노테이션이 마법처럼 느껴진다면 → 2.6(프록시·AOP) → 2.7(멀티스레드)
+- JPA에서 성능 문제를 겪는다면 → 4.4(N+1) → 4.7(인덱스) → 4.8(커넥션 풀)
+- JWT/보안을 정리하고 싶다면 → 5장 전체(특히 5.6·5.7)
+- "그래서 이게 다 어떻게 이어지지?" → 8장부터 읽고 필요한 장으로 되돌아가기
+
+**실습 병행:** 각 장에서 언급하는 `chapter0X` 모듈을 함께 실행해보면 개념이 손에 잡힌다. 2장을 읽을 때는 반드시 `chapter06-spring-data-jpa`를 실행해 `ProxyRevealRunner`의 로그를 눈으로 확인하자.
+
+---
+
+> **"시작이 반이다. 하지만 나머지 반은 계속하는 것이다."**
+
+[들어가며부터 시작하기 →](00-들어가며.md)

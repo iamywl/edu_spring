@@ -1,0 +1,27 @@
+{
+  "name": "Java 실습 샌드박스",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "java-sandbox",
+  "workspaceFolder": "/app",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "redhat.java",
+        "vscjava.vscode-java-debug",
+        "vscjava.vscode-java-test"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "java.compile.nullAnalysis.mode": "automatic",
+        "editor.fontSize": 14,
+        "editor.tabSize": 4
+      }
+    }
+  },
+
+  "postStartCommand": "bash /app/compile.sh",
+
+  "remoteUser": "root"
+}

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+  ============================================================================
+  [TODO 2 정답 - JUnit DaoTest 100% 통과 버전]
+  ★ 중3 눈높이 설명:
+  1. <mapper> 는 큰 박스! 그 안에 반드시 <select>, <insert> 작은 상자를 만들고 SQL을 적으세요!
+  2. id="selectAll", id="insert" 는 NoticeDao.java 안의 함수 이름과 100% 똑같아야 합니다.
+  3. schema.sql 실제 컬럼명이 pinned 이므로 그대로 적습니다.
+     (만약 시험장 schema.sql에서 컬럼명이 is_pinned 라면 'is_pinned AS pinned' 로 바꾸세요!)
+  ============================================================================
+-->
+<mapper namespace="com.ssafy.sample.model.dao.NoticeDao">
+
+    <!-- 1. 전체 목록 조회 (notice_id 오름차순: ORDER BY notice_id ASC) -->
+    <select id="selectAll" resultType="Notice">
+        SELECT notice_id, cat_id, mno, title, content, view_count, pinned, status, created_at
+        FROM notice
+        ORDER BY notice_id ASC
+    </select>
+
+    <!-- 2. 신규 공지 등록 + 방금 생긴 번호(AUTO_INCREMENT)를 notice.noticeId 에 자동 저장 -->
+    <insert id="insert" parameterType="Notice" useGeneratedKeys="true" keyProperty="noticeId">
+        INSERT INTO notice (cat_id, mno, title, content)
+        VALUES (#{catId}, #{mno}, #{title}, #{content})
+    </insert>
+
+</mapper>

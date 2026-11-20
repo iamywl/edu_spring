@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+  ============================================================================
+  [TODO 2 정답] NoticeMapper.xml (SQL 레시피북)
+  - ★★★ 중요: 명세서 텍스트에는 'is_pinned AS pinned'라고 적혀 있으나,
+    실제 schema.sql 테이블의 컬럼명은 'pinned' 입니다!
+    실제 DB 컬럼명이 pinned 이므로 그대로 SELECT 하면 map-underscore-to-camel-case=true로 자동 매핑됩니다.
+    (만약 실제 시험 schema.sql에서 컬럼명이 is_pinned 라면 'is_pinned AS pinned'로 적으세요!)
+  ============================================================================
+-->
+<mapper namespace="com.ssafy.sample.model.dao.NoticeDao">
+
+    <!-- 1. 전체 공지사항 목록 조회 (notice_id 오름차순) -->
+    <select id="selectAll" resultType="Notice">
+        SELECT notice_id, cat_id, mno, title, content, view_count, pinned, status, created_at
+        FROM notice
+        ORDER BY notice_id ASC
+    </select>
+
+    <!-- 2. 신규 공지사항 등록 + 생성된 PK를 notice.noticeId에 자동 주입 -->
+    <insert id="insert" parameterType="Notice" useGeneratedKeys="true" keyProperty="noticeId">
+        INSERT INTO notice (cat_id, mno, title, content)
+        VALUES (#{catId}, #{mno}, #{title}, #{content})
+    </insert>
+
+</mapper>

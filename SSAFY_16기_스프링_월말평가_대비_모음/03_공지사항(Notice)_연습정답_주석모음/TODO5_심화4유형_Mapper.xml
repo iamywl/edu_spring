@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+  ============================================================================
+  [심화 4유형 MyBatis Mapper XML 복붙 모음]
+  - 심화 1: 1:1 작성자 조인 (<resultMap> + <association> + INNER JOIN)
+  - 심화 2: 조건별 동적 검색 (<where> + <if>)
+  - 심화 3: 조회수 +1 증가 (UPDATE)
+  - 심화 4: 숨김 상태 변경 (UPDATE status = 'HIDDEN')
+  ============================================================================
+-->
+<mapper namespace="com.ssafy.sample.model.dao.NoticeDao">
+
+    <!-- [심화 1] 공지(Notice) 안에 작성자(Member) 객체까지 쏙 넣어주는 연결표 -->
+    <resultMap id="NoticeWithMemberMap" type="Notice">
+        <id column="notice_id" property="noticeId"/>
+        <result column="cat_id" property="catId"/>
+        <result column="mno" property="mno"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="view_count" property="viewCount"/>
+        <result column="pinned" property="pinned"/>
+        <result column="status" property="status"/>
+        <result column="created_at" property="createdAt"/>
+        <!-- 1:1 조인 핵심! Notice 클래스의 'private Member member;' 필드에 자동 조립 -->
+        <association property="member" javaType="com.ssafy.sample.model.dto.Member">
+            <id column="m_mno" property="mno"/>
+            <result column="m_name" property="name"/>
+            <result column="m_email" property="email"/>
+            <result column="m_role" property="role"/>
+        </association>
+    </resultMap>
+
+    <!-- [심화 1] 1:1 작성자 조인 상세 조회 -->
+    <select id="selectDetailWithMember" resultMap="NoticeWithMemberMap">
+        SELECT
+            n.notice_id, n.cat_id, n.mno, n.title, n.content,
+            n.view_count, n.pinned, n.status, n.created_at,
+            m.mno AS m_mno, m.name AS m_name, m.email AS m_email, m.role AS m_role
+        FROM notice n
+        INNER JOIN member m ON n.mno = m.mno
+        WHERE n.notice_id = #{noticeId}
+    </select>
+
+    <!-- [심화 2] 조건별 동적 검색 (<where>가 맨 앞 AND를 알아서 지워줌!) -->
+    <select id="searchNotices" parameterType="com.ssafy.sample.model.dto.NoticeSearchCondition" resultType="Notice">
+        SELECT notice_id, cat_id, mno, title, content, view_count, pinned, status, created_at
+        FROM notice
+        <where>
+            <if test="title != null and title != ''">
+                AND title LIKE CONCAT('%', #{title}, '%')
+            </if>
+            <if test="catId != null">
+                AND cat_id = #{catId}
+            </if>
+            <if test="pinned != null">
+                AND pinned = #{pinned}
+            </if>
+        </where>
+        ORDER BY notice_id ASC
+    </select>
+
+    <!-- [심화 3] 조회수 +1 증가 -->
+    <update id="increaseViewCount">
+        UPDATE notice
+        SET view_count = view_count + 1
+        WHERE notice_id = #{noticeId}
+    </update>
+
+    <!-- [심화 4] 상태 'HIDDEN' 변경 -->
+    <update id="hideNotice">
+        UPDATE notice
+        SET status = 'HIDDEN'
+        WHERE notice_id = #{noticeId}
+    </update>
+
+</mapper>
